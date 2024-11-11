@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
+import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
+import farmerRoutes from "./routes/farmerRoutes.js";
 
 dotenv.config();
 
@@ -15,6 +17,12 @@ app.use(cookieParser());
 //middleware for parsing JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use("/api/farmer", farmerRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
 
 //Starting the server
 const PORT = process.env.PORT || 5000;
