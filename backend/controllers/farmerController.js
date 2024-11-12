@@ -44,6 +44,53 @@ const farmerRegister = asyncHandler(async (req, res) => {
 });
 
 //auth Farmer
-const farmerLogin = asyncHandler(async (req, res) => {});
+const farmerLogin = asyncHandler(async (req, res) => {
+  const { phoneNumber, password } = req.body;
 
-export { farmerLogin, farmerRegister };
+  if (!phoneNumber || !password) {
+    res.status(400);
+    throw new Error("Enter required fields");
+  }
+
+  const farmer = await Farmer.findOne({ phoneNumber });
+  if (farmer) {
+    if (await bcrypt.compare(password, farmer.password)) {
+      generateToken(res, farmer._id, "farmer");
+      res.status(200).json({
+        message: "Farmer login successful",
+        data: {
+          id: farmer._id,
+          name: farmer.name,
+          phoneNumber: farmer.phoneNumber,
+        },
+      });
+    } else {
+      res.status(401);
+      throw new Error("Invalid Password");
+    }
+  } else {
+    res.status(401);
+    throw new Error("Account not registered");
+  }
+});
+
+// Add address fields
+const updateAddress = asyncHandler(async (req, res) => {
+  const { street, city, country, postalCode } = req.body;
+  if ((!street, !city, !country, !postalCode)) {
+    res.status(400);
+    throw new Error("Enter all fields");
+  }
+
+  try {
+    await Farmer.findByIdAndUpdate(req.farmerId, {
+      address: { street, city, country, postalCode },
+    });
+    res.status(200).json({ message: "Address updated" });
+  } catch (err) {
+    res.status(400);
+    throw new Error("Updating Address error occurred");
+  }
+});
+
+export { farmerLogin, farmerRegister, updateAddress };
