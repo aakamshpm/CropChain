@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
+import fs from "fs";
 import generateToken from "../utils/generateToken.js";
 import Farmer from "../models/Farmer.js";
 
@@ -93,4 +94,32 @@ const updateAddress = asyncHandler(async (req, res) => {
   }
 });
 
-export { farmerLogin, farmerRegister, updateAddress };
+// Add profile picture
+const updateProfilePicture = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    res.status(400);
+    throw new Error("No image uploaded");
+  }
+
+  const farmer = await Farmer.findById(req.farmerId);
+  try {
+    // update existing profile picture
+    if (farmer.profilePicture) {
+      fs.unlinkSync(`./uploads/profile-pictures/${farmer.profilePicture}`);
+    }
+
+    // add new profile picture
+    farmer.profilePicture = req.file.filename;
+    await farmer.save();
+
+    res.status(200).json({
+      message: "Profile picture updated successfuly",
+      profilePicture: farmer.profilePicture,
+    });
+  } catch (error) {
+    res.status(500);
+    throw new Error("Something went wrong");
+  }
+});
+
+export { farmerLogin, farmerRegister, updateAddress, updateProfilePicture };
