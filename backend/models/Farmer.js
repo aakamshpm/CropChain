@@ -4,7 +4,7 @@ const farmerSchema = mongoose.Schema(
   {
     // Personal Details
     name: { type: String, required: true },
-    phoneNumber: { type: Number, required: true },
+    phoneNumber: { type: Number, required: true, unique: true },
     password: { type: String, required: true },
     address: {
       street: { type: String },
@@ -32,7 +32,7 @@ const farmerSchema = mongoose.Schema(
         description: { type: String },
         pricePerKg: { type: Number },
         quantityAvailableInKg: { type: String },
-        category: { type: String },
+        category: { type: String }, //unique categories to be implemented in frontend. TODO: add enum
         harvestDate: { type: Date },
         images: [{ type: String }],
       },

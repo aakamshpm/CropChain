@@ -122,4 +122,104 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
   }
 });
 
-export { farmerLogin, farmerRegister, updateAddress, updateProfilePicture };
+//add a farm
+const addFarm = asyncHandler(async (req, res) => {
+  const { farmName, farmLocation, farmSizeInAcres, cropsGrown } = req.body;
+
+  try {
+    await Farmer.findByIdAndUpdate(req.farmerId, {
+      farmName,
+      farmLocation: {
+        latitude: farmLocation?.latitude,
+        longitude: farmLocation?.longitude,
+      },
+      farmSizeInAcres,
+      cropsGrown,
+    });
+    res.status(200).json({ message: "Farm details updated!" });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+// add products to sell
+const addProduct = asyncHandler(async (req, res) => {
+  try {
+    await Farmer.findByIdAndUpdate(
+      req.farmerId,
+      {
+        $push: { products: req.body },
+      },
+      { new: true }
+    );
+    res.status(200).json({ message: "Product added successfuly" });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+const updateProduct = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+  try {
+    const product = await Farmer.findOne({
+      _id: req.farmerId,
+      "products._id": productId,
+    });
+    if (!product) {
+      res.status(400);
+      throw new Error("No product found!");
+    }
+
+    await Farmer.updateOne(
+      {
+        _id: req.farmerId,
+        "products._id": productId,
+      },
+      {
+        $set: req.body,
+      }
+    );
+    res.status(200).json({ message: "Product updated" });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+const removeProduct = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+  try {
+    const product = await Farmer.findOne({
+      _id: req.farmerId,
+      "products._id": productId,
+    });
+    if (!product) {
+      res.status(400);
+      throw new Error("No product found");
+    }
+    await Farmer.findByIdAndUpdate(
+      req.farmerId,
+      {
+        $pull: { products: { _id: productId } },
+      },
+      { new: true }
+    );
+    res.status(200).json({ message: "Product removed" });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+export {
+  farmerLogin,
+  farmerRegister,
+  updateAddress,
+  updateProfilePicture,
+  addFarm,
+  addProduct,
+  updateProduct,
+  removeProduct,
+};
