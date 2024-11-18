@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import fs from "fs";
 import generateToken from "../utils/generateToken.js";
 import Farmer from "../models/Farmer.js";
+import Product from "../models/Product.js";
 
 //register Farmer
 const farmerRegister = asyncHandler(async (req, res) => {
@@ -143,75 +144,8 @@ const addFarm = asyncHandler(async (req, res) => {
   }
 });
 
-// add products to sell
-const addProduct = asyncHandler(async (req, res) => {
-  try {
-    await Farmer.findByIdAndUpdate(
-      req.farmerId,
-      {
-        $push: { products: req.body },
-      },
-      { new: true }
-    );
-    res.status(200).json({ message: "Product added successfuly" });
-  } catch (err) {
-    res.status(500);
-    throw new Error(err.message);
-  }
-});
-
-const updateProduct = asyncHandler(async (req, res) => {
-  const { productId } = req.params;
-  try {
-    const product = await Farmer.findOne({
-      _id: req.farmerId,
-      "products._id": productId,
-    });
-    if (!product) {
-      res.status(400);
-      throw new Error("No product found!");
-    }
-
-    await Farmer.updateOne(
-      {
-        _id: req.farmerId,
-        "products._id": productId,
-      },
-      {
-        $set: req.body,
-      }
-    );
-    res.status(200).json({ message: "Product updated" });
-  } catch (err) {
-    res.status(500);
-    throw new Error(err.message);
-  }
-});
-
-const removeProduct = asyncHandler(async (req, res) => {
-  const { productId } = req.params;
-  try {
-    const product = await Farmer.findOne({
-      _id: req.farmerId,
-      "products._id": productId,
-    });
-    if (!product) {
-      res.status(400);
-      throw new Error("No product found");
-    }
-    await Farmer.findByIdAndUpdate(
-      req.farmerId,
-      {
-        $pull: { products: { _id: productId } },
-      },
-      { new: true }
-    );
-    res.status(200).json({ message: "Product removed" });
-  } catch (err) {
-    res.status(500);
-    throw new Error(err.message);
-  }
-});
+// get farmer details
+const farmerDetails = asyncHandler(async (req, res) => {});
 
 export {
   farmerLogin,
@@ -219,7 +153,4 @@ export {
   updateAddress,
   updateProfilePicture,
   addFarm,
-  addProduct,
-  updateProduct,
-  removeProduct,
 };
