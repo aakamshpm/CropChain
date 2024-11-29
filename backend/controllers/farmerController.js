@@ -145,7 +145,18 @@ const addFarm = asyncHandler(async (req, res) => {
 });
 
 // get farmer details
-const farmerDetails = asyncHandler(async (req, res) => {});
+const getFarmerDetails = asyncHandler(async (req, res) => {
+  try {
+    const farmer = await Farmer.findById(req.farmerId).select("-password");
+    res.status(200).json({ data: farmer });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+// get farmer details (consumer/retailer side)
+const getFarmerDetailsByProduct = asyncHandler(async (req, res) => {});
 
 export {
   farmerLogin,
@@ -153,4 +164,5 @@ export {
   updateAddress,
   updateProfilePicture,
   addFarm,
+  getFarmerDetails,
 };
