@@ -7,7 +7,7 @@ import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 import farmerRoutes from "./routes/farmerRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import retailerRoutes from "./routes/retailerRoutes.js";
-// import orderRoutes from "./routes/orderRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 dotenv.config();
 
@@ -29,7 +29,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/farmer", farmerRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/retailer", retailerRoutes);
-// app.use("/api/order", orderRoutes);
+app.use("/api/order", orderRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -1,24 +1,27 @@
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 
-const protect = (role) => {
+const protect = (allowedRoles = []) => {
   return asyncHandler(async (req, res, next) => {
     let token = req.cookies.jwt;
 
     if (token) {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (decoded.role !== role) {
+
+        // Check if user role is allowed
+        if (allowedRoles.length && !allowedRoles.includes(decoded.role)) {
           res.status(403);
-          throw new Error("Invalid role");
+          throw new Error("Access denied: Invalid role");
         }
-        if (role === "farmer") {
-          req.farmerId = decoded.userId;
-        } else if (role === "consumer") {
-          req.consumerId = decoded.userId;
-        } else if (role === "retailer") {
-          req.retailerId = decoded.userId;
-        }
+
+        req.userRole = decoded.role;
+        req.userId = decoded.userId;
+
+        if (decoded.role === "farmer") req.farmerId = decoded.userId;
+        else if (decoded.role === "consumer") req.consumerId = decoded.userId;
+        else if (decoded.role === "retailer") req.retailerId = decoded.userId;
+
         next();
       } catch (error) {
         res.status(401);

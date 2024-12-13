@@ -12,9 +12,9 @@ import {
 const router = express.Router();
 
 router.get("/", getAllProducts);
-router.get("/farmer", protect("farmer"), getProductsByFarmer);
-router.post("/add", protect("farmer"), addProduct);
-router.post("/update/:productId", protect("farmer"), updateProduct);
-router.delete("/remove/:productId", protect("farmer"), removeProduct);
+router.get("/farmer", protect(["farmer"]), getProductsByFarmer);
+router.post("/add", protect(["farmer"]), addProduct);
+router.post("/update/:productId", protect(["farmer"]), updateProduct);
+router.delete("/remove/:productId", protect(["farmer"]), removeProduct);
 
 export default router;

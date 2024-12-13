@@ -15,15 +15,15 @@ const router = express.Router();
 router.post("/register", farmerRegister);
 router.post("/auth", farmerLogin);
 
-router.get("/", protect("farmer"), getFarmerDetails);
-router.post("/update-address", protect("farmer"), updateAddress);
+router.get("/", protect(["farmer"]), getFarmerDetails);
+router.post("/update-address", protect(["farmer"]), updateAddress);
 router.post(
   "/upload-profile-picture",
-  protect("farmer"),
+  protect(["farmer"]),
   upload.single("profilePicture"),
   updateProfilePicture
 );
 
-router.post("/add-farm", protect("farmer"), addFarm);
+router.post("/add-farm", protect(["farmer"]), addFarm);
 
 export default router;
