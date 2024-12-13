@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { Link } from "react-router-dom";
+import { farmerLogin } from "../api/farmerApi";
 
 const Login = () => {
   const [data, setData] = useState({
@@ -9,8 +10,13 @@ const Login = () => {
     password: "",
   });
 
-  const onLogin = () => {
-    console.log(data);
+  const onLogin = async () => {
+    try {
+      const response = await farmerLogin(data);
+      console.log(response);
+    } catch (err) {
+      console.log(err.response.data.message);
+    }
   };
   return (
     <div>
