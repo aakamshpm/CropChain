@@ -5,7 +5,7 @@ import generateToken from "../utils/generateToken.js";
 
 const registerRetailer = asyncHandler(async (req, res) => {
   try {
-    const { name, phoneNumber, password, address } = req.body;
+    const { name, phoneNumber, password, address } = req.body; // TODO:: add shop address
 
     if (!name || !phoneNumber || !password) {
       res.status(400);
@@ -38,13 +38,13 @@ const registerRetailer = asyncHandler(async (req, res) => {
 
 const loginRetailer = asyncHandler(async (req, res) => {
   try {
-    const { mobileNumber, password } = req.body;
-    if (!mobileNumber || !password) {
+    const { phoneNumber, password } = req.body;
+    if (!phoneNumber || !password) {
       res.status(400);
       throw new Error("Enter required fields");
     }
 
-    const retailer = await Retailer.findOne({ mobileNumber });
+    const retailer = await Retailer.findOne({ phoneNumber });
     if (retailer) {
       if (await bcrypt.compare(password, retailer.password)) {
         generateToken(res, retailer._id, "farmer");
@@ -63,4 +63,22 @@ const loginRetailer = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerRetailer, loginRetailer };
+const getRetailerDetails = asyncHandler(async (req, res) => {
+  try {
+    const retailer = await Retailer.findById(req.retailerId).select(
+      "-password"
+    );
+
+    if (!retailer) {
+      res.status(400);
+      throw new Error("Retailer not found");
+    }
+
+    res.status(200).json({ data: retailer });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+export { registerRetailer, loginRetailer, getRetailerDetails };

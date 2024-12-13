@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const retailerSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
-    mobileNumber: { type: String, required: true, unique: true },
+    phoneNumber: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     address: {
       street: { type: String },
@@ -14,14 +14,16 @@ const retailerSchema = mongoose.Schema(
     },
 
     // Shop Details
-    shopeAddress: {
-      shopName: { type: String, required: true },
-      city: { type: String, required: true },
-      state: { type: String, requierd: true },
-      postalCode: { type: String, required: true },
+
+    //TODO:: add required in these fields
+    shopAddress: {
+      shopName: { type: String },
+      city: { type: String },
+      state: { type: String },
+      postalCode: { type: String },
       country: { type: String, default: "India" },
     },
-    shopCategory: { type: String, required: true }, // eg. Grocery
+    shopCategory: { type: String }, // eg. Grocery
 
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }], // Reference to the order placed by retailer
   },
