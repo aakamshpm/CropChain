@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { farmerLogin } from "../api/farmerApi";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { farmerLogin } from "../api/farmerApi";
 
 const Login = () => {
   const [data, setData] = useState({

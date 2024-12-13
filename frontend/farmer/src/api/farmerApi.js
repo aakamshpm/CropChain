@@ -5,4 +5,9 @@ const farmerLogin = async (credentials) => {
   return response.data;
 };
 
-export { farmerLogin };
+const farmerRegister = async (credentials) => {
+  const response = await api.post("farmer/register", credentials);
+  return response.data;
+};
+
+export { farmerLogin, farmerRegister };
