@@ -1,4 +1,5 @@
 import { createRoot } from "react-dom/client";
+import { SnackbarProvider } from "notistack";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -20,5 +21,7 @@ export const router = createBrowserRouter(
 );
 
 createRoot(document.getElementById("root")).render(
-  <RouterProvider router={router} />
+  <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
+    <RouterProvider router={router} />
+  </SnackbarProvider>
 );

@@ -1,0 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&family=Volkhov:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&family=Volkhov:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .input-field {
+    @apply border-[1px] border-primary-color px-6 py-2 rounded-md mb-3 mt-1;
+  }
+  input:focus {
+    @apply outline-none;
+  }
+
+  .btn-primary {
+    @apply outline-none bg-primary-color py-2 px-4 rounded-lg text-white transition-transform hover:scale-105 duration-200 ease-in-out font-secondary;
+  }
+}
+
+* {
+  font-family: "Outfit" sans-serif;
+}
