@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import PhoneInput from "react-phone-number-input";
 import { useSnackbar } from "notistack";
-import { farmerRegister } from "../api/farmerApi";
+import { registerFarmer } from "../auth/authActions";
 import "react-phone-number-input/style.css";
 
 const Register = () => {
@@ -12,18 +13,31 @@ const Register = () => {
     password: "",
   });
 
+  const { loading, error, success, userInfo } = useSelector(
+    (state) => state.auth
+  );
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { enqueueSnackbar } = useSnackbar();
 
-  const onRegister = async () => {
-    try {
-      const response = await farmerRegister(data);
+  const onRegister = () => {
+    dispatch(registerFarmer(data));
+  };
+
+  useEffect(() => {
+    if (success) {
       enqueueSnackbar("Register success", { variant: "success" });
-    } catch (err) {
-      enqueueSnackbar(err?.response?.data?.message || err?.message, {
+      navigate("/");
+    }
+
+    if (error) {
+      enqueueSnackbar(error, {
         variant: "error",
       });
     }
-  };
+  }, [success, error, dispatch]);
 
   return (
     <div className="flex items-center justify-center h-screen">

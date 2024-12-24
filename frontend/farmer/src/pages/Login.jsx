@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { farmerLogin } from "../api/farmerApi";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-number-input";
+import { loginFarmer } from "../auth/authActions";
 import "react-phone-number-input/style.css";
 import { useSnackbar } from "notistack";
+import { useDispatch, useSelector } from "react-redux";
 
 const Login = () => {
   const [data, setData] = useState({
@@ -11,19 +12,32 @@ const Login = () => {
     password: "",
   });
 
+  const { loading, error, success, userInfo } = useSelector(
+    (state) => state.auth
+  );
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { enqueueSnackbar } = useSnackbar();
 
-  const onLogin = async () => {
-    try {
-      const response = await farmerLogin(data);
+  const onLogin = () => {
+    dispatch(loginFarmer(data));
+  };
+
+  useEffect(() => {
+    if (success) {
       enqueueSnackbar("Login success", { variant: "success" });
-    } catch (err) {
-      console.log(err.message);
-      enqueueSnackbar(err?.response?.data?.message || err?.message, {
+      navigate("/");
+    }
+
+    if (error) {
+      enqueueSnackbar(error, {
         variant: "error",
       });
     }
-  };
+  }, [success, error, dispatch]);
+
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="flex flex-col items-center justify-center p-8 border-[1px] border-black rounded-lg">
