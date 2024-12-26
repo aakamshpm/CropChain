@@ -26,13 +26,14 @@ const farmerRegister = asyncHandler(async (req, res) => {
       password: hashedPassword,
     });
     if (farmer) {
-      generateToken(res, farmer._id, "farmer");
+      const token = generateToken(res, farmer._id, "farmer");
       res.status(200).json({
         message: "Farmer registration successful",
         data: {
           id: farmer._id,
           name: farmer.name,
           phoneNumber: farmer.phoneNumber,
+          token,
         },
       });
     } else {
@@ -57,13 +58,14 @@ const farmerLogin = asyncHandler(async (req, res) => {
   const farmer = await Farmer.findOne({ phoneNumber });
   if (farmer) {
     if (await bcrypt.compare(password, farmer.password)) {
-      generateToken(res, farmer._id, "farmer");
+      const token = generateToken(res, farmer._id, "farmer");
       res.status(200).json({
         message: "Farmer login successful",
         data: {
           id: farmer._id,
           name: farmer.name,
           phoneNumber: farmer.phoneNumber,
+          token,
         },
       });
     } else {
