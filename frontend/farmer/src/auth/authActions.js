@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-const backendURL = "http://localhost:8000/api/farmer";
+const farmerURL = "http://localhost:8000/api/farmer";
 
 const config = {
   headers: {
@@ -14,7 +14,10 @@ const registerFarmer = createAsyncThunk(
   "auth/register",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${backendURL}/register`, data, config);
+      const response = await axios.post(`${farmerURL}/register`, data, {
+        ...config,
+        withCredentials: true,
+      });
       localStorage.setItem("token", response.data.data.token);
       return response.data.data;
     } catch (err) {
@@ -28,7 +31,11 @@ const loginFarmer = createAsyncThunk(
   "auth/login",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${backendURL}/auth`, data, config);
+      const response = await axios.post(`${farmerURL}/auth`, data, {
+        ...config,
+        withCredentials: true,
+      });
+      console.log(response);
       localStorage.setItem("token", response.data.data.token);
       return response.data.data;
     } catch (error) {
