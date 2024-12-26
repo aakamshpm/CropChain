@@ -9,15 +9,25 @@ import {
   Route,
 } from "react-router-dom";
 import App from "./App.jsx";
+import PublicRoutes from "./components/routes/PublicRoutes.jsx";
+import ProtectedRoutes from "./components/routes/ProtectedRoutes.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import Home from "./pages/Home.jsx";
 import "./index.css";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route element={<PublicRoutes />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
+
+      {/* Protected Routes */}
+      <Route element={<ProtectedRoutes />}>
+        <Route index element={<Home />} />
+      </Route>
     </Route>
   )
 );

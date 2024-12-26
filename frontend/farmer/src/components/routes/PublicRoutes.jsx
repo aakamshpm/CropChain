@@ -1,5 +1,8 @@
+import { Navigate, Outlet } from "react-router-dom";
+import { isAuthenticated } from "../../auth/authUtils";
+
 const PublicRoutes = () => {
-  return <div>PublicRoutes</div>;
+  return isAuthenticated() ? <Navigate to="/" /> : <Outlet />;
 };
 
 export default PublicRoutes;

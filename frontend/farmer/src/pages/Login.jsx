@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import PhoneInput from "react-phone-number-input";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { loginFarmer } from "../auth/authActions";
-import "react-phone-number-input/style.css";
 import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
+import { useForm } from "react-hook-form";
+import * as Yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import "react-phone-number-input/style.css";
 
 const Login = () => {
   const [data, setData] = useState({
@@ -15,6 +18,24 @@ const Login = () => {
   const { loading, error, success, userInfo } = useSelector(
     (state) => state.auth
   );
+
+  const formSchema = Yup.object().shape({
+    phoneNumber: Yup.string()
+      .required("Phone is required")
+      .test("is-valid-phone", "Invalid phone number", (value) =>
+        isValidPhoneNumber(data.phoneNumber)
+      ),
+    password: Yup.string().required("Password is required"),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm({ mode: "onChange", resolver: yupResolver(formSchema) });
+
+  watch();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -51,17 +72,24 @@ const Login = () => {
             name="phoneNumber"
             className="input-field"
             placeholder="Enter your phone number"
+            {...register("phoneNumber")}
             value={data.phoneNumber}
             onChange={(value) => {
               setData((prev) => ({ ...prev, phoneNumber: value }));
             }}
           />
-          <label htmlFor="password">Password</label>
+          {errors.phoneNumber && (
+            <p className="text-xs text-red-600 mt-1">
+              {errors.phoneNumber.message}
+            </p>
+          )}
 
+          <label htmlFor="password">Password</label>
           <input
             name="password"
             value={data.password}
             className="input-field"
+            {...register("password")}
             onChange={(e) =>
               setData((prev) => {
                 return {
@@ -73,8 +101,13 @@ const Login = () => {
             type="password"
             placeholder="Enter your password"
           />
+          {errors.password && (
+            <p className="text-xs text-red-600 mt-1">
+              {errors.password.message}
+            </p>
+          )}
         </div>
-        <button className="btn-primary" onClick={onLogin}>
+        <button className="btn-primary" onClick={handleSubmit(onLogin)}>
           Login
         </button>
         <p className="mt-3">

@@ -7,8 +7,9 @@
 
 @layer components {
   .input-field {
-    @apply border-[1px] border-primary-color px-6 py-2 rounded-md mb-3 mt-1;
+    @apply border-[1px] w-[20rem] border-primary-color px-6 py-2 rounded-md mt-1;
   }
+
   input:focus {
     @apply outline-none;
   }
