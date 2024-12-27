@@ -24,35 +24,6 @@ const farmerSchema = mongoose.Schema(
     },
     farmSizeInAcres: { type: Number },
     cropsGrown: [{ type: String }],
-
-    // Product Details
-    products: [
-      {
-        name: { type: String },
-        description: { type: String },
-        pricePerKg: { type: Number },
-        quantityAvailableInKg: { type: String },
-        category: { type: String }, //unique categories to be implemented in frontend. TODO: add enum
-        harvestDate: { type: Date },
-        images: [{ type: String }],
-      },
-    ],
-
-    // Transaction Details
-    transactions: [
-      {
-        buyerId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        productId: { type: mongoose.Schema.Types.ObjectId },
-        quantitySold: { type: Number },
-        totalAmount: { type: Number },
-        status: {
-          type: String,
-          enum: ["Pending", "Completed", "Cancelled"],
-          default: "Pending",
-        },
-        date: { type: Date, default: Date.now },
-      },
-    ],
   },
 
   { timestamps: true }
