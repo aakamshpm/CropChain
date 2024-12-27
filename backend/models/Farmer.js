@@ -13,7 +13,7 @@ const farmerSchema = mongoose.Schema(
       country: { type: String, default: "India" },
       postalCode: { type: String },
     },
-    profilePicture: { type: String, default: null },
+    profilePicture: { type: String, default: "" },
     bio: { type: String, maxLength: 500 },
 
     // Farm Details
