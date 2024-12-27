@@ -10,6 +10,7 @@ export const authApi = createApi({
       query: () => ({
         url: "api/farmer/",
         method: "GET",
+        credentials: "include",
       }),
     }),
   }),

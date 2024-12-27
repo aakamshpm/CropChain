@@ -35,7 +35,6 @@ const loginFarmer = createAsyncThunk(
         ...config,
         withCredentials: true,
       });
-      console.log(response);
       localStorage.setItem("token", response.data.data.token);
       return response.data.data;
     } catch (error) {
@@ -44,4 +43,19 @@ const loginFarmer = createAsyncThunk(
   }
 );
 
-export { registerFarmer, loginFarmer };
+// Logout farmer
+const logoutFarmer = createAsyncThunk(
+  "auth/logout",
+  async (data, { rejectWithValue }) => {
+    try {
+      await axios.post(`${farmerURL}/logout`, {
+        ...config,
+        withCredentials: true,
+      });
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || err?.message);
+    }
+  }
+);
+
+export { registerFarmer, loginFarmer, logoutFarmer };

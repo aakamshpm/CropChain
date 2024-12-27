@@ -12,7 +12,13 @@ const initialState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    logout: (state) => {
+      state.userInfo = {};
+      state.token = "";
+      localStorage.removeItem("token");
+    },
+  },
   extraReducers: (builder) => {
     // register user
     builder.addCase(registerFarmer.pending, (state) => {

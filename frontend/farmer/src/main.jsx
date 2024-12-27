@@ -15,6 +15,7 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Home from "./pages/Home.jsx";
 import "./index.css";
+import Profile from "./pages/Profile.jsx";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,6 +28,7 @@ export const router = createBrowserRouter(
       {/* Protected Routes */}
       <Route element={<ProtectedRoutes />}>
         <Route index element={<Home />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
     </Route>
   )
