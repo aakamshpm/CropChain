@@ -49,7 +49,7 @@ const Login = () => {
   useEffect(() => {
     if (success) {
       enqueueSnackbar("Login success", { variant: "success" });
-      navigate("/");
+      navigate("/farmer");
     }
 
     if (error) {
@@ -112,7 +112,7 @@ const Login = () => {
         </button>
         <p className="mt-3">
           New to CropChain?{" "}
-          <Link className="underline" to="/register">
+          <Link className="underline" to="/farmer/register">
             Register
           </Link>{" "}
           now!

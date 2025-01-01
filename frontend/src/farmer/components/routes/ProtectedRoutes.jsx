@@ -9,7 +9,7 @@ const ProtectedRoutes = () => {
       <Outlet />
     </div>
   ) : (
-    <Navigate to="/login" />
+    <Navigate to="/farmer/login" />
   );
 };
 

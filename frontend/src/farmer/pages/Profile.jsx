@@ -28,7 +28,7 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    if (!isLoading) {
+    if (response) {
       const {
         data: {
           name,
@@ -63,11 +63,12 @@ const Profile = () => {
         },
       });
     }
+    refetch();
   }, [response]);
 
   const onChangeHandler = (e) => {};
 
-  if (isLoading) {
+  if (!response) {
     return <p>Loading ...</p>;
   }
 

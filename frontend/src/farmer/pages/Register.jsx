@@ -53,7 +53,7 @@ const Register = () => {
   useEffect(() => {
     if (success) {
       enqueueSnackbar("Register success", { variant: "success" });
-      navigate("/");
+      navigate("/farmer");
     }
 
     if (error) {
@@ -162,7 +162,7 @@ const Register = () => {
         </button>
         <p className="mt-3">
           Already Registered?
-          <Link className="underline" to="/login">
+          <Link className="underline" to="/farmer/login">
             Login
           </Link>{" "}
           now!

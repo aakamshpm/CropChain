@@ -6,24 +6,25 @@ import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import AddchartOutlinedIcon from "@mui/icons-material/AddchartOutlined";
 
 const Sidebar = () => {
+  const basePath = "/farmer";
   const sidebarOption = [
     {
-      path: "/",
+      path: `${basePath}`,
       icon: <HomeOutlinedIcon />,
       name: "Home",
     },
     {
-      path: "/profile",
+      path: `${basePath}/profile`,
       icon: <PersonOutlineOutlinedIcon />,
       name: "Profile",
     },
     {
-      path: "/products",
+      path: `${basePath}/products`,
       icon: <InventoryOutlinedIcon />,
       name: "Products",
     },
     {
-      path: "/add-product",
+      path: `${basePath}/add-products`,
       icon: <AddchartOutlinedIcon />,
       name: "Add Products",
     },
