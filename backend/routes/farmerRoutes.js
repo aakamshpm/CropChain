@@ -6,6 +6,7 @@ import {
   farmerLogin,
   getFarmerDetails,
   updateAddress,
+  updatePD,
   updateProfilePicture,
 } from "../controllers/farmerController.js";
 import { farmerRegister } from "../controllers/farmerController.js";
@@ -16,6 +17,7 @@ router.post("/register", farmerRegister);
 router.post("/auth", farmerLogin);
 
 router.get("/", protect(["farmer"]), getFarmerDetails);
+router.post("/update-pd", protect(["farmer"]), updatePD);
 router.post("/update-address", protect(["farmer"]), updateAddress);
 router.post(
   "/upload-profile-picture",

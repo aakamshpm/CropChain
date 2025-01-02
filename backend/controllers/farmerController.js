@@ -78,6 +78,19 @@ const farmerLogin = asyncHandler(async (req, res) => {
   }
 });
 
+// Update personal details
+const updatePD = asyncHandler(async (req, res) => {
+  const { name, phoneNumber, bio } = req.body;
+
+  try {
+    await Farmer.findByIdAndUpdate(req.farmerId, { name, phoneNumber, bio });
+    res.status(200).json({ message: "Personal data updated" });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
 // Add address fields
 const updateAddress = asyncHandler(async (req, res) => {
   const { buildingName, street, city, country, postalCode } = req.body;
@@ -163,6 +176,7 @@ const getFarmerDetailsByProduct = asyncHandler(async (req, res) => {});
 export {
   farmerLogin,
   farmerRegister,
+  updatePD,
   updateAddress,
   updateProfilePicture,
   addFarm,
