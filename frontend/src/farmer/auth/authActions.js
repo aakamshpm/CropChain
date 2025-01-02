@@ -74,4 +74,30 @@ const updateFarmerData = createAsyncThunk(
   }
 );
 
-export { registerFarmer, loginFarmer, logoutFarmer, updateFarmerData };
+const uploadProfilePhoto = createAsyncThunk(
+  "auth/upload-profile",
+  async (data, { rejectWithValue }) => {
+    console.log(data);
+    try {
+      const response = await axios.post(
+        `${farmerURL}/upload-profile-picture`,
+        data,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || err?.message);
+    }
+  }
+);
+
+export {
+  registerFarmer,
+  loginFarmer,
+  logoutFarmer,
+  updateFarmerData,
+  uploadProfilePhoto,
+};

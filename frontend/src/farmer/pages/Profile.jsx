@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGetFarmerDetailsQuery } from "../auth/authService";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import InputField from "../components/InputField";
 import AddToPhotosOutlinedIcon from "@mui/icons-material/AddToPhotosOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
-import { updateFarmerData } from "../auth/authActions";
+import { updateFarmerData, uploadProfilePhoto } from "../auth/authActions";
 
 const Profile = () => {
   const { data: response, isLoading, refetch } = useGetFarmerDetailsQuery();
+  const formDataRef = useRef(new FormData());
 
   const { loading, error, success, data } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -108,13 +109,16 @@ const Profile = () => {
   };
 
   const handleProfileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    try {
+      const file = e.target.files[0];
+      if (!file) return;
 
-    setFarmerData((prev) => ({ ...prev, profilePicture: file.name }));
+      formDataRef.current.set("profilePicture", file);
+      setPreview(URL.createObjectURL(file));
+    } catch (err) {
+      enqueueSnackbar(err?.message || err?.data?.message, { variant: "error" });
+    }
   };
-
-  const onSubmitPD = () => {};
 
   useEffect(() => {
     if (success) {
@@ -374,7 +378,15 @@ const Profile = () => {
             id="profile-photo"
             onChange={handleProfileUpload}
           />
-          <button className="mt-3 btn-primary">Upload photo</button>
+
+          <button
+            onClick={() => {
+              dispatch(uploadProfilePhoto(formDataRef.current));
+            }}
+            className="mt-3 btn-primary"
+          >
+            Upload photo
+          </button>
         </div>
       </div>
     </div>

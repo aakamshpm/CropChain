@@ -1,5 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { registerFarmer, loginFarmer, updateFarmerData } from "./authActions";
+import {
+  registerFarmer,
+  loginFarmer,
+  updateFarmerData,
+  uploadProfilePhoto,
+} from "./authActions";
 
 const initialState = {
   data: {},
@@ -63,10 +68,25 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.data = action.payload;
-        state.userToken = action.payload.token;
         state.success = true;
       }),
       builder.addCase(updateFarmerData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    //profile-photo upload
+    builder.addCase(uploadProfilePhoto.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }),
+      builder.addCase(uploadProfilePhoto.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.data = action.payload;
+        state.success = true;
+      }),
+      builder.addCase(uploadProfilePhoto.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
