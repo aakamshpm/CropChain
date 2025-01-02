@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { registerFarmer, loginFarmer } from "./authActions";
+import { registerFarmer, loginFarmer, updateFarmerData } from "./authActions";
 
 const initialState = {
-  userInfo: {},
+  data: {},
   userToken: "",
   loading: false,
   success: false,
@@ -45,11 +45,28 @@ const authSlice = createSlice({
       builder.addCase(loginFarmer.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.userInfo = action.payload;
+        state.data = action.payload;
         state.userToken = action.payload.token;
         state.success = true;
       }),
       builder.addCase(loginFarmer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    //update farmer-data
+    builder.addCase(updateFarmerData.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }),
+      builder.addCase(updateFarmerData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.data = action.payload;
+        state.userToken = action.payload.token;
+        state.success = true;
+      }),
+      builder.addCase(updateFarmerData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

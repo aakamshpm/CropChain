@@ -6,7 +6,7 @@ import {
 import App from "../App";
 import PublicRoutes from "../farmer/components/routes/PublicRoutes";
 import ProtectedRoutes from "../farmer/components/routes/ProtectedRoutes";
-import FarmerApp from "../FarmerApp";
+import FarmerApp from "../farmer/FarmerApp";
 import Login from "../farmer/pages/Login";
 import Register from "../farmer/pages/Register";
 import Home from "../farmer/pages/Home";

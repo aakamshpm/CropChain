@@ -4,9 +4,13 @@ import Sidebar from "../Sidebar";
 
 const ProtectedRoutes = () => {
   return isAuthenticated() ? (
-    <div className="flex">
-      <Sidebar />
-      <Outlet />
+    <div className="layout">
+      <div className="sidebar">
+        <Sidebar />
+      </div>
+      <div className="content">
+        <Outlet />
+      </div>
     </div>
   ) : (
     <Navigate to="/farmer/login" />

@@ -32,7 +32,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <div className="h-screen flex flex-col items-center w-[15%] bg-primary-color p-4 text-white">
+      <div className="h-screen flex flex-col items-center bg-primary-color p-4 text-white">
         <header className="flex flex-col items-center">
           <h1 className="text-2xl font-bold">Crop Chain</h1>
           <p>-Farmer-</p>
