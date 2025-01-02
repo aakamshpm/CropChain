@@ -80,15 +80,15 @@ const farmerLogin = asyncHandler(async (req, res) => {
 
 // Add address fields
 const updateAddress = asyncHandler(async (req, res) => {
-  const { street, city, country, postalCode } = req.body;
-  if ((!street, !city, !country, !postalCode)) {
+  const { buildingName, street, city, country, postalCode } = req.body;
+  if ((!buildingName, !street, !city, !country, !postalCode)) {
     res.status(400);
     throw new Error("Enter all fields");
   }
 
   try {
     await Farmer.findByIdAndUpdate(req.farmerId, {
-      address: { street, city, country, postalCode },
+      address: { buildingName, street, city, country, postalCode },
     });
     res.status(200).json({ message: "Address updated" });
   } catch (err) {
