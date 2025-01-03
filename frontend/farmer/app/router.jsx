@@ -11,6 +11,8 @@ import Login from "../farmer/pages/Login";
 import Register from "../farmer/pages/Register";
 import Home from "../farmer/pages/Home";
 import Profile from "../farmer/pages/Profile";
+import Products from "../farmer/pages/Products";
+import AddProduct from "../farmer/pages/AddProduct";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,6 +29,8 @@ export const router = createBrowserRouter(
         <Route element={<ProtectedRoutes />}>
           <Route index element={<Home />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="products" element={<Products />} />
+          <Route path="add-products" element={<AddProduct />} />
         </Route>
       </Route>
     </Route>
