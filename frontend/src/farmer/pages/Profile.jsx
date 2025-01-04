@@ -1,22 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 import { useGetFarmerDetailsQuery } from "../auth/authService";
-import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import PhoneInput from "react-phone-number-input";
 import InputField from "../components/InputField";
 import AddToPhotosOutlinedIcon from "@mui/icons-material/AddToPhotosOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 import { updateFarmerData, uploadProfilePhoto } from "../auth/farmerActions";
 import { resetMessageState } from "../auth/authSlice";
+import { Box, Chip, Stack } from "@mui/material";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import CropManage from "../components/CropManage";
 
 const Profile = () => {
-  const { data: response, isLoading, refetch } = useGetFarmerDetailsQuery();
   const formDataRef = useRef(new FormData());
+  const { data: response, isLoading, refetch } = useGetFarmerDetailsQuery();
 
-  const { loading, error, success, data } = useSelector((state) => state.auth);
+  const { error, success, data } = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
+  const [isModalOpen, setIsModalOpen] = useState(false); // Toggle for the modal
   const [preview, setPreview] = useState(null);
+  const [cropName, setCropName] = useState("");
   const [farmerData, setFarmerData] = useState({
     name: "",
     phoneNumber: "",
@@ -37,6 +43,7 @@ const Profile = () => {
     },
     farmSizeInAcres: "",
     cropsGrown: [],
+    newCrop: "",
   });
 
   useEffect(() => {
@@ -74,6 +81,7 @@ const Profile = () => {
           latitude: farmLocation?.latitude || "",
           longitude: farmLocation?.longitude || "",
         },
+        newCrop: "",
       });
 
       if (response?.data?.profilePicture) {
@@ -334,6 +342,42 @@ const Profile = () => {
                 placeHolder="Enter longitude"
                 onChangeHandler={onChangeHandler}
                 parentKey="farmLocation"
+              />
+              <Box className="flex flex-col">
+                <label>Crop Grown</label>
+                <Chip
+                  label={
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      gap={1}
+                    >
+                      <span>{`${farmerData.cropsGrown.length}-Crops`}</span>
+                      <ArrowForwardIosIcon fontSize="small" />
+                    </Stack>
+                  }
+                  variant="outlined"
+                  sx={{
+                    marginTop: "4px",
+                    marginBottom: "10px",
+                    height: "40px",
+                    fontSize: "1rem",
+                    padding: "8px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                  onClick={() => setIsModalOpen(true)}
+                />
+              </Box>
+              {/* Add/View Crop Component  */}
+              <CropManage
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                cropsGrown={farmerData.cropsGrown}
+                farmerData={farmerData}
+                setFarmerData={setFarmerData}
               />
             </div>
             <button
