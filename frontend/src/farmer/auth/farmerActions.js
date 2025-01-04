@@ -13,12 +13,15 @@ const config = {
 const registerFarmer = createAsyncThunk(
   "auth/register",
   async (data, { rejectWithValue }) => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
     try {
       const response = await axios.post(`${farmerURL}/register`, data, {
         ...config,
         withCredentials: true,
       });
       localStorage.setItem("token", response.data.data.token);
+      localStorage.setItem("role", "farmer");
       return response.data.data;
     } catch (err) {
       return rejectWithValue(err?.response?.data?.message || err?.message);
@@ -30,12 +33,16 @@ const registerFarmer = createAsyncThunk(
 const loginFarmer = createAsyncThunk(
   "auth/login",
   async (data, { rejectWithValue }) => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
     try {
       const response = await axios.post(`${farmerURL}/auth`, data, {
         ...config,
         withCredentials: true,
       });
       localStorage.setItem("token", response.data.data.token);
+      localStorage.setItem("role", "farmer");
+
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error?.response?.data?.message || error?.message);

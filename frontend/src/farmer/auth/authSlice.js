@@ -77,6 +77,7 @@ const authSlice = createSlice({
         state.userToken = "";
         state.success = true;
         localStorage.removeItem("token");
+        localStorage.removeItem("role");
       }),
       builder.addCase(logoutFarmer.rejected, (state, action) => {
         state.loading = false;
