@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import "react-phone-number-input/style.css";
+import { resetMessageState } from "../auth/authSlice";
 
 const Login = () => {
   const [data, setData] = useState({
@@ -15,9 +16,7 @@ const Login = () => {
     password: "",
   });
 
-  const { loading, error, success, userInfo } = useSelector(
-    (state) => state.auth
-  );
+  const { error, success } = useSelector((state) => state.auth);
 
   const formSchema = Yup.object().shape({
     phoneNumber: Yup.string()
@@ -49,6 +48,8 @@ const Login = () => {
   useEffect(() => {
     if (success) {
       enqueueSnackbar("Login success", { variant: "success" });
+      dispatch(resetMessageState());
+
       navigate("/farmer");
     }
 
@@ -56,6 +57,7 @@ const Login = () => {
       enqueueSnackbar(error, {
         variant: "error",
       });
+      dispatch(resetMessageState());
     }
   }, [success, error, dispatch]);
 

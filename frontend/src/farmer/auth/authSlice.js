@@ -4,6 +4,7 @@ import {
   loginFarmer,
   updateFarmerData,
   uploadProfilePhoto,
+  logoutFarmer,
 } from "./farmerActions";
 import { addProduct } from "./productActions";
 
@@ -19,13 +20,14 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    logout: (state) => {
+    clearCredentials: (state) => {
       state.data = {};
       state.token = "";
       localStorage.removeItem("token");
     },
     resetMessageState: (state) => {
-      (state.success = null), (state.error = null);
+      state.success = null;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -59,6 +61,24 @@ const authSlice = createSlice({
         state.success = true;
       }),
       builder.addCase(loginFarmer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    //logout farmer
+    builder.addCase(logoutFarmer.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }),
+      builder.addCase(logoutFarmer.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.data = {};
+        state.userToken = "";
+        state.success = true;
+        localStorage.removeItem("token");
+      }),
+      builder.addCase(logoutFarmer.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -113,5 +133,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, resetMessageState } = authSlice.actions;
+export const { clearCredentials, resetMessageState } = authSlice.actions;
 export default authSlice.reducer;
