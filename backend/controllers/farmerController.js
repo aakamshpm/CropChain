@@ -78,6 +78,12 @@ const farmerLogin = asyncHandler(async (req, res) => {
   }
 });
 
+// Logout farmer
+const farmerLogout = asyncHandler(async (req, res) => {
+  res.cookie("jwt", "", { httpOnly: true, expiresIn: new Date(0) });
+  res.json({ message: "Logout successfull" });
+});
+
 // Update personal details
 const updatePD = asyncHandler(async (req, res) => {
   const { name, phoneNumber, bio } = req.body;
@@ -176,6 +182,7 @@ const getFarmerDetailsByProduct = asyncHandler(async (req, res) => {});
 export {
   farmerLogin,
   farmerRegister,
+  farmerLogout,
   updatePD,
   updateAddress,
   updateProfilePicture,

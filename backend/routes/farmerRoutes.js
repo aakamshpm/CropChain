@@ -4,6 +4,7 @@ import { protect } from "../middlewares/authMiddleware.js";
 import {
   addFarm,
   farmerLogin,
+  farmerLogout,
   getFarmerDetails,
   updateAddress,
   updatePD,
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.post("/register", farmerRegister);
 router.post("/auth", farmerLogin);
+router.post("/logout", farmerLogout);
 
 router.get("/", protect(["farmer"]), getFarmerDetails);
 router.post("/update-pd", protect(["farmer"]), updatePD);
