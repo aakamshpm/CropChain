@@ -9,6 +9,7 @@ import productRoutes from "./routes/productRoutes.js";
 import retailerRoutes from "./routes/retailerRoutes.js";
 import consumerRoutes from "./routes/consumerRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import { protect } from "./middlewares/authMiddleware.js";
 
 dotenv.config();
 
@@ -26,6 +27,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/uploads", express.static("uploads"));
 
+app.get("/api/auth/verify-role", protect(), (req, res) => {
+  res.json({ role: req.userRole });
+});
+
 // Routes
 app.use("/api/farmer", farmerRoutes);
 app.use("/api/product", productRoutes);
@@ -33,6 +38,7 @@ app.use("/api/retailer", retailerRoutes);
 app.use("/api/consumer", consumerRoutes);
 app.use("/api/order", orderRoutes);
 
+// Middlewares
 app.use(notFound);
 app.use(errorHandler);
 
