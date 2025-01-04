@@ -1,17 +1,22 @@
+import { useEffect, useState } from "react";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Button } from "@mui/material";
 import { useGetProductsByFarmerQuery } from "../auth/authService";
 import FarmerTable from "../components/FarmerTable";
 import AddProduct from "../components/AddProduct";
-import { useState } from "react";
 
 const Products = () => {
   const { data, refetch } = useGetProductsByFarmerQuery();
+
   const [open, setOpen] = useState(false);
 
   // Handlers for opening and closing the modal
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  useEffect(() => {
+    refetch();
+  }, [data]);
 
   if (!data) {
     return <p>Loading ...</p>;

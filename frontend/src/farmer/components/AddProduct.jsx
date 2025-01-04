@@ -1,9 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
+import { useSnackbar } from "notistack";
+import { useSelector } from "react-redux";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import { addProduct } from "../auth/productActions";
 
 const AddProduct = ({ handleClose, open }) => {
+  const { loading, error, success } = useSelector((state) => state.auth);
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const validationSchema = Yup.object({
+    harvestDate: Yup.string().required("Harvest Date is required"),
+    name: Yup.string().required("Name is required"),
+    description: Yup.string().required("Description is required"),
+    pricePerKg: Yup.number()
+      .typeError("Please enter a valid number")
+      .required("Price is required")
+      .positive("Enter a positive number")
+      .integer("Enter valid number"),
+    category: Yup.string().required("Category is required"),
+    quantityAvailableInKg: Yup.number()
+      .typeError("Please enter a valid number")
+      .required("Quantity is required")
+      .positive("Enter a positive number")
+      .integer("Enter valid number"),
+  });
+
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -27,14 +52,14 @@ const AddProduct = ({ handleClose, open }) => {
     zIndex: 1,
   };
 
-  const [data, setData] = useState({
-    name: "",
-    description: "",
-    pricePerKg: "",
-    quantityAvailableInKg: "",
-    category: "",
-    harvestDate: "",
-  });
+  // const [values, setData] = useState({
+  //   name: "",
+  //   description: "",
+  //   pricePerKg: "",
+  //   quantityAvailableInKg: "",
+  //   category: "",
+  //   harvestDate: "",
+  // });
 
   const dispatch = useDispatch();
 
@@ -46,6 +71,20 @@ const AddProduct = ({ handleClose, open }) => {
       [name]: value,
     }));
   };
+
+  useEffect(() => {
+    if (success) {
+      enqueueSnackbar("Product added", { variant: "success" });
+    }
+
+    if (error) {
+      enqueueSnackbar(error, {
+        variant: "error",
+      });
+    }
+  }, [success, error, dispatch]);
+
+  const handleSubmit = () => {};
 
   return (
     <>
@@ -61,76 +100,118 @@ const AddProduct = ({ handleClose, open }) => {
             Add your product
           </Typography>
 
-          <Box display="flex" flexDirection="row" gap={2} mb={2}>
-            <TextField
-              fullWidth
-              label="Name"
-              name="name"
-              value={data.name}
-              onChange={handleChange}
-              margin="normal"
-            />
-
-            <TextField
-              fullWidth
-              label="Description"
-              name="description"
-              value={data.description}
-              onChange={handleChange}
-              margin="normal"
-            />
-          </Box>
-          <Box display="flex" flexDirection="row" gap={2} mb={2}>
-            <TextField
-              fullWidth
-              label="Price Per Kg"
-              name="pricePerKg"
-              type="number"
-              value={data.pricePerKg}
-              onChange={handleChange}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              label="Quantity Available"
-              name="quantityAvailablePerKg"
-              type="number"
-              value={data.quantityAvailableInKg}
-              onChange={handleChange}
-              margin="normal"
-            />
-          </Box>
-          <Box display="flex" flexDirection="row" gap={2} mb={2}>
-            <TextField
-              fullWidth
-              label="Category"
-              name="category"
-              value={data.category}
-              onChange={handleChange}
-              margin="normal"
-            />
-
-            <TextField
-              fullWidth
-              label="Harvest Date"
-              name="harvestDate"
-              value={data.harvestDate}
-              type="date"
-              onChange={handleChange}
-              slotProps={{
-                inputLabel: { shrink: true },
-              }}
-              margin="normal"
-            />
-          </Box>
-          <Button
-            onClick={() => dispatch(addProduct(data))}
-            variant="contained"
-            sx={{ mt: 2 }}
+          <Formik
+            initialValues={{
+              name: "",
+              description: "",
+              harvestDate: "",
+              pricePerKg: "",
+              quantityAvailableInKg: "",
+              category: "",
+            }}
+            validationSchema={validationSchema}
+            onSubmit={(values) => {
+              dispatch(addProduct(values));
+              handleClose();
+            }}
           >
-            Add
-          </Button>
+            {({ values, handleChange, handleBlur, errors, touched }) => (
+              <Form>
+                <Box display="flex" flexDirection="row" gap={2} mb={2}>
+                  <TextField
+                    fullWidth
+                    label="Name"
+                    name="name"
+                    value={values.name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    margin="normal"
+                    error={touched.name && Boolean(errors.name)}
+                    helperText={<ErrorMessage name="name" />}
+                  />
 
+                  <TextField
+                    fullWidth
+                    label="Description"
+                    name="description"
+                    value={values.description}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    margin="normal"
+                    error={touched.description && Boolean(errors.description)}
+                    helperText={<ErrorMessage name="description" />}
+                  />
+                </Box>
+                <Box display="flex" flexDirection="row" gap={2} mb={2}>
+                  <TextField
+                    fullWidth
+                    label="Price per Kg"
+                    name="pricePerKg"
+                    value={values.pricePerKg}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    margin="normal"
+                    error={touched.pricePerKg && Boolean(errors.pricePerKg)}
+                    helperText={<ErrorMessage name="pricePerKg" />}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Quantity Available"
+                    name="quantityAvailableInKg"
+                    value={values.quantityAvailableInKg}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    margin="normal"
+                    error={
+                      touched.quantityAvailableInKg &&
+                      Boolean(errors.quantityAvailableInKg)
+                    }
+                    helperText={
+                      touched.quantityAvailableInKg &&
+                      errors.quantityAvailableInKg
+                    }
+                  />
+                </Box>
+                <Box display="flex" flexDirection="row" gap={2} mb={2}>
+                  <TextField
+                    fullWidth
+                    label="Category"
+                    name="category"
+                    value={values.category}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    margin="normal"
+                    error={touched.category && Boolean(errors.category)}
+                    helperText={<ErrorMessage name="category" />}
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Harvest Date"
+                    name="harvestDate"
+                    value={values.harvestDate}
+                    type="date"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    slotProps={{
+                      inputLabel: { shrink: true },
+                    }}
+                    margin="normal"
+                    error={touched.harvestDate && Boolean(errors.harvestDate)}
+                    helperText={<ErrorMessage name="harvestDate" />}
+                  />
+                </Box>
+                <Button
+                  type="submit"
+                  onClick={handleSubmit}
+                  variant="contained"
+                  sx={{ mt: 2 }}
+                >
+                  Add
+                </Button>
+              </Form>
+            )}
+          </Formik>
           <Button
             variant="outlined"
             onClick={handleClose}
