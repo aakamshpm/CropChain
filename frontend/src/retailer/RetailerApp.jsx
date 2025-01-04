@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-const FarmerApp = () => {
+const RetailerApp = () => {
   return (
     <div>
       <Outlet />
@@ -8,4 +8,4 @@ const FarmerApp = () => {
   );
 };
 
-export default FarmerApp;
+export default RetailerApp;

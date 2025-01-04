@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { isAuthenticated } from "../../auth/authUtils";
 import Sidebar from "../Sidebar";
 
-const ProtectedRoutes = () => {
+const FarmerProtectedRoutes = () => {
   return isAuthenticated() ? (
     <div className="layout">
       <div className="sidebar">
@@ -17,4 +17,4 @@ const ProtectedRoutes = () => {
   );
 };
 
-export default ProtectedRoutes;
+export default FarmerProtectedRoutes;

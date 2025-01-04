@@ -4,31 +4,51 @@ import {
   Route,
 } from "react-router-dom";
 import App from "../App";
-import PublicRoutes from "../farmer/components/routes/PublicRoutes";
-import ProtectedRoutes from "../farmer/components/routes/ProtectedRoutes";
+import FarmerPublicRoutes from "../farmer/components/routes/FarmerPublicRoutes";
+import FarmerProtectedRoutes from "../farmer/components/routes/FarmerProtectedRoutes";
 import FarmerApp from "../farmer/FarmerApp";
-import Login from "../farmer/pages/Login";
-import Register from "../farmer/pages/Register";
-import Home from "../farmer/pages/Home";
-import Profile from "../farmer/pages/Profile";
-import Products from "../farmer/pages/Products";
+import Login from "../farmer/pages/FarmerLogin";
+import Register from "../farmer/pages/FarmerRegister";
+import Home from "../farmer/pages/FarmerHome";
+import Profile from "../farmer/pages/FarmerProfile";
+import Products from "../farmer/pages/FarmerProducts";
+import RetailerApp from "../retailer/RetailerApp";
+import RetailerLogin from "../retailer/pages/RetailerLogin";
+import RetailerRegister from "../retailer/pages/RetailerRegister";
+import RetailerHome from "../retailer/pages/RetailerHome";
+import RetailerPublicRoutes from "../retailer/components/routes/RetailerPublicRoutes";
+import RetailerProtectedRoutes from "../retailer/components/routes/RetailerProtectedRoutes";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       {/* Farmer Routes  */}
       <Route path="farmer" element={<FarmerApp />}>
-        {/* Protected Routes  */}
-        <Route element={<PublicRoutes />}>
+        {/* Public Routes  */}
+        <Route element={<FarmerPublicRoutes />}>
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
         </Route>
 
         {/* Protected Routes */}
-        <Route element={<ProtectedRoutes />}>
+        <Route element={<FarmerProtectedRoutes />}>
           <Route index element={<Home />} />
           <Route path="profile" element={<Profile />} />
           <Route path="products" element={<Products />} />
+        </Route>
+      </Route>
+
+      {/* Retailer Routes  */}
+      <Route path="retailer" element={<RetailerApp />}>
+        {/* Public Routes  */}
+        <Route element={<RetailerPublicRoutes />}>
+          <Route path="login" element={<RetailerLogin />} />
+          <Route path="register" element={<RetailerRegister />} />
+        </Route>
+
+        {/* Protected Routes */}
+        <Route element={<RetailerProtectedRoutes />}>
+          <Route index element={<RetailerHome />} />
         </Route>
       </Route>
     </Route>
