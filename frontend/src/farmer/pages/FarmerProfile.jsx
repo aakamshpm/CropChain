@@ -86,7 +86,7 @@ const Profile = () => {
 
       if (response?.data?.profilePicture) {
         setPreview(
-          `${import.meta.env.VITE_API_SERVER_URL}/uploads/profile-pictures/${
+          `${import.meta.env.VITE_API_SERVER_URL}/uploads/${
             response.data.profilePicture
           }`
         );
