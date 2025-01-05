@@ -18,8 +18,9 @@ const retailerRegister = createAsyncThunk(
         ...config,
         withCredentials: true,
       });
-      localStorage.setItem("token", response.data.data.token);
-      return response.data.data;
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("role", "retailer");
+      return response.data;
     } catch (err) {
       return rejectWithValue(err?.response?.data?.message || err?.message);
     }
@@ -35,8 +36,10 @@ const retailerLogin = createAsyncThunk(
         ...config,
         withCredentials: true,
       });
-      localStorage.setItem("token", response.data.data.token);
-      return response.data.data;
+
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("role", "retailer");
+      return response.data;
     } catch (error) {
       return rejectWithValue(error?.response?.data?.message || error?.message);
     }

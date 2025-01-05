@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useSnackbar } from "notistack";
 import { useSelector } from "react-redux";
-import { Formik, Field, Form, ErrorMessage } from "formik";
+import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { addProduct } from "../auth/productActions";
 
 const AddProduct = ({ handleClose, open }) => {
-  const { loading, error, success } = useSelector((state) => state.auth);
+  const { error, success } = useSelector((state) => state.auth);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -52,25 +52,7 @@ const AddProduct = ({ handleClose, open }) => {
     zIndex: 1,
   };
 
-  // const [values, setData] = useState({
-  //   name: "",
-  //   description: "",
-  //   pricePerKg: "",
-  //   quantityAvailableInKg: "",
-  //   category: "",
-  //   harvestDate: "",
-  // });
-
   const dispatch = useDispatch();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
 
   useEffect(() => {
     if (success) {
@@ -83,8 +65,6 @@ const AddProduct = ({ handleClose, open }) => {
       });
     }
   }, [success, error, dispatch]);
-
-  const handleSubmit = () => {};
 
   return (
     <>
@@ -201,12 +181,7 @@ const AddProduct = ({ handleClose, open }) => {
                     helperText={<ErrorMessage name="harvestDate" />}
                   />
                 </Box>
-                <Button
-                  type="submit"
-                  onClick={handleSubmit}
-                  variant="contained"
-                  sx={{ mt: 2 }}
-                >
+                <Button type="submit" variant="contained" sx={{ mt: 2 }}>
                   Add
                 </Button>
               </Form>

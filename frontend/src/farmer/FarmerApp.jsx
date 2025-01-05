@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 
 const FarmerApp = () => {
   return (
-    <div>
+    <div className="farmer">
       <Outlet />
     </div>
   );

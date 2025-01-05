@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { retailerLogin, retailerRegister } from "./RetailerActions";
+import { retailerLogin, retailerRegister } from "./retailerActions";
 
 const initialState = {
   response: {},
@@ -14,7 +14,7 @@ const retailerSlice = createSlice({
   initialState,
   reducers: {
     clearCredentials: (state) => {
-      state.data = {};
+      state.response = {};
       state.token = "";
       localStorage.removeItem("token");
     },
@@ -32,8 +32,8 @@ const retailerSlice = createSlice({
       builder.addCase(retailerRegister.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.userInfo = action.payload;
-        state.userToken = action.payload.token;
+        state.response = action.payload;
+        state.retailerToken = action.payload.token;
         state.success = true;
       }),
       builder.addCase(retailerRegister.rejected, (state, action) => {
@@ -49,8 +49,8 @@ const retailerSlice = createSlice({
       builder.addCase(retailerLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.data = action.payload;
-        state.userToken = action.payload.token;
+        state.response = action.payload;
+        state.retailerToken = action.payload.token;
         state.success = true;
       }),
       builder.addCase(retailerLogin.rejected, (state, action) => {

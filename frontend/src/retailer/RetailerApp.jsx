@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 
 const RetailerApp = () => {
   return (
-    <div>
+    <div className="retailer">
       <Outlet />
     </div>
   );
