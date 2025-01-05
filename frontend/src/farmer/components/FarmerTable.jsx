@@ -7,7 +7,6 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
 const FarmerTable = ({ data }) => {
-  console.log(data);
   return (
     <>
       <TableContainer component={Paper} className="mt-3">

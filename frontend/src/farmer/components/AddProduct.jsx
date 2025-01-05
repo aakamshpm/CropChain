@@ -1,11 +1,19 @@
 import { useEffect } from "react";
-import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Input,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useSnackbar } from "notistack";
 import { useSelector } from "react-redux";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { addProduct } from "../auth/productActions";
+import { resetMessageState } from "../auth/authSlice";
 
 const AddProduct = ({ handleClose, open }) => {
   const { error, success } = useSelector((state) => state.auth);
@@ -27,6 +35,9 @@ const AddProduct = ({ handleClose, open }) => {
       .required("Quantity is required")
       .positive("Enter a positive number")
       .integer("Enter valid number"),
+    images: Yup.array()
+      .of(Yup.mixed().required("File is required"))
+      .min(1, "At least one image is required"),
   });
 
   const modalStyle = {
@@ -58,11 +69,13 @@ const AddProduct = ({ handleClose, open }) => {
     if (success) {
       enqueueSnackbar("Product added", { variant: "success" });
     }
+    dispatch(resetMessageState());
 
     if (error) {
       enqueueSnackbar(error, {
         variant: "error",
       });
+      dispatch(resetMessageState());
     }
   }, [success, error, dispatch]);
 
@@ -88,14 +101,36 @@ const AddProduct = ({ handleClose, open }) => {
               pricePerKg: "",
               quantityAvailableInKg: "",
               category: "",
+              images: [],
             }}
             validationSchema={validationSchema}
-            onSubmit={(values) => {
-              dispatch(addProduct(values));
+            onSubmit={async (values, actions) => {
+              console.log(values);
+              const formData = new FormData();
+
+              // Append product details
+              Object.keys(values).forEach((key) => {
+                if (key !== "images") formData.append(key, values[key]);
+              });
+
+              // Append images
+              values.images.forEach((file) => {
+                formData.append("images", file);
+              });
+
+              dispatch(addProduct(formData));
+              actions.setSubmitting(false);
               handleClose();
             }}
           >
-            {({ values, handleChange, handleBlur, errors, touched }) => (
+            {({
+              values,
+              handleChange,
+              handleBlur,
+              setFieldValue,
+              errors,
+              touched,
+            }) => (
               <Form>
                 <Box display="flex" flexDirection="row" gap={2} mb={2}>
                   <TextField
@@ -180,6 +215,21 @@ const AddProduct = ({ handleClose, open }) => {
                     error={touched.harvestDate && Boolean(errors.harvestDate)}
                     helperText={<ErrorMessage name="harvestDate" />}
                   />
+                </Box>
+                <Box sx={{ marginTop: 2 }}>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files);
+                      setFieldValue("images", files);
+                    }}
+                  />
+
+                  {touched.images && errors.images && (
+                    <div>{errors.images}</div>
+                  )}
                 </Box>
                 <Button type="submit" variant="contained" sx={{ mt: 2 }}>
                   Add

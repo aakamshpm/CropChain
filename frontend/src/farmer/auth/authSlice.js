@@ -24,6 +24,7 @@ const authSlice = createSlice({
       state.data = {};
       state.token = "";
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
     },
     resetMessageState: (state) => {
       state.success = null;
@@ -74,10 +75,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.data = {};
-        state.userToken = "";
-        state.success = true;
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
+        state.success = null;
       }),
       builder.addCase(logoutFarmer.rejected, (state, action) => {
         state.loading = false;

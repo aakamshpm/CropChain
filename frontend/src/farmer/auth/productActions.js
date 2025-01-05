@@ -15,9 +15,12 @@ const addProduct = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${productURL}/add`, data, {
-        ...config,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
         withCredentials: true,
       });
+
       return response.data;
     } catch (err) {
       return rejectWithValue(err?.response?.data?.message || err?.message);

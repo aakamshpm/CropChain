@@ -1,17 +1,15 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useSnackbar } from "notistack";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { logoutFarmer } from "../auth/farmerActions";
-import { resetMessageState } from "../auth/authSlice";
+import { clearCredentials } from "../auth/authSlice";
 
 const Sidebar = () => {
-  const { loading, error, success, data } = useSelector((state) => state.auth);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
@@ -36,20 +34,14 @@ const Sidebar = () => {
   ];
 
   const handleLogout = () => {
-    dispatch(logoutFarmer());
-  };
-
-  useEffect(() => {
-    if (success) {
-      enqueueSnackbar("Logout success", { variant: "success" });
+    try {
+      dispatch(clearCredentials());
+      dispatch(logoutFarmer());
       navigate("/farmer/login");
-      dispatch(resetMessageState());
+    } catch (err) {
+      enqueueSnackbar(err || "Logout failed", { variant: "error" });
     }
-    if (error) {
-      enqueueSnackbar(error || "Logout failed", { variant: "error" });
-      dispatch(resetMessageState());
-    }
-  }, [success, error, dispatch]);
+  };
 
   return (
     <>

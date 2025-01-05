@@ -32,8 +32,6 @@ const CropManage = ({
     setError(false);
   };
 
-  console.log(farmerData);
-
   return (
     <div>
       <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>

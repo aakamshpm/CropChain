@@ -55,10 +55,11 @@ const logoutFarmer = createAsyncThunk(
   "auth/logout",
   async (data, { rejectWithValue }) => {
     try {
-      await axios.post(`${farmerURL}/logout`, {
+      const response = await axios.post(`${farmerURL}/logout`, {
         ...config,
         withCredentials: true,
       });
+      return response.data.data;
     } catch (err) {
       return rejectWithValue(err?.response?.data?.message || err?.message);
     }

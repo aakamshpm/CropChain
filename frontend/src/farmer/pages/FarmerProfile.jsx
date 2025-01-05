@@ -131,6 +131,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (success) {
+      console.log(success);
       enqueueSnackbar(data?.message || "Success", { variant: "success" });
       dispatch(resetMessageState()); // reset success and error state to null to prevent popping up during each component mount
     }
