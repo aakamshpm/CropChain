@@ -47,8 +47,8 @@ const loginRetailer = asyncHandler(async (req, res) => {
     const retailer = await Retailer.findOne({ phoneNumber });
     if (retailer) {
       if (await bcrypt.compare(password, retailer.password)) {
-        generateToken(res, retailer._id, "retailer");
-        res.status(200).json({ message: "Login success" });
+        const token = generateToken(res, retailer._id, "retailer");
+        res.status(200).json({ message: "Login success", token });
       } else {
         res.status(400);
         throw new Error("Invalid Password");

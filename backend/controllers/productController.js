@@ -1,13 +1,62 @@
 import asyncHandler from "express-async-handler";
 import Product from "../models/Product.js";
+import fs from "fs";
 
 // add products to sell
 const addProduct = asyncHandler(async (req, res) => {
   try {
-    const newProduct = new Product({ ...req.body, farmer: req.farmerId });
+    const {
+      name,
+      description,
+      pricePerKg,
+      quantityAvailableInKg,
+      category,
+      harvestDate,
+    } = req.body;
+
+    if (
+      (!name ||
+        !description ||
+        !pricePerKg ||
+        !quantityAvailableInKg ||
+        !category,
+      !harvestDate)
+    ) {
+      res.status(400);
+      throw new Error("Please fill every fields");
+    }
+
+    if (!req.files) {
+      res.status(400);
+      throw new Error("Please upload product images");
+    }
+
+    const imagePaths = req.files.map((file) => file.path);
+
+    const newProduct = new Product({
+      name,
+      description,
+      pricePerKg,
+      quantityAvailableInKg,
+      category,
+      harvestDate,
+      farmer: req.farmerId,
+      images: imagePaths,
+    });
     await newProduct.save();
     res.status(200).json({ message: "Product added successfuly" });
   } catch (err) {
+    if (req.files && req.files.length > 0) {
+      req.files.forEach((file) => {
+        fs.unlink(file.path, (unlinkErr) => {
+          if (unlinkErr) {
+            res.status(500);
+            throw new Error("Error deleting file");
+          }
+        });
+      });
+    }
+
     res.status(500);
     throw new Error(err.message);
   }
