@@ -6,7 +6,7 @@ import {
   uploadProfilePhoto,
   logoutFarmer,
 } from "./farmerActions";
-import { addProduct } from "./productActions";
+import { addProduct, updateProduct } from "./productActions";
 
 const initialState = {
   data: {},
@@ -126,6 +126,22 @@ const authSlice = createSlice({
         state.success = true;
       }),
       builder.addCase(addProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    //update product
+    builder.addCase(updateProduct.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }),
+      builder.addCase(updateProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.data = action.payload;
+        state.success = true;
+      }),
+      builder.addCase(updateProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

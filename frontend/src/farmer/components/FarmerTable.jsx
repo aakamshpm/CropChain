@@ -1,3 +1,5 @@
+import { useState } from "react";
+import ModifyProduct from "../components/ModifyProduct";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -6,7 +8,13 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-const FarmerTable = ({ data }) => {
+const FarmerTable = ({ data, setSelectedProduct, setModify, handleOpen }) => {
+  const handleViewProduct = (product) => {
+    setModify(true);
+    setSelectedProduct(product);
+    handleOpen();
+  };
+
   return (
     <>
       <TableContainer component={Paper} className="mt-3">
@@ -24,7 +32,12 @@ const FarmerTable = ({ data }) => {
 
           <TableBody>
             {data.map((product, i) => (
-              <TableRow key={i}>
+              <TableRow
+                key={i}
+                hover
+                style={{ cursor: "pointer" }}
+                onClick={() => handleViewProduct(product)}
+              >
                 <TableCell component="th" scope="row">
                   {i + 1}
                 </TableCell>

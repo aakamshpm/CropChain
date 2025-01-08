@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -12,11 +12,11 @@ import { useSnackbar } from "notistack";
 import { useSelector } from "react-redux";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { addProduct } from "../auth/productActions";
+import { addProduct, updateProduct } from "../auth/productActions";
 import { resetMessageState } from "../auth/authSlice";
 
-const AddProduct = ({ handleClose, open }) => {
-  const { error, success } = useSelector((state) => state.auth);
+const AddProduct = ({ handleClose, open, product, modify, setModify }) => {
+  const { data: response, error, success } = useSelector((state) => state.auth);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -67,7 +67,7 @@ const AddProduct = ({ handleClose, open }) => {
 
   useEffect(() => {
     if (success) {
-      enqueueSnackbar("Product added", { variant: "success" });
+      enqueueSnackbar(response?.message || "hi", { variant: "success" });
     }
     dispatch(resetMessageState());
 
@@ -90,22 +90,21 @@ const AddProduct = ({ handleClose, open }) => {
       >
         <Box sx={modalStyle}>
           <Typography id="popup-title" variant="h6" component="h2">
-            Add your product
+            {modify ? "Update your product" : "Add your product"}
           </Typography>
 
           <Formik
             initialValues={{
-              name: "",
-              description: "",
-              harvestDate: "",
-              pricePerKg: "",
-              quantityAvailableInKg: "",
-              category: "",
-              images: [],
+              name: product?.name || "",
+              description: product?.description || "",
+              harvestDate: product?.harvestDate?.split("T")[0] || "",
+              pricePerKg: product?.pricePerKg || "",
+              quantityAvailableInKg: product?.quantityAvailableInKg || "",
+              category: product?.category || "",
+              images: product?.images || [],
             }}
             validationSchema={validationSchema}
             onSubmit={async (values, actions) => {
-              console.log(values);
               const formData = new FormData();
 
               // Append product details
@@ -113,12 +112,20 @@ const AddProduct = ({ handleClose, open }) => {
                 if (key !== "images") formData.append(key, values[key]);
               });
 
+              // Append product id
+              formData.append("id", product?._id);
+
               // Append images
               values.images.forEach((file) => {
                 formData.append("images", file);
               });
 
-              dispatch(addProduct(formData));
+              {
+                !modify
+                  ? dispatch(addProduct(formData))
+                  : dispatch(updateProduct(formData));
+              }
+
               actions.setSubmitting(false);
               handleClose();
             }}
@@ -228,11 +235,11 @@ const AddProduct = ({ handleClose, open }) => {
                   />
 
                   {touched.images && errors.images && (
-                    <div>{errors.images}</div>
+                    <div className="text-red-600">{errors.images}</div>
                   )}
                 </Box>
                 <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-                  Add
+                  {modify ? "Update" : "Add"}
                 </Button>
               </Form>
             )}
