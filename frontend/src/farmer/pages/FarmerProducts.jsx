@@ -11,6 +11,7 @@ const Products = () => {
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [modify, setModify] = useState(false);
+  const [preview, setPreview] = useState(null);
 
   // Handlers for opening and closing the modal
   const handleOpen = () => {
@@ -19,6 +20,7 @@ const Products = () => {
   const handleClose = () => setOpen(false);
 
   const handleAddProduct = () => {
+    setPreview(null);
     setModify(false);
     setSelectedProduct(null);
 
@@ -26,8 +28,9 @@ const Products = () => {
   };
 
   useEffect(() => {
+    console.log("hi");
     refetch();
-  }, [data]);
+  }, [open]);
 
   if (!data) {
     return <p>Loading ...</p>;
@@ -47,6 +50,8 @@ const Products = () => {
         open={open}
         modify={modify}
         setModify={setModify}
+        preview={preview}
+        setPreview={setPreview}
       />
 
       <FarmerTable

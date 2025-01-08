@@ -15,7 +15,14 @@ import * as Yup from "yup";
 import { addProduct, updateProduct } from "../auth/productActions";
 import { resetMessageState } from "../auth/authSlice";
 
-const AddProduct = ({ handleClose, open, product, modify, setModify }) => {
+const ModifyProduct = ({
+  handleClose,
+  open,
+  product,
+  modify,
+  preview,
+  setPreview,
+}) => {
   const { data: response, error, success } = useSelector((state) => state.auth);
 
   const { enqueueSnackbar } = useSnackbar();
@@ -66,8 +73,16 @@ const AddProduct = ({ handleClose, open, product, modify, setModify }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (product && product?.images[0]) {
+      setPreview(
+        `${import.meta.env.VITE_API_SERVER_URL}/uploads/${product.images[0]}`
+      );
+    }
+  }, [product]);
+
+  useEffect(() => {
     if (success) {
-      enqueueSnackbar(response?.message || "hi", { variant: "success" });
+      enqueueSnackbar(response?.message, { variant: "success" });
     }
     dispatch(resetMessageState());
 
@@ -229,6 +244,7 @@ const AddProduct = ({ handleClose, open, product, modify, setModify }) => {
                     accept="image/*"
                     multiple
                     onChange={(e) => {
+                      setPreview(URL.createObjectURL(e.target.files[0]));
                       const files = Array.from(e.target.files);
                       setFieldValue("images", files);
                     }}
@@ -238,6 +254,11 @@ const AddProduct = ({ handleClose, open, product, modify, setModify }) => {
                     <div className="text-red-600">{errors.images}</div>
                   )}
                 </Box>
+                {preview && (
+                  <Box>
+                    <img className="w-20" src={preview} alt="" />
+                  </Box>
+                )}
                 <Button type="submit" variant="contained" sx={{ mt: 2 }}>
                   {modify ? "Update" : "Add"}
                 </Button>
@@ -257,4 +278,4 @@ const AddProduct = ({ handleClose, open, product, modify, setModify }) => {
   );
 };
 
-export default AddProduct;
+export default ModifyProduct;

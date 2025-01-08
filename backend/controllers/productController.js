@@ -31,7 +31,7 @@ const addProduct = asyncHandler(async (req, res) => {
       throw new Error("Please upload product images");
     }
 
-    const imagePaths = req.files.map((file) => file.path);
+    const imagePaths = req.files.map((file) => file.filename);
 
     const newProduct = new Product({
       name,

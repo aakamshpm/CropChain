@@ -1,5 +1,3 @@
-import { useState } from "react";
-import ModifyProduct from "../components/ModifyProduct";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
