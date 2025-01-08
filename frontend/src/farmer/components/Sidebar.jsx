@@ -6,6 +6,8 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
+import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import { logoutFarmer } from "../auth/farmerActions";
 import { clearCredentials } from "../auth/authSlice";
 
@@ -30,6 +32,11 @@ const Sidebar = () => {
       path: `${farmerEndpoint}/products`,
       icon: <InventoryOutlinedIcon />,
       name: "Products",
+    },
+    {
+      path: `${farmerEndpoint}/transactions`,
+      icon: <PaidOutlinedIcon />,
+      name: "Transactions",
     },
   ];
 

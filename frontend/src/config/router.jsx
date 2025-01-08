@@ -18,6 +18,8 @@ import RetailerRegister from "../retailer/pages/RetailerRegister";
 import RetailerHome from "../retailer/pages/RetailerHome";
 import RetailerPublicRoutes from "../retailer/components/routes/RetailerPublicRoutes";
 import RetailerProtectedRoutes from "../retailer/components/routes/RetailerProtectedRoutes";
+import Orders from "../farmer/pages/Orders";
+import Transactions from "../farmer/pages/Transactions";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,6 +37,8 @@ export const router = createBrowserRouter(
           <Route index element={<Home />} />
           <Route path="profile" element={<Profile />} />
           <Route path="products" element={<Products />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="transactions" element={<Transactions />} />
         </Route>
       </Route>
 
