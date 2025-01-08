@@ -41,7 +41,7 @@ const RetailerLogin = () => {
 
   return (
     <div className="flex items-center justify-center h-screen font-['Poppins']">
-      <div className="flex flex-col items-center justify-center p-8 border-[1px] border-black rounded-lg">
+      <div className="flex flex-col items-center justify-center p-8 border-[1px] w-[30%] border-black rounded-lg">
         <h1 className="text-2xl">
           <span className="font-semibold">Login</span> - RETAILER
         </h1>
