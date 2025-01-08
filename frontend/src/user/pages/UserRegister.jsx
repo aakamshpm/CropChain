@@ -5,21 +5,28 @@ import { useSnackbar } from "notistack";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { isValidPhoneNumber } from "react-phone-number-input";
-import { retailerLogin } from "../utils/retailerActions";
+import {
+  retailerLogin,
+  retailerRegister,
+} from "../utils/retailer/retailerActions";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { resetMessageState } from "../utils/retailerSlice";
+import { resetMessageState } from "../utils/userSlice";
 
-const RetailerLogin = () => {
+const UserRegister = () => {
   const validationSchema = Yup.object({
+    name: Yup.string().required("Name is required"),
     phoneNumber: Yup.string()
       .required("Phone number is required")
       .test("is-valid-phoen", "Invalid phone number", (value) =>
         isValidPhoneNumber(value)
       ),
     password: Yup.string().required("Password is required"),
+    confirmPassword: Yup.string()
+      .required("Confirm password is required")
+      .oneOf([Yup.ref("password")], "Passwords must match"),
   });
 
-  const { error, success } = useSelector((state) => state.retailer);
+  const { error, success } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,8 +35,8 @@ const RetailerLogin = () => {
 
   useEffect(() => {
     if (success) {
-      enqueueSnackbar("Login success", { variant: "success" });
-      navigate("/retailer");
+      enqueueSnackbar("Registration success", { variant: "success" });
+      navigate("/");
       dispatch(resetMessageState());
     }
 
@@ -41,18 +48,20 @@ const RetailerLogin = () => {
 
   return (
     <div className="flex items-center justify-center h-screen font-['Poppins']">
-      <div className="flex flex-col items-center justify-center p-8 border-[1px] w-[30%] border-black rounded-lg">
+      <div className="flex flex-col items-center justify-center p-8 border-[1px] w-[40%] border-black rounded-lg">
         <h1 className="text-2xl">
-          <span className="font-semibold">Login</span> - RETAILER
+          <span className="font-semibold">Register</span> - RETAILER
         </h1>
         <Formik
           initialValues={{
+            name: "",
             phoneNumber: "+91 ",
             password: "",
+            confirmPassword: "",
           }}
           validationSchema={validationSchema}
           onSubmit={(values, actions) => {
-            dispatch(retailerLogin(values));
+            dispatch(retailerRegister(values));
 
             actions.resetForm(false);
           }}
@@ -74,6 +83,18 @@ const RetailerLogin = () => {
 
                 <TextField
                   fullWidth
+                  label="Full name"
+                  name="name"
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  margin="normal"
+                  error={touched.name && Boolean(errors.name)}
+                  helperText={<ErrorMessage name="name" />}
+                />
+
+                <TextField
+                  fullWidth
                   label="Password"
                   name="password"
                   type="password"
@@ -83,6 +104,21 @@ const RetailerLogin = () => {
                   margin="normal"
                   error={touched.password && Boolean(errors.password)}
                   helperText={<ErrorMessage name="password" />}
+                />
+
+                <TextField
+                  fullWidth
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  type="password"
+                  value={values.confirmPassword}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  margin="normal"
+                  error={
+                    touched.confirmPassword && Boolean(errors.confirmPassword)
+                  }
+                  helperText={<ErrorMessage name="confirmPassword" />}
                 />
               </Box>
               <Button
@@ -96,7 +132,7 @@ const RetailerLogin = () => {
                   fontSize: "15px",
                 }}
               >
-                Login
+                Register
               </Button>
             </Form>
           )}
@@ -104,9 +140,9 @@ const RetailerLogin = () => {
 
         <div className="mt-4">
           <p>
-            Not registered?{" "}
-            <Link to="/retailer/register" className="font-semibold underline">
-              Register now!
+            Already registered?{" "}
+            <Link to="/login" className="font-semibold underline">
+              Login now!
             </Link>
           </p>
         </div>
@@ -115,4 +151,4 @@ const RetailerLogin = () => {
   );
 };
 
-export default RetailerLogin;
+export default UserRegister;
