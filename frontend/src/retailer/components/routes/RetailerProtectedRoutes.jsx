@@ -4,13 +4,9 @@ import Navbar from "../Navbar";
 
 const RetailerProtectedRoutes = () => {
   return isRetailerAuthenticated() ? (
-    <div className="layout">
-      <div className="navbar">
-        <Navbar />
-      </div>
-      <div className="content">
-        <Outlet />
-      </div>
+    <div className="flex flex-col">
+      <Navbar />
+      <Outlet />
     </div>
   ) : (
     <Navigate to="/retailer/login" />
