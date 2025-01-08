@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
@@ -6,7 +6,14 @@ import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { retailerLogin } from "../utils/retailer/retailerActions";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  TextField,
+} from "@mui/material";
 import { resetMessageState } from "../utils/userSlice";
 
 const UserLogin = () => {
@@ -18,6 +25,8 @@ const UserLogin = () => {
       ),
     password: Yup.string().required("Password is required"),
   });
+
+  const [selectedValue, setSelectedValue] = useState("Consumer");
 
   const { error, success } = useSelector((state) => state.user);
 
@@ -42,8 +51,51 @@ const UserLogin = () => {
   return (
     <div className="flex items-center justify-center h-screen font-['Poppins']">
       <div className="flex flex-col items-center justify-center p-8 border-[1px] w-[30%] border-black rounded-lg">
-        <h1 className="text-2xl">
-          <span className="font-semibold">Login</span> - RETAILER
+        <div>
+          <RadioGroup
+            sx={{
+              flexDirection: "row",
+              ".MuiFormControlLabel-root": {
+                position: "relative",
+                paddingBottom: "5px",
+                margin: "0 10px",
+              },
+              ".MuiFormControlLabel-root::after": {
+                content: '""',
+                position: "absolute",
+                bottom: "0",
+                left: "0",
+                right: "0",
+                height: "2px",
+                backgroundColor: "transparent",
+                transition: "background-color 0.3s ease",
+              },
+              ".MuiFormControlLabel-root[data-selected='true']::after": {
+                backgroundColor: "green", // Change the underline color for the selected option
+              },
+            }}
+            value={selectedValue}
+            onChange={(e) => setSelectedValue(e.target.value)}
+          >
+            {["Retailer", "Consumer"].map((label) => (
+              <FormControlLabel
+                key={label}
+                value={label}
+                control={
+                  <Radio
+                    sx={{
+                      display: "none", // Hide the default radio icon
+                    }}
+                  />
+                }
+                label={label}
+                data-selected={selectedValue === label}
+              />
+            ))}
+          </RadioGroup>
+        </div>
+        <h1 className="text-2xl mt-4">
+          <span className="font-semibold">Login</span> - {selectedValue}
         </h1>
         <Formik
           initialValues={{
@@ -52,7 +104,9 @@ const UserLogin = () => {
           }}
           validationSchema={validationSchema}
           onSubmit={(values, actions) => {
-            dispatch(retailerLogin(values));
+            selectedValue === "Retailer"
+              ? dispatch(retailerLogin(values))
+              : enqueueSnackbar("Not yet", { variant: "info" });
 
             actions.resetForm(false);
           }}

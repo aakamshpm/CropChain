@@ -4,15 +4,18 @@ import Person2OutlinedIcon from "@mui/icons-material/Person2Outlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { TextField } from "@mui/material";
+import { isUserAuthenticated } from "../utils/userAuth";
 
 const Navbar = () => {
+  const role = isUserAuthenticated();
+
   return (
     <div className="flex flex-col font-['Poppins']">
       <div className="flex justify-between px-20 py-5 items-center">
-        <div className="logo flex items-center justify-between">
+        <Link to="/" className="logo flex items-center justify-between">
           <img src="/plant.png" alt="logo" />
           <h1 className=" text-2xl font-semibold ml-1">CropChain</h1>
-        </div>
+        </Link>
 
         <div className="flex">
           <div className="border-y-[1px] border-s border-gray-500 rounded-s-lg px-4 py-1 flex items-center w-[25em]">
@@ -35,8 +38,22 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center">
-          <Person2OutlinedIcon sx={{ fontSize: 30 }} />
-          <p className="text-lg ">Profile</p>
+          {role ? (
+            <>
+              <Person2OutlinedIcon sx={{ fontSize: 30 }} />
+              <p className="text-lg ">
+                Profile <span>({role.toUpperCase()})</span>
+              </p>
+            </>
+          ) : (
+            <div>
+              <p className="flex">
+                <Link to="/login">Sign In</Link>
+                <span className="ml-1 mr-1">/</span>
+                <Link to="/register"> Sign Up</Link>
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
