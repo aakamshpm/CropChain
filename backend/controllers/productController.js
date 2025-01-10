@@ -75,6 +75,25 @@ const getAllProducts = asyncHandler(async (req, res) => {
   }
 });
 
+// Get product by Id
+const getProductById = asyncHandler(async (req, res) => {
+  const { productId } = req.params;
+
+  try {
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      res.status(400);
+      throw new Error("No product found");
+    }
+
+    res.status(200).json({ product });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
 // get product based on farmer
 const getProductsByFarmer = asyncHandler(async (req, res) => {
   try {
@@ -134,6 +153,7 @@ const removeProduct = asyncHandler(async (req, res) => {
 export {
   addProduct,
   getAllProducts,
+  getProductById,
   getProductsByFarmer,
   updateProduct,
   removeProduct,
