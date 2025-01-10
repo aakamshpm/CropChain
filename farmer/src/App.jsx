@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
 
-const FarmerApp = () => {
+const App = () => {
   return (
-    <div className="farmer">
+    <div className="app">
       <Outlet />
     </div>
   );
 };
 
-export default FarmerApp;
+export default App;

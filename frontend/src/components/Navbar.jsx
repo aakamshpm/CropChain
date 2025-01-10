@@ -10,7 +10,7 @@ const Navbar = () => {
   const role = isUserAuthenticated();
 
   return (
-    <div className="flex flex-col font-['Poppins']">
+    <div className="flex flex-col ">
       <div className="flex justify-between px-20 py-5 items-center">
         <Link to="/" className="logo flex items-center justify-between">
           <img src="/plant.png" alt="logo" />

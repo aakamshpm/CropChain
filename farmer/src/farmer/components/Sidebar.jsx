@@ -16,25 +16,24 @@ const Sidebar = () => {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
-  const farmerEndpoint = "/farmer";
   const sidebarOption = [
     {
-      path: `${farmerEndpoint}`,
+      path: "/",
       icon: <HomeOutlinedIcon />,
       name: "Home",
     },
     {
-      path: `${farmerEndpoint}/profile`,
+      path: `/profile`,
       icon: <PersonOutlineOutlinedIcon />,
       name: "Profile",
     },
     {
-      path: `${farmerEndpoint}/products`,
+      path: `/products`,
       icon: <InventoryOutlinedIcon />,
       name: "Products",
     },
     {
-      path: `${farmerEndpoint}/transactions`,
+      path: `/transactions`,
       icon: <PaidOutlinedIcon />,
       name: "Transactions",
     },

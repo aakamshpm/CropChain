@@ -13,7 +13,7 @@ const FarmerProtectedRoutes = () => {
       </div>
     </div>
   ) : (
-    <Navigate to="/farmer/login" />
+    <Navigate to="/login" />
   );
 };
 

@@ -6,16 +6,44 @@
 @tailwind components;
 @tailwind utilities;
 
-.retailer {
-  font-family: "Poppins" serif;
+@layer components {
+  .input-field {
+    @apply border-[1px] w-[20rem] border-primary-color px-2 py-2 rounded-md mt-1;
+  }
+
+  input:focus {
+    @apply outline-none;
+  }
+
+  .btn-primary {
+    @apply outline-none bg-primary-color py-2 px-4 rounded-lg text-white transition-transform hover:scale-105 duration-200 ease-in-out font-secondary;
+  }
+}
+
+.farmer {
+  font-family: "Outfit" sans-serif;
 }
 
 .app {
   height: 100vh;
 }
 
-hr {
-  border: none;
-  border-top: 1px solid grey;
-  margin: 20px 0;
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 230px;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.content {
+  margin-left: 250px;
+  flex: 1;
+  overflow-y: auto;
+  height: 100vh;
 }

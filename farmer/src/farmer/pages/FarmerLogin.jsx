@@ -50,7 +50,7 @@ const Login = () => {
       enqueueSnackbar("Login success", { variant: "success" });
       dispatch(resetMessageState());
 
-      navigate("/farmer");
+      navigate("/");
     }
 
     if (error) {
