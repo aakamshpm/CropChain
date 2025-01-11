@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 import farmerRoutes from "./routes/farmerRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
 import retailerRoutes from "./routes/retailerRoutes.js";
 import consumerRoutes from "./routes/consumerRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
@@ -34,6 +35,7 @@ app.get("/api/auth/verify-role", protect(), (req, res) => {
 // Routes
 app.use("/api/farmer", farmerRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/cart", cartRoutes);
 app.use("/api/retailer", retailerRoutes);
 app.use("/api/consumer", consumerRoutes);
 app.use("/api/order", orderRoutes);

@@ -24,7 +24,7 @@ const retailerSchema = mongoose.Schema(
       country: { type: String, default: "India" },
     },
     shopCategory: { type: String }, // eg. Grocery
-
+    cartData: { type: Object, default: {} },
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }], // Reference to the order placed by retailer
   },
   { timestamps: true }

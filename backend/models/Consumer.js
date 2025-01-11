@@ -12,7 +12,7 @@ const consumerSchema = mongoose.Schema(
       country: { type: String, default: "India" },
       postalCode: { type: String },
     },
-
+    cartData: { type: Object, default: {} },
     orders: { type: mongoose.Schema.Types.ObjectId, ref: "Orders" },
   },
   { timestamps: true }
