@@ -1,19 +1,48 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetProductByIdQuery } from "../utils/userServices";
 import { Rating } from "@mui/material";
+import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
+import Counter from "../components/Counter";
+import { isUserAuthenticated } from "../utils/userAuth";
+import { useSnackbar } from "notistack";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCartAsync } from "../utils/cartSlice";
 
 const ProductView = () => {
   const { id } = useParams();
-
   const { data, isLoading } = useGetProductByIdQuery(id);
 
   const [product, setProduct] = useState(null);
+  const [count, setCount] = useState(0);
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const isAuthenticated = isUserAuthenticated();
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { cartItems, loading, error } = useSelector((state) => state.cart);
+
+  const handleCart = () => {
+    if (!isAuthenticated) {
+      enqueueSnackbar("Please Sign In / Sign Up before continuing", {
+        variant: "warning",
+      });
+      return;
+    }
+
+    navigate("/cart");
+  };
+
+  useEffect(() => {
+    if (cartItems && cartItems[id]) setCount(cartItems[id]);
+  }, [cartItems]);
 
   useEffect(() => {
     if (data) setProduct(data?.product);
   }, [data]);
-  console.log(product);
 
   const averageRating = product?.ratings?.length
     ? product.ratings.reduce((sum, r) => sum + r.rating, 0) /
@@ -29,7 +58,7 @@ const ProductView = () => {
   }
 
   return (
-    <div className="px-20 py-5">
+    <div className="px-24 py-5">
       <div className="grid grid-cols-2">
         <div className="w-[60%]">
           <img
@@ -42,20 +71,45 @@ const ProductView = () => {
         </div>
 
         <div className="flex flex-col">
-          <h1 className="text-4xl font-semibold">{product?.name}</h1>
+          <div className="flex flex-col">
+            <h1 className="text-4xl font-semibold">{product?.name}</h1>
 
-          <div className="flex items-center mt-2">
-            <Rating value={averageRating} readOnly precision={0.5} />
-            <p className="ml-1 text-sm">
-              {product?.ratings?.length || 0} ratings
+            <div className="flex items-center mt-2">
+              <Rating value={averageRating} readOnly precision={0.5} />
+              <p className="ml-1 text-sm">
+                {product?.ratings?.length || 0} ratings
+              </p>
+            </div>
+
+            <p className="mt-4 text-[#2C742F] font-medium text-2xl">
+              ₹{product?.pricePerKg}
             </p>
           </div>
 
-          <p className="mt-4 text-[#2C742F] font-medium text-2xl">
-            ₹{product?.pricePerKg}
-          </p>
+          <hr />
+
+          <div className="flex flex-col justify-center">
+            <p className="text-[#808080] text-sm">{product?.description}</p>
+            <p className="mt-3">
+              Quantity Available: {product?.quantityAvailableInKg} kg(s)
+            </p>
+          </div>
 
           <hr />
+
+          <div className="flex items-center">
+            <Counter productId={id} count={cartItems[id]} setCount={setCount} />
+            <button
+              onClick={handleCart}
+              className="ml-4 px-28 py-4 bg-[#00B207] text-white rounded-full font-medium"
+            >
+              {!cartItems[id] ? "Add to cart" : "Go to cart"}
+              <LocalMallOutlinedIcon
+                className="ml-1"
+                sx={{ fontSize: "1.4em" }}
+              />
+            </button>
+          </div>
         </div>
       </div>
     </div>

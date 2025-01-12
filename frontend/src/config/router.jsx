@@ -10,6 +10,7 @@ import UserHome from "../pages/UserHome";
 import PublicRoute from "../components/routes/PublicRoutes";
 import ProductView from "../pages/ProductView";
 import FarmerProfile from "../pages/FarmerProfile";
+import Cart from "../pages/Cart";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,6 +19,7 @@ export const router = createBrowserRouter(
       <Route index element={<UserHome />} />
       <Route path="/farmer/:id" element={<FarmerProfile />} />
       <Route path="/product/:id" element={<ProductView />} />
+      <Route path="/cart" element={<Cart />} />
 
       {/* Login and Register restricted to unauthenticated users */}
       <Route element={<PublicRoute />}>

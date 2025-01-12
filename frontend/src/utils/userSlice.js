@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { retailerLogin, retailerRegister } from "./retailer/retailerActions";
+import { retailerLogin, retailerRegister } from "./actions/retailerActions";
 
 const initialState = {
   response: {},

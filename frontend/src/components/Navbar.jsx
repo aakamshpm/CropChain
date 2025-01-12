@@ -1,13 +1,29 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import Person2OutlinedIcon from "@mui/icons-material/Person2Outlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { TextField } from "@mui/material";
 import { isUserAuthenticated } from "../utils/userAuth";
+import { useDispatch } from "react-redux";
+import { getCartDataAsync } from "../utils/cartSlice";
+import { clearCredentials } from "../utils/userSlice";
 
 const Navbar = () => {
   const role = isUserAuthenticated();
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const onLogout = () => {
+    dispatch(clearCredentials());
+    navigate("/login");
+  };
+
+  useEffect(() => {
+    if (role) dispatch(getCartDataAsync());
+  }, [dispatch, role]);
 
   return (
     <div className="flex flex-col ">
@@ -66,7 +82,9 @@ const Navbar = () => {
 
         <div className="flex justify-between gap-4">
           <ShoppingCartOutlinedIcon />
-          <LogoutOutlinedIcon />
+          <button onClick={onLogout}>
+            <LogoutOutlinedIcon />
+          </button>
         </div>
       </div>
     </div>

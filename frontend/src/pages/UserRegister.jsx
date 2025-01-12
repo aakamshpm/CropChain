@@ -5,10 +5,7 @@ import { useSnackbar } from "notistack";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { isValidPhoneNumber } from "react-phone-number-input";
-import {
-  retailerLogin,
-  retailerRegister,
-} from "../utils/retailer/retailerActions";
+import { retailerRegister } from "../utils/actions/retailerActions";
 import {
   Box,
   Button,

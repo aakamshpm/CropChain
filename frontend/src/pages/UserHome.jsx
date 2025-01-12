@@ -1,5 +1,5 @@
-import ProductWidget from "../components/ProductWidget";
 import { useGetProductsQuery } from "../utils/userServices";
+import ProductWidget from "../components/ProductWidget";
 
 const UserHome = () => {
   const { data: products, isLoading } = useGetProductsQuery();

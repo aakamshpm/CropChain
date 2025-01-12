@@ -30,7 +30,6 @@ const addToCart = asyncHandler(async (req, res) => {
 
 // get cart info
 const getCartInfo = asyncHandler(async (req, res) => {
-  4;
   const { userId, userRole } = req;
   try {
     const userData =
