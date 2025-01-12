@@ -1,4 +1,6 @@
 import asyncHandler from "express-async-handler";
+import bcrypt from "bcryptjs";
+import generateToken from "../utils/generateToken.js";
 import Consumer from "../models/Consumer.js";
 
 const registerConsumer = asyncHandler(async (req, res) => {
@@ -25,8 +27,8 @@ const registerConsumer = asyncHandler(async (req, res) => {
       address,
     });
     if (consumer) {
-      generateToken(res, consumer._id, "consumer");
-      res.status(200).json({ message: "Registered successfuly" });
+      const token = generateToken(res, consumer._id, "consumer");
+      res.status(200).json({ message: "Registered successfuly", token });
     }
   } catch (err) {
     res.status(500);
@@ -45,8 +47,8 @@ const loginConsumer = asyncHandler(async (req, res) => {
     const consumer = await Consumer.findOne({ phoneNumber });
     if (consumer) {
       if (await bcrypt.compare(password, consumer.password)) {
-        generateToken(res, consumer._id, "consumer");
-        res.status(200).json({ message: "Login success" });
+        const token = generateToken(res, consumer._id, "consumer");
+        res.status(200).json({ message: "Login success", token });
       } else {
         res.status(400);
         throw new Error("Invalid Password");

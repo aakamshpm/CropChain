@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { retailerLogin, retailerRegister } from "./actions/retailerActions";
+import { consumerLogin, consumerRegister } from "./actions/consumerActions";
 
 const initialState = {
   response: {},
@@ -54,6 +55,40 @@ const userSlice = createSlice({
         state.success = true;
       }),
       builder.addCase(retailerLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // register consumer
+    builder.addCase(consumerRegister.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }),
+      builder.addCase(consumerRegister.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.response = action.payload;
+        state.userToken = action.payload.token;
+        state.success = true;
+      }),
+      builder.addCase(consumerRegister.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // login consumer
+    builder.addCase(consumerLogin.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }),
+      builder.addCase(consumerLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.response = action.payload;
+        state.userToken = action.payload.token;
+        state.success = true;
+      }),
+      builder.addCase(consumerLogin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

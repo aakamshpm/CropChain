@@ -15,6 +15,7 @@ import {
   TextField,
 } from "@mui/material";
 import { resetMessageState } from "../utils/userSlice";
+import { consumerRegister } from "../utils/actions/consumerActions";
 
 const UserRegister = () => {
   const validationSchema = Yup.object({
@@ -81,7 +82,7 @@ const UserRegister = () => {
             value={selectedValue}
             onChange={(e) => setSelectedValue(e.target.value)}
           >
-            {["Retailer", "Consumer"].map((label) => (
+            {["Consumer", "Retailer"].map((label) => (
               <FormControlLabel
                 key={label}
                 value={label}
@@ -112,7 +113,7 @@ const UserRegister = () => {
           onSubmit={(values, actions) => {
             selectedValue === "Retailer"
               ? dispatch(retailerRegister(values))
-              : enqueueSnackbar("Not yet", { variant: "info" });
+              : dispatch(consumerRegister(values));
 
             actions.resetForm(false);
           }}

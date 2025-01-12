@@ -14,7 +14,6 @@ const ProductView = () => {
   const { data, isLoading } = useGetProductByIdQuery(id);
 
   const [product, setProduct] = useState(null);
-  const [count, setCount] = useState(0);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -33,12 +32,13 @@ const ProductView = () => {
       return;
     }
 
+    if (!cartItems[id]) {
+      dispatch(addToCartAsync(id));
+      return;
+    }
+
     navigate("/cart");
   };
-
-  useEffect(() => {
-    if (cartItems && cartItems[id]) setCount(cartItems[id]);
-  }, [cartItems]);
 
   useEffect(() => {
     if (data) setProduct(data?.product);
@@ -98,7 +98,7 @@ const ProductView = () => {
           <hr />
 
           <div className="flex items-center">
-            <Counter productId={id} count={cartItems[id]} setCount={setCount} />
+            <Counter productId={id} count={cartItems[id]} />
             <button
               onClick={handleCart}
               className="ml-4 px-28 py-4 bg-[#00B207] text-white rounded-full font-medium"
