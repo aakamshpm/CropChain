@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { isUserAuthenticated } from "../../utils/userAuth";
 
 const PublicRoute = () => {

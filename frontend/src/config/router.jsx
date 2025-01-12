@@ -11,6 +11,7 @@ import PublicRoute from "../components/routes/PublicRoutes";
 import ProductView from "../pages/ProductView";
 import FarmerProfile from "../pages/FarmerProfile";
 import Cart from "../pages/Cart";
+import NotFound from "../pages/NotFound";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,6 +27,8 @@ export const router = createBrowserRouter(
         <Route path="login" element={<UserLogin />} />
         <Route path="register" element={<UserRegister />} />
       </Route>
+
+      <Route path="*" element={<NotFound />} />
     </Route>
   )
 );

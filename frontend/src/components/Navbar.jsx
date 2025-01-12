@@ -7,7 +7,7 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import { TextField } from "@mui/material";
 import { isUserAuthenticated } from "../utils/userAuth";
 import { useDispatch } from "react-redux";
-import { getCartDataAsync } from "../utils/cartSlice";
+import { clearCartData, getCartDataAsync } from "../utils/cartSlice";
 import { clearCredentials } from "../utils/userSlice";
 
 const Navbar = () => {
@@ -18,6 +18,7 @@ const Navbar = () => {
 
   const onLogout = () => {
     dispatch(clearCredentials());
+    dispatch(clearCartData());
     navigate("/login");
   };
 
@@ -75,13 +76,15 @@ const Navbar = () => {
 
       <div className="bg-[#F2F2F2] px-20 py-3 flex justify-between items-center">
         <div className="flex justify-between gap-5">
-          <Link to="#">Home</Link>
-          <Link to="#">Orders</Link>
-          <Link to="#">Farmers</Link>
+          <Link to="/">Home</Link>
+          <Link to="/my-orders">Orders</Link>
+          <Link to="/farmers">Farmers</Link>
         </div>
 
         <div className="flex justify-between gap-4">
-          <ShoppingCartOutlinedIcon />
+          <Link to="/cart">
+            <ShoppingCartOutlinedIcon />
+          </Link>
           <button onClick={onLogout}>
             <LogoutOutlinedIcon />
           </button>

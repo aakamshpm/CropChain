@@ -51,14 +51,14 @@ const ProductView = () => {
 
   if (!product) {
     return (
-      <div>
+      <div className="h-screen px-24 py-5">
         <p>Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="px-24 py-5">
+    <div className="px-24 py-5 h-screen">
       <div className="grid grid-cols-2">
         <div className="w-[60%]">
           <img

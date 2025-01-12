@@ -6,7 +6,7 @@ const UserHome = () => {
 
   if (isLoading) {
     return (
-      <div className="p-5">
+      <div className="p-5 h-screen">
         <p>Loading...</p>
       </div>
     );
@@ -14,7 +14,7 @@ const UserHome = () => {
 
   if (products?.data.length === 0) {
     return (
-      <div>
+      <div className="h-screen">
         <p>No products</p>
       </div>
     );

@@ -50,7 +50,7 @@ const UserLogin = () => {
   }, [success, error]);
 
   return (
-    <div className="flex items-center justify-center h-screen font-['Poppins']">
+    <div className="flex items-center justify-center h-[30rem] font-['Poppins']">
       <div className="flex flex-col items-center justify-center p-8 border-[1px] w-[30%] border-black rounded-lg">
         <div>
           <RadioGroup
