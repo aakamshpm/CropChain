@@ -1,9 +1,20 @@
 import mongoose from "mongoose";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const consumerSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
+    phoneNumber: {
+      type: String,
+      required: true,
+      set: (value) => {
+        const phoneNumber = parsePhoneNumberFromString(value);
+        if (phoneNumber) {
+          return phoneNumber.format("E.164");
+        }
+        return value.trim();
+      },
+    },
     password: { type: String, required: true },
     address: {
       street: { type: String },
