@@ -1,6 +1,6 @@
 import { useSnackbar } from "notistack";
 import { isUserAuthenticated } from "../utils/userAuth";
-import { addToCartAsync, removeCartItemAsync } from "../utils/cartSlice";
+import { addToCartAsync, decrementCartItemAsync } from "../utils/cartSlice";
 import { useDispatch } from "react-redux";
 
 const Counter = ({ productId, count }) => {
@@ -16,7 +16,7 @@ const Counter = ({ productId, count }) => {
         variant: "warning",
       });
     } else {
-      if (count) dispatch(removeCartItemAsync(productId));
+      if (count) dispatch(decrementCartItemAsync(productId));
     }
   };
 
@@ -31,7 +31,7 @@ const Counter = ({ productId, count }) => {
   };
 
   return (
-    <div className="flex justify-center items-center px-4 py-2 border border-gray-300 rounded-full gap-4 shadow-sm">
+    <div className="flex justify-center items-center px-2 py-1 border border-gray-300 rounded-full gap-4 shadow-sm">
       {/* Decrement Button */}
       <button
         onClick={removeItem}
@@ -42,7 +42,7 @@ const Counter = ({ productId, count }) => {
 
       {/* Number Display */}
       <p
-        className="w-4 text-center text-lg font-medium text-gray-700"
+        className="w-2 text-center text-lg font-medium text-gray-700"
         style={{ minWidth: "0.5em" }}
       >
         {count ? count : "0"}

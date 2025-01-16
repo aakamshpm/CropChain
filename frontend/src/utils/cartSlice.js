@@ -42,12 +42,28 @@ const getCartDataAsync = createAsyncThunk(
   }
 );
 
-const removeCartItemAsync = createAsyncThunk(
-  "cart/removeCartItem",
+const decrementCartItemAsync = createAsyncThunk(
+  "cart/decrementCartItem",
   async (productId, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${cartUrl}/remove`,
+        `${cartUrl}/decrement`,
+        { productId },
+        { withCredentials: true }
+      );
+      return { productId, response: response.data };
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Error removing item");
+    }
+  }
+);
+
+const removeCartItemAsync = createAsyncThunk(
+  "cart/remove-cart-item",
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${cartUrl}/remove-item`,
         { productId },
         { withCredentials: true }
       );
@@ -101,7 +117,7 @@ const cartSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(removeCartItemAsync.fulfilled, (state, action) => {
+      .addCase(decrementCartItemAsync.fulfilled, (state, action) => {
         const { productId } = action.payload;
 
         if (state.cartItems[productId]) {
@@ -115,12 +131,29 @@ const cartSlice = createSlice({
         state.loading = false;
         state.success = true;
       })
+      .addCase(decrementCartItemAsync.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
+      .addCase(removeCartItemAsync.fulfilled, (state, action) => {
+        const { productId } = action.payload;
+
+        if (state.cartItems[productId]) delete state.cartItems[productId];
+
+        state.loading = false;
+        state.success = true;
+      })
       .addCase(removeCartItemAsync.rejected, (state, action) => {
         state.error = action.payload;
       });
   },
 });
 
-export { addToCartAsync, getCartDataAsync, removeCartItemAsync };
+export {
+  addToCartAsync,
+  getCartDataAsync,
+  decrementCartItemAsync,
+  removeCartItemAsync,
+};
 export const { clearCartData } = cartSlice.actions;
 export default cartSlice.reducer;
