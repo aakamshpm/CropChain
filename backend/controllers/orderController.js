@@ -31,6 +31,7 @@ const createOrder = asyncHandler(async (req, res) => {
         address,
         totalAmount: totalAmount + 2,
         paymentMode,
+        paymentStatus: true,
       });
 
       res.status(200).json({
@@ -108,4 +109,55 @@ const verifyPayment = asyncHandler(async (req, res) => {
   }
 });
 
-export { createOrder, verifyPayment };
+const getUserOrders = asyncHandler(async (req, res) => {
+  const { userId } = req;
+
+  try {
+    const orders = await Order.find({ "placedBy.userId": userId }).populate({
+      path: "products.product",
+      select: "name images category",
+    });
+    res.status(200).json({ orders });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+const getAllOrders = asyncHandler(async (req, res) => {
+  try {
+    const orders = await Order.find().populate({
+      path: "products.product",
+      select: "name images category",
+    });
+    res.status(200).json({ orders });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+const updateOrderStatus = asyncHandler(async (req, res) => {
+  const { status, orderId } = req.body;
+
+  try {
+    if (!status) {
+      res.status(400);
+      throw new Error("Status not defined");
+    }
+
+    await Order.findByIdAndUpdate(orderId, { status });
+    res.status(200).json({ message: `Status changed to: ${status}` });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+export {
+  createOrder,
+  verifyPayment,
+  getAllOrders,
+  getUserOrders,
+  updateOrderStatus,
+};
