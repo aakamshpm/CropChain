@@ -75,6 +75,7 @@ const Cart = () => {
                           onClick={() =>
                             dispatch(removeCartItemAsync(product._id))
                           }
+                          className="outline-none border-none"
                         >
                           <CancelOutlinedIcon
                             sx={{ color: "#808080", cursor: "pointer" }}
@@ -111,7 +112,7 @@ const Cart = () => {
                   </p>
                 </div>
                 <Link
-                  to="#"
+                  to="/checkout"
                   className="w-full py-3 bg-[#00B207] text-white rounded-full font-medium hover:bg-[#2C742F] text-center"
                 >
                   Proceed to checkout

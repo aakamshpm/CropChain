@@ -18,7 +18,7 @@ export const authApi = createApi({
 
     getProductsByFarmer: builder.query({
       query: () => ({
-        url: "api/product/farmer",
+        url: "api/product/farmer/get",
         method: "GET",
         credentials: "include",
       }),

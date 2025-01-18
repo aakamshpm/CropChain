@@ -12,6 +12,8 @@ import ProductView from "../pages/ProductView";
 import FarmerProfile from "../pages/FarmerProfile";
 import Cart from "../pages/Cart";
 import NotFound from "../pages/NotFound";
+import Checkout from "../pages/Checkout";
+import OrderSuccess from "../pages/OrderSuccess";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -21,6 +23,8 @@ export const router = createBrowserRouter(
       <Route path="/farmer/:id" element={<FarmerProfile />} />
       <Route path="/product/:id" element={<ProductView />} />
       <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
+      <Route path="/order-success" element={<OrderSuccess />} />
 
       {/* Login and Register restricted to unauthenticated users */}
       <Route element={<PublicRoute />}>

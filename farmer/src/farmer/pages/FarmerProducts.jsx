@@ -6,7 +6,7 @@ import FarmerTable from "../components/FarmerTable";
 import ModifyProduct from "../components/ModifyProduct";
 
 const Products = () => {
-  const { data, refetch } = useGetProductsByFarmerQuery();
+  const { data, isLoading, refetch } = useGetProductsByFarmerQuery();
 
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -28,11 +28,11 @@ const Products = () => {
   };
 
   useEffect(() => {
-    console.log("hi");
+    console.log("useEffect");
     refetch();
   }, [open]);
 
-  if (!data) {
+  if (isLoading) {
     return <p>Loading ...</p>;
   }
 
