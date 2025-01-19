@@ -23,8 +23,19 @@ export const authApi = createApi({
         credentials: "include",
       }),
     }),
+
+    getAllOrders: builder.query({
+      query: () => ({
+        url: "api/order/",
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
-export const { useGetFarmerDetailsQuery, useGetProductsByFarmerQuery } =
-  authApi;
+export const {
+  useGetFarmerDetailsQuery,
+  useGetProductsByFarmerQuery,
+  useGetAllOrdersQuery,
+} = authApi;

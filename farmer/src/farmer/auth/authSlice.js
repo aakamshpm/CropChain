@@ -7,6 +7,7 @@ import {
   logoutFarmer,
 } from "./farmerActions";
 import { addProduct, updateProduct } from "./productActions";
+import { changeOrderStatusAsync } from "./orderActions";
 
 const initialState = {
   data: {},
@@ -142,6 +143,22 @@ const authSlice = createSlice({
         state.success = true;
       }),
       builder.addCase(updateProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // change order-status
+    builder.addCase(changeOrderStatusAsync.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }),
+      builder.addCase(changeOrderStatusAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.data = action.payload;
+        state.success = true;
+      }),
+      builder.addCase(changeOrderStatusAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

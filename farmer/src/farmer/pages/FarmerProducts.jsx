@@ -28,7 +28,6 @@ const Products = () => {
   };
 
   useEffect(() => {
-    console.log("useEffect");
     refetch();
   }, [open]);
 

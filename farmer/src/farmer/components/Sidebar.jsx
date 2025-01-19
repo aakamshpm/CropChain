@@ -8,6 +8,7 @@ import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
+import ChecklistRtlOutlinedIcon from "@mui/icons-material/ChecklistRtlOutlined";
 import { logoutFarmer } from "../auth/farmerActions";
 import { clearCredentials } from "../auth/authSlice";
 
@@ -31,6 +32,11 @@ const Sidebar = () => {
       path: `/products`,
       icon: <InventoryOutlinedIcon />,
       name: "Products",
+    },
+    {
+      path: `/orders`,
+      icon: <ChecklistRtlOutlinedIcon />,
+      name: "Orders",
     },
     {
       path: `/transactions`,
@@ -74,9 +80,9 @@ const Sidebar = () => {
             ))}
           </div>
         </div>
-        <Link onClick={handleLogout}>
+        <button onClick={handleLogout}>
           <LogoutOutlinedIcon /> Logout
-        </Link>
+        </button>
       </div>
     </>
   );
