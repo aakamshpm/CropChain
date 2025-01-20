@@ -3,7 +3,7 @@ import { isUserAuthenticated } from "../utils/userAuth";
 import { addToCartAsync, decrementCartItemAsync } from "../utils/cartSlice";
 import { useDispatch } from "react-redux";
 
-const Counter = ({ productId, count }) => {
+const Counter = ({ productId, count, cartFarmerId }) => {
   const isAuthenticated = isUserAuthenticated();
 
   const dispatch = useDispatch();
@@ -26,7 +26,7 @@ const Counter = ({ productId, count }) => {
         variant: "warning",
       });
     } else {
-      dispatch(addToCartAsync(productId));
+      dispatch(addToCartAsync({ productId, cartFarmerId }));
     }
   };
 

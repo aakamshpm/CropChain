@@ -7,7 +7,7 @@ import crypto from "crypto";
 
 const createOrder = asyncHandler(async (req, res) => {
   try {
-    const { products, address, paymentMode } = req.body;
+    const { farmerId, products, address, paymentMode } = req.body;
 
     if (!products) {
       res.status(400);
@@ -26,6 +26,7 @@ const createOrder = asyncHandler(async (req, res) => {
     if (paymentMode === "cod") {
       //create order
       const order = await Order.create({
+        farmerId,
         placedBy: { userType, userId },
         products,
         address,

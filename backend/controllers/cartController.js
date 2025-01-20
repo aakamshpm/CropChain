@@ -5,23 +5,30 @@ import Retailer from "../models/Retailer.js";
 // add item to cart
 const addToCart = asyncHandler(async (req, res) => {
   const { userId, userRole } = req;
-  const { productId } = req.body;
+  const { productId, cartFarmerId } = req.body;
   try {
     const userData =
       userRole === "consumer"
         ? await Consumer.findById(userId)
         : await Retailer.findById(userId);
+    if (
+      !userData?.cartFarmerId ||
+      String(userData?.cartFarmerId) === cartFarmerId
+    ) {
+      let cartData = await userData.cartData;
 
-    let cartData = await userData.cartData;
+      if (cartData[productId]) cartData[productId] += 1;
+      else cartData[productId] = 1;
 
-    if (cartData[productId]) cartData[productId] += 1;
-    else cartData[productId] = 1;
+      userRole === "consumer"
+        ? await Consumer.findByIdAndUpdate(userId, { cartFarmerId, cartData })
+        : await Retailer.findByIdAndUpdate(userId, { cartFarmerId, cartData });
 
-    userRole === "consumer"
-      ? await Consumer.findByIdAndUpdate(userId, { cartData })
-      : await Retailer.findByIdAndUpdate(userId, { cartData });
-
-    res.status(200).json({ message: "Item added to cart" });
+      res.status(200).json({ message: "Item added to cart" });
+    } else {
+      res.status(400);
+      throw new Error("Try adding same farmer products");
+    }
   } catch (err) {
     res.status(500);
     throw new Error(err.message);
@@ -38,7 +45,7 @@ const getCartInfo = asyncHandler(async (req, res) => {
         : await Retailer.findById(userId);
 
     const cartData = await userData.cartData;
-    res.status(200).json({ cartData });
+    res.status(200).json({ cartData, cartFarmerId: userData?.cartFarmerId });
   } catch (err) {
     res.status(500);
     throw new Error(err);
@@ -64,12 +71,21 @@ const decrementFromCart = asyncHandler(async (req, res) => {
       throw new Error("No items to remove");
     }
 
-    if (cartData[productId] === 0) delete cartData[productId];
+    if (cartData[productId] === 0) {
+      delete cartData[productId];
+    }
+
+    let cartFarmerId = userData.cartFarmerId;
+    const update = { cartData };
+    if (Object.keys(cartData).length === 0) {
+      update.$unset = { cartFarmerId: "" };
+    } else {
+      update.cartFarmerId = cartFarmerId;
+    }
 
     userRole === "consumer"
-      ? await Consumer.findByIdAndUpdate(userId, { cartData })
-      : await Retailer.findByIdAndUpdate(userId, { cartData });
-
+      ? await Consumer.findByIdAndUpdate(userId, update)
+      : await Retailer.findByIdAndUpdate(userId, update);
     res.status(200).json({ message: "Item removed" });
   } catch (err) {
     res.status(500);
@@ -91,9 +107,17 @@ const removeFromCart = asyncHandler(async (req, res) => {
 
   if (cartData[productId]) delete cartData[productId];
 
+  let cartFarmerId = userData.cartFarmerId;
+  const update = { cartData };
+  if (Object.keys(cartData).length === 0) {
+    update.$unset = { cartFarmerId: "" };
+  } else {
+    update.cartFarmerId = cartFarmerId;
+  }
+
   userRole === "consumer"
-    ? await Consumer.findByIdAndUpdate(userId, { cartData })
-    : await Retailer.findByIdAndUpdate(userId, { cartData });
+    ? await Consumer.findByIdAndUpdate(userId, update)
+    : await Retailer.findByIdAndUpdate(userId, update);
 
   res.status(200).json({ message: "Item removed" });
 });
@@ -105,8 +129,11 @@ const removeAllFromCart = asyncHandler(async (req, res) => {
   try {
     const cartData = {};
     userRole === "consumer"
-      ? await Consumer.findByIdAndUpdate(userId, { cartData })
-      : await Retailer.findByIdAndUpdate(userId, { cartData });
+      ? await Consumer.findByIdAndUpdate(userId, { cartFarmerId: "", cartData })
+      : await Retailer.findByIdAndUpdate(userId, {
+          cartFarmerId: "",
+          cartData,
+        });
 
     res.status(200).json({ message: "Cart cleared" });
   } catch (err) {

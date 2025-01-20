@@ -8,20 +8,21 @@ const initialState = {
   loading: false,
   success: null,
   error: null,
+  cartFarmerId: "",
 };
 
 const addToCartAsync = createAsyncThunk(
   "cart/addToCart",
-  async (productId, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${cartUrl}/add`,
-        { productId },
-        {
-          withCredentials: true,
-        }
-      );
-      return { productId, response: response.data };
+      const response = await axios.post(`${cartUrl}/add`, data, {
+        withCredentials: true,
+      });
+      return {
+        productId: data.productId,
+        cartFarmerId: data.cartFarmerId,
+        response: response.data,
+      };
     } catch (err) {
       return rejectWithValue(err.response?.data || "Error adding to cart");
     }
@@ -35,7 +36,7 @@ const getCartDataAsync = createAsyncThunk(
       const response = await axios.get(`${cartUrl}/`, {
         withCredentials: true,
       });
-      return response.data.cartData;
+      return response.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || "Error fetching cart data");
     }
@@ -80,6 +81,7 @@ const cartSlice = createSlice({
   reducers: {
     clearCartData: (state) => {
       state.cartItems = {};
+      state.cartFarmerId = undefined;
     },
   },
   extraReducers: (builder) => {
@@ -90,8 +92,9 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(addToCartAsync.fulfilled, (state, action) => {
-        const { productId } = action.payload;
+        const { productId, cartFarmerId } = action.payload;
         state.cartItems[productId] = (state.cartItems[productId] || 0) + 1;
+        state.cartFarmerId = cartFarmerId;
         state.loading = false;
         state.success = true;
       })
@@ -107,7 +110,9 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(getCartDataAsync.fulfilled, (state, action) => {
-        state.cartItems = action.payload;
+        const { cartData, cartFarmerId } = action.payload;
+        state.cartItems = cartData;
+        state.cartFarmerId = cartFarmerId;
         state.loading = false;
         state.success = true;
       })

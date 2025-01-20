@@ -67,6 +67,7 @@ const Cart = () => {
                         <Counter
                           productId={product._id}
                           count={cartItems[product._id]}
+                          cartFarmerId={product.farmer._id}
                         />
                         <p className="text-lg font-semibold">
                           ₹ {product.pricePerKg * cartItems[product._id]}

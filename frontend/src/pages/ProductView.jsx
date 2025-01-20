@@ -98,7 +98,11 @@ const ProductView = () => {
           <hr />
 
           <div className="flex items-center">
-            <Counter productId={id} count={cartItems[id]} />
+            <Counter
+              productId={id}
+              count={cartItems[id]}
+              cartFarmerId={product.farmer}
+            />
             <button
               onClick={handleCart}
               className="ml-4 px-28 py-4 bg-[#00B207] text-white rounded-full font-medium"

@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const orderSchema = mongoose.Schema(
   {
+    farmerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Farmer",
+    },
     placedBy: {
       type: {
         userType: {

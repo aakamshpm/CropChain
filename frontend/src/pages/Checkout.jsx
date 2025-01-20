@@ -19,7 +19,7 @@ import axios from "axios";
 import { clearCartData } from "../utils/cartSlice";
 
 const Checkout = () => {
-  const { cartItems } = useSelector((state) => state.cart);
+  const { cartItems, cartFarmerId } = useSelector((state) => state.cart);
   const { orderData: orderResponse } = useSelector((state) => state.order);
 
   const { enqueueSnackbar } = useSnackbar();
@@ -75,6 +75,7 @@ const Checkout = () => {
     });
 
     let orderData = {
+      cartFarmerId,
       products: orderedProducts,
       address,
       paymentMode,
@@ -90,18 +91,16 @@ const Checkout = () => {
         dispatch(clearCartData());
         navigate(`/order-success?=${orderResponse?.orderId}`);
       } else {
-        const { razorpayOrderId, orderId, amount, currency } =
-          await orderResponse;
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-          amount: amount,
-          currency: currency,
+          amount: orderResponse?.amount,
+          currency: orderResponse?.currency,
           name: "CropChain BANK",
           description: "Test Transaction",
-          order_id: razorpayOrderId,
+          order_id: orderResponse?.razorpayOrderId,
           handler: async function (response) {
             const paymentData = {
-              orderId,
+              orderId: orderResponse?.orderId,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpayOrderId: response.razorpay_order_id,
               razorpaySignature: response.razorpay_signature,
@@ -116,7 +115,7 @@ const Checkout = () => {
                 { withCredentials: true }
               );
               dispatch(clearCartData());
-              navigate(`/order-success=${orderId}`);
+              navigate(`/order-success=${orderResponse?.orderId}`);
             } catch (err) {
               enqueueSnackbar(err?.message || "Payment failed", {
                 variant: "error",

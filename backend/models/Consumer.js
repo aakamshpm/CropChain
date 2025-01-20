@@ -23,6 +23,7 @@ const consumerSchema = mongoose.Schema(
       country: { type: String, default: "India" },
       postalCode: { type: String },
     },
+    cartFarmerId: { type: mongoose.Schema.Types.ObjectId, ref: "Farmer" },
     cartData: { type: Object, default: {} },
     orders: { type: mongoose.Schema.Types.ObjectId, ref: "Orders" },
   },
