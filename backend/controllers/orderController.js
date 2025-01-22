@@ -54,6 +54,7 @@ const createOrder = asyncHandler(async (req, res) => {
 
       //create order
       const order = await Order.create({
+        farmerId,
         placedBy: { userType, userId },
         products,
         address,
@@ -125,9 +126,9 @@ const getUserOrders = asyncHandler(async (req, res) => {
   }
 });
 
-const getAllOrders = asyncHandler(async (req, res) => {
+const getFarmerOrders = asyncHandler(async (req, res) => {
   try {
-    const orders = await Order.find().populate({
+    const orders = await Order.find({ farmerId: req.farmerId }).populate({
       path: "products.product",
       select: "name images category",
     });
@@ -158,7 +159,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 export {
   createOrder,
   verifyPayment,
-  getAllOrders,
+  getFarmerOrders,
   getUserOrders,
   updateOrderStatus,
 };

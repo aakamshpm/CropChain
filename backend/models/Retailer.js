@@ -19,6 +19,7 @@ const retailerSchema = mongoose.Schema(
 
     password: { type: String, required: true },
     address: {
+      houseName: { type: String },
       street: { type: String },
       city: { type: String },
       state: { type: String },

@@ -5,7 +5,8 @@ import generateToken from "../utils/generateToken.js";
 
 const registerRetailer = asyncHandler(async (req, res) => {
   try {
-    const { name, phoneNumber, password, address } = req.body; // TODO:: add shop address
+    const { name, phoneNumber, password, address, shopAddress, shopCategory } =
+      req.body;
 
     if (!name || !phoneNumber || !password) {
       res.status(400);
@@ -25,6 +26,8 @@ const registerRetailer = asyncHandler(async (req, res) => {
       phoneNumber,
       password: hashedPassword,
       address,
+      shopAddress,
+      shopCategory,
     });
     if (retailer) {
       generateToken(res, retailer._id, "retailer");

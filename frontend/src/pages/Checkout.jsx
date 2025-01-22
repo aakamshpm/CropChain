@@ -20,7 +20,6 @@ import { clearCartData } from "../utils/cartSlice";
 
 const Checkout = () => {
   const { cartItems, cartFarmerId } = useSelector((state) => state.cart);
-  const { orderData: orderResponse } = useSelector((state) => state.order);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -64,40 +63,45 @@ const Checkout = () => {
 
   const placeOrder = async (address) => {
     let orderedProducts = [];
-    products?.data.map((product) => {
-      if (cartItems[product._id] > 0) {
-        let productInfo = { product: product._id };
-        productInfo["quantity"] = cartItems[product._id];
-        productInfo["pricePerKg"] = product.pricePerKg;
 
-        orderedProducts.push(productInfo);
+    products?.data.forEach((product) => {
+      if (cartItems[product._id] > 0) {
+        orderedProducts.push({
+          product: product._id,
+          quantity: cartItems[product._id],
+          pricePerKg: product.pricePerKg,
+        });
       }
     });
 
     let orderData = {
-      cartFarmerId,
+      farmerId: cartFarmerId,
       products: orderedProducts,
       address,
       paymentMode,
     };
 
     try {
-      dispatch(placeOrderAsync(orderData));
+      const orderResponse = await dispatch(placeOrderAsync(orderData)).unwrap();
+
+      if (!orderResponse) {
+        throw new Error("Order response is undefined or invalid");
+      }
 
       if (paymentMode === "cod") {
-        enqueueSnackbar(orderResponse?.message || "Order placed", {
+        enqueueSnackbar(orderResponse?.message || "Order placed successfully", {
           variant: "success",
         });
         dispatch(clearCartData());
-        navigate(`/order-success?=${orderResponse?.orderId}`);
+        navigate(`/order-success?orderId=${orderResponse?.orderId}`);
       } else {
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-          amount: orderResponse?.amount,
+          amount: orderResponse?.amount * 100, // Amount in paise
           currency: orderResponse?.currency,
           name: "CropChain BANK",
           description: "Test Transaction",
-          order_id: orderResponse?.razorpayOrderId,
+          order_id: orderResponse?.razorpayOrderId, // Pass Razorpay order ID
           handler: async function (response) {
             const paymentData = {
               orderId: orderResponse?.orderId,
@@ -114,23 +118,37 @@ const Checkout = () => {
                 paymentData,
                 { withCredentials: true }
               );
-              dispatch(clearCartData());
-              navigate(`/order-success=${orderResponse?.orderId}`);
-            } catch (err) {
-              enqueueSnackbar(err?.message || "Payment failed", {
-                variant: "error",
+              enqueueSnackbar("Payment verified successfully", {
+                variant: "success",
               });
-              console.log(err);
+              dispatch(clearCartData());
+              navigate(`/order-success?orderId=${orderResponse?.orderId}`);
+            } catch (err) {
+              enqueueSnackbar(
+                err?.response?.data?.message || "Payment verification failed",
+                {
+                  variant: "error",
+                }
+              );
+              console.error(err);
             }
           },
         };
 
         const rzp = new window.Razorpay(options);
+        rzp.on("payment.failed", function (response) {
+          console.error("Payment failed:", response);
+          enqueueSnackbar("Payment failed. Please try again.", {
+            variant: "error",
+          });
+        });
         rzp.open();
       }
     } catch (err) {
-      console.log(err);
-      enqueueSnackbar(err, { variant: "error" });
+      console.error(err);
+      enqueueSnackbar(err?.message || "Order placement failed", {
+        variant: "error",
+      });
     }
   };
 

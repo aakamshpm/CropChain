@@ -33,7 +33,9 @@ const ProductView = () => {
     }
 
     if (!cartItems[id]) {
-      dispatch(addToCartAsync(id));
+      dispatch(
+        addToCartAsync({ productId: id, cartFarmerId: product?.farmer })
+      );
       return;
     }
 

@@ -14,6 +14,7 @@ import Cart from "../pages/Cart";
 import NotFound from "../pages/NotFound";
 import Checkout from "../pages/Checkout";
 import OrderSuccess from "../pages/OrderSuccess";
+import OrderHistory from "../pages/OrderHistory";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,6 +26,7 @@ export const router = createBrowserRouter(
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/my-orders" element={<OrderHistory />} />
 
       {/* Login and Register restricted to unauthenticated users */}
       <Route element={<PublicRoute />}>
