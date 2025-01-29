@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Product from "../models/Product.js";
 import fs from "fs";
+import decodeToken from "../utils/decodeToken.js";
 
 // add products to sell
 const addProduct = asyncHandler(async (req, res) => {
@@ -62,13 +63,26 @@ const addProduct = asyncHandler(async (req, res) => {
   }
 });
 
-// get all products for consumer and retailers
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find().populate("farmer", "name farmName");
+    let userRole = null;
+
+    const token = await decodeToken(req);
+    if (token) {
+      userRole = token.role;
+    }
+
+    const query =
+      userRole === "retailer" ? { quantityAvailableInKg: { $gte: 100 } } : {};
+
+    const products = await Product.find(query).populate(
+      "farmer",
+      "name farmName"
+    );
+
     res
       .status(200)
-      .json({ message: "Products fetched successfuly", data: products });
+      .json({ message: "Products fetched successfully", data: products });
   } catch (error) {
     res.status(500);
     throw new Error(error.message);

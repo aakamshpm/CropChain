@@ -4,7 +4,7 @@ const productSchema = mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String },
   pricePerKg: { type: Number, required: true },
-  quantityAvailableInKg: { type: String, required: true },
+  quantityAvailableInKg: { type: Number, required: true },
   category: { type: String, required: true },
   harvestDate: { type: Date },
   images: [{ type: String }],
