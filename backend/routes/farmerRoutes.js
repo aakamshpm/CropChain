@@ -5,6 +5,8 @@ import {
   addFarm,
   farmerLogin,
   farmerLogout,
+  getAllFarmer,
+  getFarmerById,
   getFarmerDetails,
   updateAddress,
   updatePD,
@@ -19,6 +21,9 @@ router.post("/auth", farmerLogin);
 router.post("/logout", farmerLogout);
 
 router.get("/", protect(["farmer"]), getFarmerDetails);
+router.get("/get-one", getFarmerById);
+router.get("/get-all", getAllFarmer);
+
 router.post("/update-pd", protect(["farmer"]), updatePD);
 router.post("/update-address", protect(["farmer"]), updateAddress);
 router.post(

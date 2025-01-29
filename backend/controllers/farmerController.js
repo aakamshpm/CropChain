@@ -176,8 +176,27 @@ const getFarmerDetails = asyncHandler(async (req, res) => {
   }
 });
 
-// get farmer details (consumer/retailer side)
-const getFarmerDetailsByProduct = asyncHandler(async (req, res) => {});
+// get all farmer details (consumer/retailer side)
+const getAllFarmer = asyncHandler(async (req, res) => {
+  try {
+    const farmers = await Farmer.find().select("-password");
+    res.status(200).json({ farmers });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
+const getFarmerById = asyncHandler(async (req, res) => {
+  const farmerId = req.body;
+  try {
+    const farmer = await Farmer.findById(farmerId).select("-password");
+    res.status(200).json({ farmer });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
 
 export {
   farmerLogin,
@@ -188,4 +207,6 @@ export {
   updateProfilePicture,
   addFarm,
   getFarmerDetails,
+  getAllFarmer,
+  getFarmerById,
 };

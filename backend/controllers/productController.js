@@ -96,8 +96,9 @@ const getProductById = asyncHandler(async (req, res) => {
 
 // get product based on farmer
 const getProductsByFarmer = asyncHandler(async (req, res) => {
+  const { farmer } = req.query;
   try {
-    const products = await Product.find({ farmer: req.farmerId });
+    const products = await Product.find({ farmer });
     res.status(200).json({ data: products });
   } catch (err) {
     res.status(500);

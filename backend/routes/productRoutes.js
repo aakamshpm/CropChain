@@ -13,7 +13,7 @@ import {
 const router = express.Router();
 
 router.get("/", getAllProducts);
-router.get("/farmer/get", protect(["farmer"]), getProductsByFarmer);
+router.get("/farmer", getProductsByFarmer);
 router.get("/:productId", getProductById);
 router.post("/add", protect(["farmer"]), upload.array("images"), addProduct);
 router.post("/update/:productId", protect(["farmer"]), updateProduct);
