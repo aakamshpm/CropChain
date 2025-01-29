@@ -114,7 +114,7 @@ const Login = () => {
         </button>
         <p className="mt-3">
           New to CropChain?{" "}
-          <Link className="underline" to="/farmer/register">
+          <Link className="underline" to="/register">
             Register
           </Link>{" "}
           now!

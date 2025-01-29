@@ -1,12 +1,29 @@
 import { useEffect, useState } from "react";
+import { useGetProductsByFarmerQuery } from "../auth/authService";
+import { jwtDecode } from "jwt-decode";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Button } from "@mui/material";
-import { useGetProductsByFarmerQuery } from "../auth/authService";
 import FarmerTable from "../components/FarmerTable";
 import ModifyProduct from "../components/ModifyProduct";
 
 const Products = () => {
-  const { data, isLoading, refetch } = useGetProductsByFarmerQuery();
+  const getFarmerIdFromToken = () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        const decoded = jwtDecode(token);
+        return decoded.userId;
+      }
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return null;
+    }
+  };
+
+  const farmerId = getFarmerIdFromToken();
+
+  const { data, isLoading, refetch } = useGetProductsByFarmerQuery(farmerId);
 
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -31,7 +48,7 @@ const Products = () => {
     refetch();
   }, [open]);
 
-  if (isLoading) {
+  if (!data) {
     return <p>Loading ...</p>;
   }
 

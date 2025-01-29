@@ -26,8 +26,6 @@ const Register = () => {
       .max(12, "Password cannot exceed more than 12 characters"),
     confirmPassword: Yup.string()
       .required("Confirm Password is required")
-      .min(4, "Password length should be at least 4 characters")
-      .max(12, "Password cannot exceed more than 12 characters")
       .oneOf([Yup.ref("password")], "Passwords do not match"),
   });
 
@@ -162,7 +160,7 @@ const Register = () => {
         </button>
         <p className="mt-3">
           Already Registered?
-          <Link className="underline" to="/farmer/login">
+          <Link className="underline" to="/login">
             Login
           </Link>{" "}
           now!
