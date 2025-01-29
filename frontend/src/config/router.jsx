@@ -9,19 +9,19 @@ import UserRegister from "../pages/UserRegister";
 import UserHome from "../pages/UserHome";
 import PublicRoute from "../components/routes/PublicRoutes";
 import ProductView from "../pages/ProductView";
-import FarmerProfile from "../pages/FarmerProfile";
 import Cart from "../pages/Cart";
 import NotFound from "../pages/NotFound";
 import Checkout from "../pages/Checkout";
 import OrderSuccess from "../pages/OrderSuccess";
 import OrderHistory from "../pages/OrderHistory";
+import ViewFarmers from "../pages/ViewFarmers";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       {/* Public Routes */}
       <Route index element={<UserHome />} />
-      <Route path="/farmer/:id" element={<FarmerProfile />} />
+      <Route path="/farmers" element={<ViewFarmers />} />
       <Route path="/product/:id" element={<ProductView />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
