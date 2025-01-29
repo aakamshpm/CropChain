@@ -29,6 +29,14 @@ export const userApi = createApi({
         credentials: "include",
       }),
     }),
+
+    getAllFarmers: builder.query({
+      query: () => ({
+        url: "api/farmer/get-all",
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -36,4 +44,5 @@ export const {
   useGetProductsQuery,
   useGetProductByIdQuery,
   useGetUserOrdersQuery,
+  useGetAllFarmersQuery,
 } = userApi;
