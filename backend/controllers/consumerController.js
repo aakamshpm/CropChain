@@ -63,6 +63,17 @@ const loginConsumer = asyncHandler(async (req, res) => {
   }
 });
 
+// logout Consumer
+const logoutConsumer = asyncHandler(async (req, res) => {
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    expires: new Date(0),
+  });
+  res.json({ message: "Logout successfull" });
+});
+
 const getConsumerDetails = asyncHandler(async (req, res) => {
   try {
     const consumer = await Consumer.findById(req.consumerId).select(
@@ -81,4 +92,4 @@ const getConsumerDetails = asyncHandler(async (req, res) => {
   }
 });
 
-export { loginConsumer, registerConsumer, getConsumerDetails };
+export { loginConsumer, registerConsumer, logoutConsumer, getConsumerDetails };

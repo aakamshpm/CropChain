@@ -45,5 +45,22 @@ const retailerLogin = createAsyncThunk(
     }
   }
 );
+const retailerLogout = createAsyncThunk(
+  "retailer/logout",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${retailerURL}/logout`,
+        {}, // Empty body
+        {
+          withCredentials: true, // Ensure credentials are included
+        }
+      );
 
-export { retailerLogin, retailerRegister };
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data?.message || error?.message);
+    }
+  }
+);
+export { retailerLogin, retailerRegister, retailerLogout };

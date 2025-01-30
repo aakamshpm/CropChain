@@ -6,11 +6,15 @@ import ProductWidget from "../components/ProductWidget";
 import FarmerDetails from "../components/FarmerDetails";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Box, CardMedia, CircularProgress } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 const UserHome = () => {
-  const { data: products, isLoading: loadingProducts } = useGetProductsQuery();
+  const {
+    data: products,
+    isLoading: loadingProducts,
+    refetch,
+  } = useGetProductsQuery();
   const {
     data: farmersData,
     isLoading: loadingFarmers,
@@ -50,6 +54,10 @@ const UserHome = () => {
     setOpen(false);
     setSelectedFarmer(null);
   };
+
+  useEffect(() => {
+    refetch();
+  }, [products]);
 
   if (loadingProducts || loadingFarmers) {
     return (

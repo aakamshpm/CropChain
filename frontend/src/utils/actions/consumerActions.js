@@ -46,4 +46,21 @@ const consumerLogin = createAsyncThunk(
   }
 );
 
-export { consumerLogin, consumerRegister };
+//logout consumer
+const consumerLogout = createAsyncThunk(
+  "consumer/logout",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${consumerURL}/logout`, {
+        ...config,
+        withCredentials: true,
+      });
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data?.message || error?.message);
+    }
+  }
+);
+
+export { consumerLogin, consumerRegister, consumerLogout };

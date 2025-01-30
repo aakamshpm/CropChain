@@ -9,6 +9,8 @@ import { isUserAuthenticated } from "../utils/userAuth";
 import { useDispatch } from "react-redux";
 import { clearCartData, getCartDataAsync } from "../utils/cartSlice";
 import { clearCredentials } from "../utils/userSlice";
+import { consumerLogout } from "../utils/actions/consumerActions";
+import { retailerLogout } from "../utils/actions/retailerActions";
 
 const Navbar = () => {
   const role = isUserAuthenticated();
@@ -17,6 +19,11 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const onLogout = () => {
+    {
+      role === "retailer"
+        ? dispatch(retailerLogout())
+        : dispatch(consumerLogout());
+    }
     dispatch(clearCredentials());
     dispatch(clearCartData());
     navigate("/login");

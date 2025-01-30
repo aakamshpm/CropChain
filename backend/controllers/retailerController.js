@@ -66,6 +66,16 @@ const loginRetailer = asyncHandler(async (req, res) => {
   }
 });
 
+const logoutRetailer = asyncHandler(async (req, res) => {
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    expires: new Date(0),
+  });
+  res.json({ message: "Logout successful" });
+});
+
 const getRetailerDetails = asyncHandler(async (req, res) => {
   try {
     const retailer = await Retailer.findById(req.retailerId).select(
@@ -84,4 +94,4 @@ const getRetailerDetails = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerRetailer, loginRetailer, getRetailerDetails };
+export { registerRetailer, loginRetailer, logoutRetailer, getRetailerDetails };
