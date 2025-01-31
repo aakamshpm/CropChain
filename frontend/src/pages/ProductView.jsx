@@ -24,6 +24,8 @@ const ProductView = () => {
 
   const { cartItems, loading, error } = useSelector((state) => state.cart);
 
+  const [quantityAvailable, setQuantityAvailable] = useState(null);
+
   const handleCart = () => {
     if (!isAuthenticated) {
       enqueueSnackbar("Please Sign In / Sign Up before continuing", {
@@ -43,7 +45,10 @@ const ProductView = () => {
   };
 
   useEffect(() => {
-    if (data) setProduct(data?.product);
+    if (data) {
+      setProduct(data?.product);
+      setQuantityAvailable(data?.product?.quantityAvailableInKg);
+    }
   }, [data]);
 
   const averageRating = product?.ratings?.length
@@ -92,9 +97,13 @@ const ProductView = () => {
 
           <div className="flex flex-col justify-center">
             <p className="text-[#808080] text-sm">{product?.description}</p>
-            <p className="mt-3">
-              Quantity Available: {product?.quantityAvailableInKg} kg(s)
-            </p>
+            {!quantityAvailable || quantityAvailable < 1 ? (
+              <p className="mt-3 text-red-600">Out of Stock</p>
+            ) : (
+              <p className="mt-3">
+                Quantity Available: {quantityAvailable} kg(s)
+              </p>
+            )}
           </div>
 
           <hr />
@@ -104,6 +113,8 @@ const ProductView = () => {
               productId={id}
               count={cartItems[id]}
               cartFarmerId={product.farmer}
+              quantityAvailable={quantityAvailable}
+              setQuantityAvailable={setQuantityAvailable}
             />
             <button
               onClick={handleCart}

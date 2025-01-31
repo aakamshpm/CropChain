@@ -3,7 +3,13 @@ import { isUserAuthenticated } from "../utils/userAuth";
 import { addToCartAsync, decrementCartItemAsync } from "../utils/cartSlice";
 import { useDispatch } from "react-redux";
 
-const Counter = ({ productId, count, cartFarmerId }) => {
+const Counter = ({
+  productId,
+  count,
+  cartFarmerId,
+  quantityAvailable,
+  setQuantityAvailable,
+}) => {
   const isAuthenticated = isUserAuthenticated();
 
   const dispatch = useDispatch();
@@ -16,7 +22,10 @@ const Counter = ({ productId, count, cartFarmerId }) => {
         variant: "warning",
       });
     } else {
-      if (count) dispatch(decrementCartItemAsync(productId));
+      if (count) {
+        dispatch(decrementCartItemAsync(productId));
+        setQuantityAvailable((prev) => prev + 1);
+      }
     }
   };
 
@@ -25,8 +34,13 @@ const Counter = ({ productId, count, cartFarmerId }) => {
       enqueueSnackbar("Please Sign In / Sign Up before continuing", {
         variant: "warning",
       });
-    } else {
+    } else if (quantityAvailable > 0) {
       dispatch(addToCartAsync({ productId, cartFarmerId }));
+      setQuantityAvailable((prev) => prev - 1);
+    } else {
+      enqueueSnackbar("Out of stock!", {
+        variant: "warning",
+      });
     }
   };
 
@@ -43,7 +57,7 @@ const Counter = ({ productId, count, cartFarmerId }) => {
       {/* Number Display */}
       <p
         className="w-2 text-center text-lg font-medium text-gray-700"
-        style={{ minWidth: "0.5em" }}
+        style={{ minWidth: "1em" }}
       >
         {count ? count : "0"}
       </p>

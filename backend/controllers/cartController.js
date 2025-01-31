@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Consumer from "../models/Consumer.js";
 import Retailer from "../models/Retailer.js";
+import Product from "../models/Product.js";
 
 // add item to cart
 const addToCart = asyncHandler(async (req, res) => {
@@ -23,6 +24,11 @@ const addToCart = asyncHandler(async (req, res) => {
       userRole === "consumer"
         ? await Consumer.findByIdAndUpdate(userId, { cartFarmerId, cartData })
         : await Retailer.findByIdAndUpdate(userId, { cartFarmerId, cartData });
+
+      await Product.findOneAndUpdate(
+        { _id: productId, quantityAvailableInKg: { $gte: 1 } },
+        { $inc: { quantityAvailableInKg: -1 } }
+      );
 
       res.status(200).json({ message: "Item added to cart" });
     } else {
@@ -86,6 +92,11 @@ const decrementFromCart = asyncHandler(async (req, res) => {
     userRole === "consumer"
       ? await Consumer.findByIdAndUpdate(userId, update)
       : await Retailer.findByIdAndUpdate(userId, update);
+
+    await Product.findByIdAndUpdate(productId, {
+      $inc: { quantityAvailableInKg: 1 },
+    });
+
     res.status(200).json({ message: "Item removed" });
   } catch (err) {
     res.status(500);
