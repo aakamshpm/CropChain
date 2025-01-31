@@ -111,6 +111,25 @@ const verifyPayment = asyncHandler(async (req, res) => {
   }
 });
 
+const fetchAnOrder = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findById(orderId)
+      .populate("products.product")
+      .populate("farmerId");
+    if (!order) {
+      res.status(400);
+      throw new Error("Order not found!");
+    }
+
+    res.status(200).json({ order });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
 const getUserOrders = asyncHandler(async (req, res) => {
   const { userId } = req;
 
@@ -160,6 +179,7 @@ export {
   createOrder,
   verifyPayment,
   getFarmerOrders,
+  fetchAnOrder,
   getUserOrders,
   updateOrderStatus,
 };

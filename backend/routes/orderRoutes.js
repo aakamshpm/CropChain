@@ -2,6 +2,7 @@ import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
 import {
   createOrder,
+  fetchAnOrder,
   getFarmerOrders,
   getUserOrders,
   updateOrderStatus,
@@ -12,6 +13,7 @@ const router = express.Router();
 
 router.get("/", protect(["farmer"]), getFarmerOrders);
 router.get("/user-orders", protect(["consumer", "retailer"]), getUserOrders);
+router.get("/fetch/:orderId", protect(["consumer", "retailer"]), fetchAnOrder);
 
 router.post("/create-order", protect(["consumer", "retailer"]), createOrder);
 router.post(
