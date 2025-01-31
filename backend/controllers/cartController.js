@@ -3,7 +3,7 @@ import Consumer from "../models/Consumer.js";
 import Retailer from "../models/Retailer.js";
 import Product from "../models/Product.js";
 
-// add item to cart
+// add item to cart (Consumer only)
 const addToCart = asyncHandler(async (req, res) => {
   const { userId, userRole } = req;
   const { productId, cartFarmerId } = req.body;
@@ -153,10 +153,17 @@ const removeAllFromCart = asyncHandler(async (req, res) => {
   }
 });
 
+// Retailer cart
+const addToRetailerCart = asyncHandler(async (req, res) => {
+  const { productId, cartFarmerId } = req.body;
+  const { userRole, userId } = req;
+});
+
 export {
   addToCart,
   getCartInfo,
   decrementFromCart,
   removeFromCart,
   removeAllFromCart,
+  addToRetailerCart,
 };

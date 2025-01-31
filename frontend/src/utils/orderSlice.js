@@ -25,6 +25,36 @@ const placeOrderAsync = createAsyncThunk(
   }
 );
 
+const fetchOrderByID = createAsyncThunk(
+  "order/fetchOne",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${orderUrl}/fetch/${orderId}`, {
+        withCredentials: true,
+      });
+      return response.data.order;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || err?.message);
+    }
+  }
+);
+
+const cancelOrder = createAsyncThunk(
+  "order/cancel",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `${orderUrl}/cancel/${orderId}`,
+        {},
+        { withCredentials: true }
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || err?.message);
+    }
+  }
+);
+
 const orderSlice = createSlice({
   name: "order",
   initialState,
@@ -45,9 +75,25 @@ const orderSlice = createSlice({
         state.loading = false;
         state.success = false;
         state.error = action.payload;
+      })
+
+      //fetch order by id
+
+      .addCase(fetchOrderByID.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchOrderByID.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orderData = action.payload;
+        state.error = false;
+      })
+      .addCase(fetchOrderByID.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export { placeOrderAsync };
+export { placeOrderAsync, fetchOrderByID, cancelOrder };
 export default orderSlice.reducer;

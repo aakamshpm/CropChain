@@ -8,6 +8,7 @@ import { isUserAuthenticated } from "../utils/userAuth";
 import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCartAsync } from "../utils/cartSlice";
+import RetailerCounter from "../components/RetailerCounter";
 
 const ProductView = () => {
   const { id } = useParams();
@@ -17,7 +18,7 @@ const ProductView = () => {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const isAuthenticated = isUserAuthenticated();
+  const role = isUserAuthenticated();
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ const ProductView = () => {
   const [quantityAvailable, setQuantityAvailable] = useState(null);
 
   const handleCart = () => {
-    if (!isAuthenticated) {
+    if (!role) {
       enqueueSnackbar("Please Sign In / Sign Up before continuing", {
         variant: "warning",
       });
@@ -109,13 +110,17 @@ const ProductView = () => {
           <hr />
 
           <div className="flex items-center">
-            <Counter
-              productId={id}
-              count={cartItems[id]}
-              cartFarmerId={product.farmer}
-              quantityAvailable={quantityAvailable}
-              setQuantityAvailable={setQuantityAvailable}
-            />
+            {role === "retailer" ? (
+              <RetailerCounter />
+            ) : (
+              <Counter
+                productId={id}
+                count={cartItems[id]}
+                cartFarmerId={product.farmer}
+                quantityAvailable={quantityAvailable}
+                setQuantityAvailable={setQuantityAvailable}
+              />
+            )}
             <button
               onClick={handleCart}
               className="ml-4 px-28 py-4 bg-[#00B207] text-white rounded-full font-medium"

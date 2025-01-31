@@ -175,6 +175,30 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   }
 });
 
+//  cancel an order
+const cancelOrder = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    const order = await Order.findById(orderId);
+    if (!order) {
+      res.status(400);
+      throw new Error("Order not found");
+    }
+
+    if (order.status !== "Pending") {
+      res.status(400);
+      throw new Error("Order cannot be cancelled");
+    }
+
+    order.status = "Cancelled";
+    await order.save();
+    res.status(200).json({ message: "Order cancelled" });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
 export {
   createOrder,
   verifyPayment,
@@ -182,4 +206,5 @@ export {
   fetchAnOrder,
   getUserOrders,
   updateOrderStatus,
+  cancelOrder,
 };

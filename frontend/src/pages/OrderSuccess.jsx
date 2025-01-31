@@ -1,39 +1,28 @@
 import { useEffect, useState } from "react";
-import { useLocation, Link } from "react-router-dom";
-import axios from "axios";
+import { useParams, Link, useLocation } from "react-router-dom";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchOrderByID } from "../utils/orderSlice";
 
 const OrderSuccess = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const orderId = searchParams.get("orderId");
+  const dispatch = useDispatch();
 
-  const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    orderData: order,
+    loading,
+    error,
+  } = useSelector((state) => state.order);
 
   useEffect(() => {
-    const fetchOrderDetails = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_SERVER_URL}/api/order/fetch/${orderId}`,
-          { withCredentials: true }
-        );
-        setOrder(response.data.order);
-        setLoading(false);
-      } catch (err) {
-        console.error("Failed to fetch order details:", err);
-        setError("Failed to load order details. Please try again later.");
-        setLoading(false);
-      }
-    };
-
     if (orderId) {
-      fetchOrderDetails();
+      dispatch(fetchOrderByID(orderId));
     }
-  }, [orderId]);
+  }, [dispatch, orderId]);
 
   if (loading) {
     return (

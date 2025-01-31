@@ -1,6 +1,7 @@
 import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
 import {
+  cancelOrder,
   createOrder,
   fetchAnOrder,
   getFarmerOrders,
@@ -22,5 +23,11 @@ router.post(
   verifyPayment
 );
 router.post("/update-status", protect(["farmer"]), updateOrderStatus);
+
+router.put(
+  "/cancel/:orderId",
+  protect(["consumer", "retailer", "farmer"]),
+  cancelOrder
+);
 
 export default router;
