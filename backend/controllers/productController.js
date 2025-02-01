@@ -165,6 +165,26 @@ const removeProduct = asyncHandler(async (req, res) => {
   }
 });
 
+// Search products
+const searchForProducts = asyncHandler(async (req, res) => {
+  const { search } = req.query;
+
+  if (!search) {
+    res.status(400);
+    throw new Error("Search query is required");
+  }
+
+  try {
+    const products = await Product.find({
+      $text: { $search: search },
+    }).populate("farmer", "name farmName");
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500);
+    throw new Error("Failed to search products: " + err.message);
+  }
+});
+
 export {
   addProduct,
   getAllProducts,
@@ -172,4 +192,5 @@ export {
   getProductsByFarmer,
   updateProduct,
   removeProduct,
+  searchForProducts,
 };

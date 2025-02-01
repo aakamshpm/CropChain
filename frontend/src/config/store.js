@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "../utils/userSlice";
 import cartReducer from "../utils/cartSlice";
 import orderReducer from "../utils/orderSlice";
+import producReducer from "../utils/productSlice";
 import { userApi } from "../utils/userServices";
 
 const store = configureStore({
@@ -9,6 +10,7 @@ const store = configureStore({
     user: userReducer,
     cart: cartReducer,
     order: orderReducer,
+    product: producReducer,
     [userApi.reducerPath]: userApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

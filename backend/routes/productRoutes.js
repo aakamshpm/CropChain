@@ -7,6 +7,7 @@ import {
   getProductById,
   getProductsByFarmer,
   removeProduct,
+  searchForProducts,
   updateProduct,
 } from "../controllers/productController.js";
 
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.get("/", getAllProducts);
 router.get("/farmer", getProductsByFarmer);
+router.get("/search", searchForProducts);
 router.get("/:productId", getProductById);
 router.post("/add", protect(["farmer"]), upload.array("images"), addProduct);
 router.post("/update/:productId", protect(["farmer"]), updateProduct);

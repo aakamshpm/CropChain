@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import Person2OutlinedIcon from "@mui/icons-material/Person2Outlined";
@@ -18,6 +18,8 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const onLogout = () => {
     {
       role === "retailer"
@@ -27,6 +29,12 @@ const Navbar = () => {
     dispatch(clearCredentials());
     dispatch(clearCartData());
     navigate("/login");
+  };
+
+  const searchProducts = () => {
+    if (searchTerm.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+    }
   };
 
   useEffect(() => {
@@ -46,17 +54,27 @@ const Navbar = () => {
             <SearchOutlinedIcon />
             <TextField
               variant="standard"
-              placeholder="Search"
+              placeholder="Search for products"
               fullWidth
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.code === "Enter") {
+                  searchProducts();
+                }
+              }}
               slotProps={{
                 input: {
                   disableUnderline: true,
-                  style: { fontFamily: "Poppins" },
+                  style: { fontFamily: "Poppins", marginLeft: "4px" },
                 },
               }}
             />
           </div>
-          <button className="bg-[#00B207] rounded-e-lg text-white px-4 py-1">
+          <button
+            onClick={searchProducts}
+            className="bg-[#00B207] rounded-e-lg text-white px-4 py-1"
+          >
             Submit
           </button>
         </div>
