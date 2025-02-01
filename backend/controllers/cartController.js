@@ -7,6 +7,7 @@ import Product from "../models/Product.js";
 const addToCart = asyncHandler(async (req, res) => {
   const { userId, userRole } = req;
   const { productId, cartFarmerId } = req.body;
+
   try {
     const userData =
       userRole === "consumer"

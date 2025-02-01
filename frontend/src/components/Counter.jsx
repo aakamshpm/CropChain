@@ -24,19 +24,23 @@ const Counter = ({
     } else {
       if (count) {
         dispatch(decrementCartItemAsync(productId));
-        setQuantityAvailable((prev) => prev + 1);
       }
     }
   };
 
-  const addItem = () => {
+  const addItem = async () => {
     if (!isAuthenticated) {
       enqueueSnackbar("Please Sign In / Sign Up before continuing", {
         variant: "warning",
       });
     } else if (quantityAvailable > 0) {
-      dispatch(addToCartAsync({ productId, cartFarmerId }));
-      setQuantityAvailable((prev) => prev - 1);
+      try {
+        await dispatch(addToCartAsync({ productId, cartFarmerId })).unwrap();
+      } catch (err) {
+        enqueueSnackbar(err || "Error", {
+          variant: "error",
+        });
+      }
     } else {
       enqueueSnackbar("Out of stock!", {
         variant: "warning",

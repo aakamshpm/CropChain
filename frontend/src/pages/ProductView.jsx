@@ -23,7 +23,7 @@ const ProductView = () => {
   const dispatch = useDispatch();
   const { cartItems } = useSelector((state) => state.cart);
 
-  const handleCart = () => {
+  const handleCart = async () => {
     if (!role) {
       enqueueSnackbar("Please Sign In / Sign Up before continuing", {
         variant: "warning",
@@ -31,11 +31,17 @@ const ProductView = () => {
       return;
     }
 
-    if (!cartItems[id]) {
-      dispatch(
-        addToCartAsync({ productId: id, cartFarmerId: product?.farmer })
-      );
-      return;
+    if (!cartItems?.[id]) {
+      try {
+        await dispatch(
+          addToCartAsync({ productId: id, cartFarmerId: product?.farmer })
+        ).unwrap();
+      } catch (error) {
+        enqueueSnackbar(error?.message || "Failed to add item to cart", {
+          variant: "error",
+        });
+        return;
+      }
     }
 
     navigate("/cart");
@@ -117,16 +123,24 @@ const ProductView = () => {
             {/* Add to Cart Section */}
             <div className="flex items-center space-x-4">
               {role === "retailer" ? (
-                <RetailerCounter />
+                <div className="flex flex-col">
+                  <RetailerCounter />
+                  <p className="text-sm mt-2 text-gray-500">
+                    Minimum order quantity:{" "}
+                    <span className="font-medium text-black">100 KG</span>
+                  </p>
+                </div>
               ) : (
                 <Counter
                   productId={id}
                   count={cartItems[id]}
-                  cartFarmerId={product.farmer}
+                  cartFarmerId={product.farmer._id}
                   quantityAvailable={quantityAvailable}
                   setQuantityAvailable={setQuantityAvailable}
                 />
               )}
+
+              {/* Add to cart button  */}
               <button
                 onClick={handleCart}
                 className="flex items-center justify-center px-8 py-3 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 transition-colors"

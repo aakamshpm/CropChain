@@ -11,6 +11,7 @@ const initialState = {
   cartFarmerId: "",
 };
 
+//Consumer cart
 const addToCartAsync = createAsyncThunk(
   "cart/addToCart",
   async (data, { rejectWithValue }) => {
@@ -24,7 +25,7 @@ const addToCartAsync = createAsyncThunk(
         response: response.data,
       };
     } catch (err) {
-      return rejectWithValue(err.response?.data || "Error adding to cart");
+      return rejectWithValue(err.response?.data || "Error adding item");
     }
   }
 );
@@ -75,6 +76,15 @@ const removeCartItemAsync = createAsyncThunk(
   }
 );
 
+// Retailer cart
+const addToRetailerCartAsync = createAsyncThunk(
+  "cart/retailerAdd",
+  async (data, { rejectWithValue }) => {
+    try {
+    } catch (err) {}
+  }
+);
+
 const cartSlice = createSlice({
   name: "cart",
   initialState,
@@ -86,19 +96,21 @@ const cartSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(addToCartAsync.pending, (state) => {
+      .addCase(addToCartAsync.pending, (state, action) => {
+        const { productId } = action.meta.arg;
+        state.cartItems[productId] = (state.cartItems[productId] || 0) + 1;
         state.loading = true;
-        state.success = false;
         state.error = null;
       })
       .addCase(addToCartAsync.fulfilled, (state, action) => {
-        const { productId, cartFarmerId } = action.payload;
-        state.cartItems[productId] = (state.cartItems[productId] || 0) + 1;
-        state.cartFarmerId = cartFarmerId;
+        state.cartFarmerId = action.payload.cartFarmerId;
         state.loading = false;
         state.success = true;
       })
       .addCase(addToCartAsync.rejected, (state, action) => {
+        const { productId } = action.meta.arg;
+        state.cartItems[productId] = (state.cartItems[productId] || 0) - 1;
+
         state.loading = false;
         state.success = false;
         state.error = action.payload;
@@ -118,13 +130,11 @@ const cartSlice = createSlice({
       })
       .addCase(getCartDataAsync.rejected, (state, action) => {
         state.loading = false;
-        state.success = false;
         state.error = action.payload;
       })
 
-      .addCase(decrementCartItemAsync.fulfilled, (state, action) => {
-        const { productId } = action.payload;
-
+      .addCase(decrementCartItemAsync.pending, (state, action) => {
+        const productId = action.meta.arg;
         if (state.cartItems[productId]) {
           state.cartItems[productId] -= 1;
 
@@ -132,11 +142,17 @@ const cartSlice = createSlice({
             delete state.cartItems[productId];
           }
         }
-
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(decrementCartItemAsync.fulfilled, (state) => {
         state.loading = false;
         state.success = true;
       })
       .addCase(decrementCartItemAsync.rejected, (state, action) => {
+        const productId = action.meta.arg;
+        state.cartItems[productId] = (state.cartItems[productId] || 0) + 1;
+
         state.error = action.payload;
       })
 
@@ -150,6 +166,28 @@ const cartSlice = createSlice({
       })
       .addCase(removeCartItemAsync.rejected, (state, action) => {
         state.error = action.payload;
+      })
+
+      //Retailer cart
+      .addCase(addToRetailerCartAsync.pending, (state, action) => {
+        const { productId, quantity } = action.payload;
+        state.cartItems[productId] =
+          (state.cartItems[productId] || 0) + quantity;
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addToRetailerCartAsync.fulfilled, (state, action) => {
+        const { cartFarmerId } = action.payload;
+        state.cartFarmerId = cartFarmerId;
+        state.loading = false;
+        state.success = true;
+      })
+      .addCase(addToRetailerCartAsync.rejected, (state, action) => {
+        const { productId, quantity } = action.payload;
+        state.cartItems[productId] = state.cartItems[productId] - quantity;
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
       });
   },
 });
@@ -159,6 +197,7 @@ export {
   getCartDataAsync,
   decrementCartItemAsync,
   removeCartItemAsync,
+  addToRetailerCartAsync,
 };
 export const { clearCartData } = cartSlice.actions;
 export default cartSlice.reducer;
