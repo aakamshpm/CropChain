@@ -94,7 +94,10 @@ const getProductById = asyncHandler(async (req, res) => {
   const { productId } = req.params;
 
   try {
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).populate(
+      "farmer",
+      "name farmName"
+    );
 
     if (!product) {
       res.status(400);

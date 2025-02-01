@@ -15,17 +15,13 @@ const ProductView = () => {
   const { data, isLoading } = useGetProductByIdQuery(id);
 
   const [product, setProduct] = useState(null);
+  const [quantityAvailable, setQuantityAvailable] = useState(null);
 
   const { enqueueSnackbar } = useSnackbar();
-
   const role = isUserAuthenticated();
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const { cartItems, loading, error } = useSelector((state) => state.cart);
-
-  const [quantityAvailable, setQuantityAvailable] = useState(null);
+  const { cartItems } = useSelector((state) => state.cart);
 
   const handleCart = () => {
     if (!role) {
@@ -54,7 +50,7 @@ const ProductView = () => {
 
   const averageRating = product?.ratings?.length
     ? product.ratings.reduce((sum, r) => sum + r.rating, 0) /
-      product.rating.length
+      product.ratings.length
     : 0;
 
   if (!product) {
@@ -66,72 +62,118 @@ const ProductView = () => {
   }
 
   return (
-    <div className="px-24 py-5 h-screen">
-      <div className="grid grid-cols-2">
-        <div className="w-[60%]">
-          <img
-            src={`${import.meta.env.VITE_API_SERVER_URL}/uploads/${
-              product?.images[0]
-            }`}
-            alt=""
-            className="w-full"
-          />
-        </div>
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Product Details Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Product Image */}
+          <div className="w-full lg:w-[80%]">
+            <img
+              src={`${import.meta.env.VITE_API_SERVER_URL}/uploads/${
+                product?.images[0]
+              }`}
+              alt={product?.name}
+              className="w-full h-auto rounded-lg shadow-lg"
+            />
+          </div>
 
-        <div className="flex flex-col">
-          <div className="flex flex-col">
-            <h1 className="text-4xl font-semibold">{product?.name}</h1>
+          {/* Product Information */}
+          <div className="flex flex-col space-y-6">
+            <h1 className="text-4xl font-bold text-gray-900">
+              {product?.name}
+            </h1>
 
-            <div className="flex items-center mt-2">
+            {/* Rating */}
+            <div className="flex items-center space-x-2">
               <Rating value={averageRating} readOnly precision={0.5} />
-              <p className="ml-1 text-sm">
-                {product?.ratings?.length || 0} ratings
+              <p className="text-sm text-gray-600">
+                ({product?.ratings?.length || 0} ratings)
               </p>
             </div>
 
-            <p className="mt-4 text-[#2C742F] font-medium text-2xl">
-              ₹{product?.pricePerKg}
+            {/* Price */}
+            <p className="text-3xl font-semibold text-green-600">
+              ₹{product?.pricePerKg} / kg
             </p>
+
+            {/* Description */}
+            <div className="text-gray-700">
+              <p className="text-lg font-medium">Description</p>
+              <p className="text-sm">{product?.description}</p>
+            </div>
+
+            {/* Stock Status */}
+            <div className="text-gray-700">
+              <p className="text-lg font-medium">Availability</p>
+              {!quantityAvailable || quantityAvailable < 1 ? (
+                <p className="text-red-600">Out of Stock</p>
+              ) : (
+                <p className="text-green-600">
+                  {quantityAvailable} kg(s) available
+                </p>
+              )}
+            </div>
+
+            {/* Add to Cart Section */}
+            <div className="flex items-center space-x-4">
+              {role === "retailer" ? (
+                <RetailerCounter />
+              ) : (
+                <Counter
+                  productId={id}
+                  count={cartItems[id]}
+                  cartFarmerId={product.farmer}
+                  quantityAvailable={quantityAvailable}
+                  setQuantityAvailable={setQuantityAvailable}
+                />
+              )}
+              <button
+                onClick={handleCart}
+                className="flex items-center justify-center px-8 py-3 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 transition-colors"
+              >
+                {!cartItems[id] ? "Add to Cart" : "Go to Cart"}
+                <LocalMallOutlinedIcon className="ml-2" />
+              </button>
+            </div>
+
+            {/* Additional Details */}
+            <div className="text-gray-700">
+              <p className="text-lg font-medium">Product Details</p>
+              <ul className="list-disc list-inside text-sm">
+                <li>Category: {product?.category}</li>
+                <li>
+                  Harvest Date:{" "}
+                  {new Date(product?.harvestDate).toLocaleDateString()}
+                </li>
+                <li>Farm: {product?.farmer?.farmName}</li>
+                <li>Farmer: {product?.farmer?.name}</li>
+              </ul>
+            </div>
           </div>
+        </div>
 
-          <hr />
-
-          <div className="flex flex-col justify-center">
-            <p className="text-[#808080] text-sm">{product?.description}</p>
-            {!quantityAvailable || quantityAvailable < 1 ? (
-              <p className="mt-3 text-red-600">Out of Stock</p>
-            ) : (
-              <p className="mt-3">
-                Quantity Available: {quantityAvailable} kg(s)
-              </p>
-            )}
-          </div>
-
-          <hr />
-
-          <div className="flex items-center">
-            {role === "retailer" ? (
-              <RetailerCounter />
-            ) : (
-              <Counter
-                productId={id}
-                count={cartItems[id]}
-                cartFarmerId={product.farmer}
-                quantityAvailable={quantityAvailable}
-                setQuantityAvailable={setQuantityAvailable}
-              />
-            )}
-            <button
-              onClick={handleCart}
-              className="ml-4 px-28 py-4 bg-[#00B207] text-white rounded-full font-medium"
-            >
-              {!cartItems[id] ? "Add to cart" : "Go to cart"}
-              <LocalMallOutlinedIcon
-                className="ml-1"
-                sx={{ fontSize: "1.4em" }}
-              />
-            </button>
-          </div>
+        {/* Reviews Section */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            Customer Reviews
+          </h2>
+          {product?.ratings?.length > 0 ? (
+            <div className="space-y-4">
+              {product.ratings.map((rating, index) => (
+                <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
+                  <div className="flex items-center space-x-2">
+                    <Rating value={rating.rating} readOnly precision={0.5} />
+                    <p className="text-sm text-gray-600">
+                      by {rating.user?.name || "Anonymous"}
+                    </p>
+                  </div>
+                  <p className="text-gray-700 mt-2">{rating.comment}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600">No reviews yet.</p>
+          )}
         </div>
       </div>
     </div>
