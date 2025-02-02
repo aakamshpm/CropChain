@@ -97,7 +97,7 @@ const ProductView = () => {
 
       // retailer cart
       if (role === "retailer" && cartItems) {
-        setRetailerCartQuantity(cartItems[data?.product._id]);
+        setRetailerCartQuantity(cartItems[data?.product._id] || 100);
       }
     }
   }, [data, cartItems, role]);

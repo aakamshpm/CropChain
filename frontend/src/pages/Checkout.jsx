@@ -11,15 +11,22 @@ import {
   TextField,
 } from "@mui/material";
 import * as Yup from "yup";
+import { useSnackbar } from "notistack";
+import axios from "axios";
 import { useGetProductsQuery } from "../utils/userServices";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { placeOrderAsync } from "../utils/orderSlice";
-import { useSnackbar } from "notistack";
-import axios from "axios";
 import { clearCartData } from "../utils/cartSlice";
+import { isUserAuthenticated } from "../utils/userAuth";
+import { fetchRetailerData } from "../utils/actions/retailerActions";
 
 const Checkout = () => {
   const { cartItems, cartFarmerId } = useSelector((state) => state.cart);
+
+  const role = isUserAuthenticated();
+  const [retailerData, setRetailerData] = useState(null);
+  const [deliveryAddress, setDeliveryAddress] = useState("home"); // "home" or "shop"
+  const [isRetailerDataLoading, setIsRetailerDataLoading] = useState(false);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -61,6 +68,24 @@ const Checkout = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (role === "retailer") {
+          setIsRetailerDataLoading(true);
+          const data = await dispatch(fetchRetailerData()).unwrap();
+          setRetailerData(data.data);
+        }
+        setIsRetailerDataLoading(false);
+      } catch (error) {
+        setIsRetailerDataLoading(false);
+        enqueueSnackbar(error.message, { variant: "error" });
+      }
+    };
+
+    fetchData();
+  }, [role]);
+
   const placeOrder = async (address) => {
     let orderedProducts = [];
 
@@ -74,11 +99,19 @@ const Checkout = () => {
       }
     });
 
+    // Determine the delivery address based on the selected option
+    const selectedAddress =
+      role === "retailer"
+        ? deliveryAddress === "home"
+          ? retailerData.address
+          : retailerData.shopAddress
+        : address; // Use address for non-retailers
+
     let orderData = {
       farmerId: cartFarmerId,
       products: orderedProducts,
-      address,
       paymentMode,
+      address: selectedAddress,
     };
 
     try {
@@ -152,6 +185,14 @@ const Checkout = () => {
     }
   };
 
+  if (isRetailerDataLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-[40em] px-28 py-5">
       <div className="flex w-full justify-center gap-10 mt-3">
@@ -160,15 +201,15 @@ const Checkout = () => {
 
           <Formik
             initialValues={{
-              firstName: "",
-              lastName: "",
-              phoneNumber: "",
-              houseName: "",
-              street: "",
-              city: "",
-              postalCode: "",
+              firstName: retailerData?.name?.split(" ")[0] || "",
+              lastName: retailerData?.name?.split(" ")[1] || "",
+              phoneNumber: retailerData?.phoneNumber || "",
+              houseName: retailerData?.address?.houseName || "",
+              street: retailerData?.address?.street || "",
+              city: retailerData?.address?.city || "",
+              postalCode: retailerData?.address?.postalCode || "",
             }}
-            validationSchema={validationSchema}
+            validationSchema={deliveryAddress !== "shop" && validationSchema}
             onSubmit={(values, actions) => {
               placeOrder(values);
             }}
@@ -270,13 +311,67 @@ const Checkout = () => {
                     />
                   </div>
                 </Box>
+
+                {/* Display Shop Address for Retailers */}
+                {role === "retailer" && (
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold">Shop Address</h3>
+                    <p className="text-gray-600">
+                      {retailerData?.shopAddress?.shopName},{" "}
+                      {retailerData?.shopAddress?.city},{" "}
+                      {retailerData?.shopAddress?.state},{" "}
+                      {retailerData?.shopAddress?.postalCode}
+                    </p>
+                  </div>
+                )}
+
+                {/* Choose Delivery Address for Retailers */}
+                {role === "retailer" && (
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold">Delivery Address</h3>
+                    <FormControl>
+                      <RadioGroup
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        sx={{ display: "flex", flexDirection: "row" }}
+                      >
+                        <FormControlLabel
+                          value="home"
+                          control={
+                            <Radio
+                              sx={{
+                                color: "green",
+                                "&.Mui-checked": { color: "green" },
+                              }}
+                            />
+                          }
+                          label="Home Address"
+                        />
+                        <FormControlLabel
+                          value="shop"
+                          control={
+                            <Radio
+                              sx={{
+                                color: "green",
+                                "&.Mui-checked": { color: "green" },
+                              }}
+                            />
+                          }
+                          label="Shop Address"
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                  </div>
+                )}
+
                 <button id="place-order" type="submit" className="hidden" />
               </Form>
             )}
           </Formik>
         </div>
 
-        <div className="border-[1px] border-[#808080] rounded-md p-5 min-w-[40%] flex flex-col justify-between lg:min-w-[30%]">
+        {/* Order Summary Section */}
+        <div className="border-[1px] border-[#808080] rounded-md p-5 min-w-[40%] flex flex-col lg:min-w-[30%]">
           <div className="flex flex-col">
             <h2>Order Summary</h2>
 

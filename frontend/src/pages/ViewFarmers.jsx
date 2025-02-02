@@ -130,7 +130,7 @@ const ViewFarmers = () => {
             {farmer.profilePicture ? (
               <CardMedia
                 component="img"
-                height="200"
+                sx={{ height: "200px", objectFit: "contain" }}
                 image={`${import.meta.env.VITE_API_SERVER_URL}/uploads/${
                   farmer.profilePicture
                 }`}

@@ -13,8 +13,8 @@ const router = express.Router();
 
 router.get("/", protect(["retailer", "consumer"]), getCartInfo);
 
-router.post("/add", protect(["retailer", "consumer"]), addToCart);
-router.post("/decrement", protect(["retailer", "consumer"]), decrementFromCart);
+router.post("/add", protect(["consumer"]), addToCart);
+router.post("/decrement", protect(["consumer"]), decrementFromCart);
 router.post("/remove-item", protect(["retailer", "consumer"]), removeFromCart);
 router.post(
   "/remove-all",

@@ -43,12 +43,15 @@ const FarmerDetails = ({
               {selectedFarmer.profilePicture ? (
                 <CardMedia
                   component="img"
-                  height="200"
                   image={`${import.meta.env.VITE_API_SERVER_URL}/uploads/${
                     selectedFarmer.profilePicture
                   }`}
                   alt={`${selectedFarmer.name}'s profile`}
-                  sx={{ borderRadius: 2 }}
+                  sx={{
+                    borderRadius: 2,
+                    height: "200px",
+                    objectFit: "contain",
+                  }}
                 />
               ) : (
                 <Box
@@ -231,6 +234,7 @@ const FarmerDetails = ({
               display: "block",
               marginLeft: "auto",
               marginRight: "auto",
+              bgcolor: "green",
             }}
           >
             Close
