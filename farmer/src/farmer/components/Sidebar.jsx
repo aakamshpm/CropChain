@@ -49,7 +49,7 @@ const Sidebar = () => {
     try {
       dispatch(clearCredentials());
       dispatch(logoutFarmer());
-      navigate("/farmer/login");
+      navigate("/login");
     } catch (err) {
       enqueueSnackbar(err || "Logout failed", { variant: "error" });
     }
