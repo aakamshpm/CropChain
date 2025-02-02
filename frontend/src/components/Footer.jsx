@@ -119,7 +119,7 @@ const Footer = () => {
 
             {/* Download Mobile App */}
             <div className="flex flex-col items-start">
-              <h2 className="text-lg text-white">Download Mobile App</h2>
+              <h2 className="text-lg text-white">Download App</h2>
               <div className="w-8 my-3 bg-[#00B207] h-[2px]" />
               <div className="flex gap-3">
                 <Link to="#">

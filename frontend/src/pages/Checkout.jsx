@@ -368,7 +368,7 @@ const Checkout = () => {
                         }}
                       />
                     }
-                    label="RazorPay"
+                    label="UPI/Card (RazorPay)"
                   />
                 </RadioGroup>
               </FormControl>

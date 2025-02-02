@@ -9,6 +9,7 @@ const initialState = {
   success: null,
   error: null,
   cartFarmerId: "",
+  prevCartCount: null,
 };
 
 //Consumer cart
@@ -77,11 +78,18 @@ const removeCartItemAsync = createAsyncThunk(
 );
 
 // Retailer cart
-const addToRetailerCartAsync = createAsyncThunk(
-  "cart/retailerAdd",
+const updateRetailerCart = createAsyncThunk(
+  "cart/retailer",
   async (data, { rejectWithValue }) => {
     try {
-    } catch (err) {}
+      console.log(data);
+      const response = await axios.post(`${cartUrl}/update-retailer`, data, {
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Error updating quantity");
+    }
   }
 );
 
@@ -169,22 +177,22 @@ const cartSlice = createSlice({
       })
 
       //Retailer cart
-      .addCase(addToRetailerCartAsync.pending, (state, action) => {
-        const { productId, quantity } = action.payload;
-        state.cartItems[productId] =
-          (state.cartItems[productId] || 0) + quantity;
+      .addCase(updateRetailerCart.pending, (state, action) => {
+        const { productId, quantity } = action.meta.arg;
+        state.prevCartCount = state.cartItems[productId];
+        state.cartItems[productId] = quantity;
         state.loading = true;
         state.error = null;
       })
-      .addCase(addToRetailerCartAsync.fulfilled, (state, action) => {
+      .addCase(updateRetailerCart.fulfilled, (state, action) => {
         const { cartFarmerId } = action.payload;
         state.cartFarmerId = cartFarmerId;
         state.loading = false;
         state.success = true;
       })
-      .addCase(addToRetailerCartAsync.rejected, (state, action) => {
-        const { productId, quantity } = action.payload;
-        state.cartItems[productId] = state.cartItems[productId] - quantity;
+      .addCase(updateRetailerCart.rejected, (state, action) => {
+        const { productId } = action.meta.arg;
+        state.cartItems[productId] = state.prevCartCount;
         state.loading = false;
         state.success = false;
         state.error = action.payload;
@@ -197,7 +205,7 @@ export {
   getCartDataAsync,
   decrementCartItemAsync,
   removeCartItemAsync,
-  addToRetailerCartAsync,
+  updateRetailerCart,
 };
 export const { clearCartData } = cartSlice.actions;
 export default cartSlice.reducer;

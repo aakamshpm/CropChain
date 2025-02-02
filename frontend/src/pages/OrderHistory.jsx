@@ -33,7 +33,9 @@ const OrderHistory = () => {
 
   const handleCancelConfirm = async () => {
     try {
-      const resultAction = await dispatch(cancelOrder(selectedOrderId));
+      const resultAction = await dispatch(
+        cancelOrder(selectedOrderId)
+      ).unwrap();
 
       if (cancelOrder.fulfilled.match(resultAction)) {
         enqueueSnackbar("Order cancelled", { variant: "success" });

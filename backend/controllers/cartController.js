@@ -26,11 +26,6 @@ const addToCart = asyncHandler(async (req, res) => {
         ? await Consumer.findByIdAndUpdate(userId, { cartFarmerId, cartData })
         : await Retailer.findByIdAndUpdate(userId, { cartFarmerId, cartData });
 
-      await Product.findOneAndUpdate(
-        { _id: productId, quantityAvailableInKg: { $gte: 1 } },
-        { $inc: { quantityAvailableInKg: -1 } }
-      );
-
       res.status(200).json({ message: "Item added to cart" });
     } else {
       res.status(400);
@@ -94,10 +89,6 @@ const decrementFromCart = asyncHandler(async (req, res) => {
       ? await Consumer.findByIdAndUpdate(userId, update)
       : await Retailer.findByIdAndUpdate(userId, update);
 
-    await Product.findByIdAndUpdate(productId, {
-      $inc: { quantityAvailableInKg: 1 },
-    });
-
     res.status(200).json({ message: "Item removed" });
   } catch (err) {
     res.status(500);
@@ -154,10 +145,52 @@ const removeAllFromCart = asyncHandler(async (req, res) => {
   }
 });
 
-// Retailer cart
-const addToRetailerCart = asyncHandler(async (req, res) => {
-  const { productId, cartFarmerId } = req.body;
+//Retailer cart update
+const updateRetailerCart = asyncHandler(async (req, res) => {
+  const { productId, cartFarmerId, quantity } = req.body;
   const { userRole, userId } = req;
+
+  if (!productId || !cartFarmerId || !quantity) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  if (userRole !== "retailer") {
+    return res
+      .status(403)
+      .json({ message: "Only retailers can perform this operation" });
+  }
+  if (quantity < 100) {
+    return res.status(400).json({ message: "Add a minimum of 100kg" });
+  }
+
+  try {
+    const retailerData = await Retailer.findById(userId);
+
+    if (!retailerData) {
+      return res.status(404).json({ message: "Retailer not found" });
+    }
+    if (
+      String(retailerData.cartFarmerId) &&
+      cartFarmerId !== String(retailerData.cartFarmerId)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Add products from the same farmer only" });
+    }
+
+    // Update cart data
+    const updatedCartData = { ...retailerData.cartData, [productId]: quantity };
+
+    await Retailer.findByIdAndUpdate(
+      userId,
+      { cartData: updatedCartData, cartFarmerId },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Cart updated successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 });
 
 export {
@@ -166,5 +199,5 @@ export {
   decrementFromCart,
   removeFromCart,
   removeAllFromCart,
-  addToRetailerCart,
+  updateRetailerCart,
 };

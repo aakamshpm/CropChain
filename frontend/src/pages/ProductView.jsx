@@ -7,7 +7,7 @@ import Counter from "../components/Counter";
 import { isUserAuthenticated } from "../utils/userAuth";
 import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCartAsync } from "../utils/cartSlice";
+import { addToCartAsync, updateRetailerCart } from "../utils/cartSlice";
 import RetailerCounter from "../components/RetailerCounter";
 
 const ProductView = () => {
@@ -16,6 +16,7 @@ const ProductView = () => {
 
   const [product, setProduct] = useState(null);
   const [quantityAvailable, setQuantityAvailable] = useState(null);
+  const [retailerCartQuantity, setRetailerCartQuantity] = useState(100);
 
   const { enqueueSnackbar } = useSnackbar();
   const role = isUserAuthenticated();
@@ -33,26 +34,73 @@ const ProductView = () => {
 
     if (!cartItems?.[id]) {
       try {
-        await dispatch(
-          addToCartAsync({ productId: id, cartFarmerId: product?.farmer })
-        ).unwrap();
+        if (role === "consumer")
+          await dispatch(
+            addToCartAsync({
+              productId: id,
+              cartFarmerId: product?.farmer?._id,
+            })
+          ).unwrap();
+
+        if (role === "retailer") {
+          if (retailerCartQuantity < 100) {
+            enqueueSnackbar("Add a minimum of 100kg", { variant: "error" });
+            setRetailerCartQuantity(100);
+          } else {
+            await dispatch(
+              updateRetailerCart({
+                productId: id,
+                cartFarmerId: product?.farmer?._id,
+                quantity: retailerCartQuantity,
+              })
+            ).unwrap();
+          }
+        }
       } catch (error) {
         enqueueSnackbar(error?.message || "Failed to add item to cart", {
           variant: "error",
         });
         return;
       }
+    } else if (role === "retailer") {
+      try {
+        if (retailerCartQuantity < 100) {
+          enqueueSnackbar("Add a minimum of 100KG", { variant: "error" });
+          setRetailerCartQuantity(100);
+        } else {
+          await dispatch(
+            updateRetailerCart({
+              productId: id,
+              cartFarmerId: product?.farmer?._id,
+              quantity: retailerCartQuantity,
+            })
+          ).unwrap();
+          enqueueSnackbar("Cart updated!", {
+            variant: "success",
+          });
+        }
+      } catch (err) {
+        enqueueSnackbar(err?.message || "Failed to add item to cart", {
+          variant: "error",
+        });
+        return;
+      }
+    } else {
+      navigate("/cart");
     }
-
-    navigate("/cart");
   };
 
   useEffect(() => {
     if (data) {
       setProduct(data?.product);
       setQuantityAvailable(data?.product?.quantityAvailableInKg);
+
+      // retailer cart
+      if (role === "retailer" && cartItems) {
+        setRetailerCartQuantity(cartItems[data?.product._id]);
+      }
     }
-  }, [data]);
+  }, [data, cartItems, role]);
 
   const averageRating = product?.ratings?.length
     ? product.ratings.reduce((sum, r) => sum + r.rating, 0) /
@@ -121,10 +169,13 @@ const ProductView = () => {
             </div>
 
             {/* Add to Cart Section */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-start space-x-2">
               {role === "retailer" ? (
                 <div className="flex flex-col">
-                  <RetailerCounter />
+                  <RetailerCounter
+                    cartQuantity={retailerCartQuantity}
+                    setCartQuantity={setRetailerCartQuantity}
+                  />
                   <p className="text-sm mt-2 text-gray-500">
                     Minimum order quantity:{" "}
                     <span className="font-medium text-black">100 KG</span>
@@ -145,7 +196,11 @@ const ProductView = () => {
                 onClick={handleCart}
                 className="flex items-center justify-center px-8 py-3 bg-green-600 text-white rounded-full font-medium hover:bg-green-700 transition-colors"
               >
-                {!cartItems[id] ? "Add to Cart" : "Go to Cart"}
+                {!cartItems[id]
+                  ? "Add to Cart"
+                  : role === "retailer"
+                  ? "Update Cart"
+                  : "Go to Cart"}
                 <LocalMallOutlinedIcon className="ml-2" />
               </button>
             </div>

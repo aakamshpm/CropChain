@@ -6,6 +6,7 @@ import {
   getCartInfo,
   removeAllFromCart,
   removeFromCart,
+  updateRetailerCart,
 } from "../controllers/cartController.js";
 
 const router = express.Router();
@@ -20,5 +21,8 @@ router.post(
   protect(["retailer", "consumer"]),
   removeAllFromCart
 );
+
+// Retailer cart
+router.post("/update-retailer", protect(["retailer"]), updateRetailerCart);
 
 export default router;

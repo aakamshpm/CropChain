@@ -2,13 +2,16 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import { isUserAuthenticated } from "../utils/userAuth";
 import { useGetProductsQuery } from "../utils/userServices";
-import Counter from "../components/Counter";
 import { removeCartItemAsync } from "../utils/cartSlice";
+import Counter from "../components/Counter";
 
 const Cart = () => {
   const { data: products, isLoading, isError } = useGetProductsQuery();
   const { cartItems } = useSelector((state) => state.cart);
+
+  const role = isUserAuthenticated();
 
   const dispatch = useDispatch();
 
@@ -64,11 +67,18 @@ const Cart = () => {
                           <p className="text-lg">{product.name}</p>
                         </div>
                         <p className="text-lg">₹ {product.pricePerKg}</p>
-                        <Counter
-                          productId={product._id}
-                          count={cartItems[product._id]}
-                          cartFarmerId={product.farmer._id}
-                        />
+
+                        {/* Cart Counter  */}
+                        {role === "retailer" ? (
+                          <p className="text-lg">{cartItems[product._id]} KG</p>
+                        ) : (
+                          <Counter
+                            productId={product._id}
+                            count={cartItems[product._id]}
+                            cartFarmerId={product.farmer._id}
+                          />
+                        )}
+
                         <p className="text-lg font-semibold">
                           ₹ {product.pricePerKg * cartItems[product._id]}
                         </p>
