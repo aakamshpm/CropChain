@@ -38,7 +38,10 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (role) dispatch(getCartDataAsync());
+    if (role) {
+      dispatch(getCartDataAsync());
+      setSearchTerm("");
+    }
   }, [dispatch, role]);
 
   return (

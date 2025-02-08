@@ -33,17 +33,11 @@ const OrderHistory = () => {
 
   const handleCancelConfirm = async () => {
     try {
-      const resultAction = await dispatch(
-        cancelOrder(selectedOrderId)
-      ).unwrap();
+      await dispatch(cancelOrder(selectedOrderId)).unwrap();
 
-      if (cancelOrder.fulfilled.match(resultAction)) {
-        enqueueSnackbar("Order cancelled", { variant: "success" });
-        refetch();
-        setOpenCancelDialog(false);
-      } else {
-        enqueueSnackbar("Failed to cancel order", { variant: "error" });
-      }
+      enqueueSnackbar("Order cancelled", { variant: "success" });
+      refetch();
+      setOpenCancelDialog(false);
     } catch (err) {
       enqueueSnackbar("Failed to cancel order", { variant: "error" });
     }
