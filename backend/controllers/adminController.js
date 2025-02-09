@@ -25,9 +25,9 @@ const loginAdmin = asyncHandler(async (req, res) => {
       throw new Error("Only registered admins can log in!");
     }
 
-    generateToken(res, adminUser._id, "admin");
+    const token = generateToken(res, adminUser._id, "admin");
 
-    res.status(200).json({ message: "Logged in" });
+    res.status(200).json({ message: "Logged in", token });
   } catch (error) {
     console.log(error);
     res.status(401).json({ error: "Invalid Firebase token" });
