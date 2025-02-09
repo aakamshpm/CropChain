@@ -12,6 +12,7 @@ import PublicRoutes from "./routes/PublicRoutes.jsx";
 import PrivateRoutes from "./routes/PrivateRoutes.jsx";
 import Login from "./pages/Login.jsx";
 import Home from "./pages/Home.jsx";
+import { SnackbarProvider } from "notistack";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,6 +32,8 @@ const router = createBrowserRouter(
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
+      <RouterProvider router={router} />
+    </SnackbarProvider>
   </StrictMode>
 );
