@@ -10,6 +10,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 import retailerRoutes from "./routes/retailerRoutes.js";
 import consumerRoutes from "./routes/consumerRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import { protect } from "./middlewares/authMiddleware.js";
 
 dotenv.config();
@@ -52,6 +53,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/retailer", retailerRoutes);
 app.use("/api/consumer", consumerRoutes);
 app.use("/api/order", orderRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Middlewares
 app.use(notFound);

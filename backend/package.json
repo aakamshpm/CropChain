@@ -17,6 +17,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "express-async-handler": "^1.2.0",
+    "firebase": "^11.3.0",
+    "firebase-admin": "^13.1.0",
     "jsonwebtoken": "^9.0.2",
     "libphonenumber-js": "^1.11.18",
     "mongoose": "^8.8.1",
