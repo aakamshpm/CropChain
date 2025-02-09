@@ -4,7 +4,7 @@ import SideBar from "../components/SideBar";
 
 const PrivateRoutes = () => {
   return isAdminAuthenticated() ? (
-    <div className="flex">
+    <div className="flex h-screen">
       <SideBar />
       <Outlet />
     </div>
