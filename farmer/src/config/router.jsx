@@ -12,7 +12,7 @@ import Home from "../farmer/pages/FarmerHome";
 import Profile from "../farmer/pages/FarmerProfile";
 import Products from "../farmer/pages/FarmerProducts";
 import Orders from "../farmer/pages/Orders";
-import Transactions from "../farmer/pages/Transactions";
+import Verify from "../farmer/pages/Verify";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,7 +31,7 @@ export const router = createBrowserRouter(
           <Route path="profile" element={<Profile />} />
           <Route path="products" element={<Products />} />
           <Route path="orders" element={<Orders />} />
-          <Route path="transactions" element={<Transactions />} />
+          <Route path="verify" element={<Verify />} />
         </Route>
       </Route>
     </Route>

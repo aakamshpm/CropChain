@@ -14,7 +14,7 @@ const Orders = () => {
 
   return (
     <div>
-      <OrdersTable orders={orders.orders} />
+      <OrdersTable orders={orders?.orders} />
     </div>
   );
 };

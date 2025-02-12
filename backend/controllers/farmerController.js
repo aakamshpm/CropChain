@@ -4,6 +4,7 @@ import fs from "fs";
 import generateToken from "../utils/generateToken.js";
 import Farmer from "../models/Farmer.js";
 import Product from "../models/Product.js";
+import Tesseract from "tesseract.js";
 
 //register Farmer
 const farmerRegister = asyncHandler(async (req, res) => {
@@ -198,6 +199,132 @@ const getFarmerById = asyncHandler(async (req, res) => {
   }
 });
 
+const uploadDocumentsForVerification = asyncHandler(async (req, res) => {
+  try {
+    const farmer = await Farmer.findById(req.farmerId).select("-password");
+
+    if (farmer?.appliedForReview) {
+      res.status(400);
+      throw new Error("Already applied for verification");
+    }
+
+    const aadhaarFilePath = req?.files["aadhaar"]
+      ? req?.files["aadhaar"][0].path
+      : null;
+
+    const landFilePath = req?.files["land"] ? req?.files["land"][0].path : null;
+
+    if (!landFilePath && !aadhaarFilePath) {
+      res.status(400);
+      throw new Error("Both Aadhaar and land documents must be provided.");
+    }
+
+    const [aadhaarResult, landResult] = await Promise.all([
+      Tesseract.recognize(aadhaarFilePath, "eng"),
+      Tesseract.recognize(landFilePath, "eng"),
+    ]);
+
+    const combinedText = aadhaarResult.data.text + "\n" + landResult.data.text;
+
+    // Extract neccessary fields
+    const extractedData = parceOCR(combinedText);
+    const confidenceScore = computeConfidence(extractedData);
+    const matchResult = matchFarmer(extractedData, farmer, res);
+
+    // delete uploaded files
+    // fs.unlink(aadhaarFilePath, (err) => {
+    //   if (err) console.error("Error deleting Aadhaar file:", err);
+    // });
+    // fs.unlink(landFilePath, (err) => {
+    //   if (err) console.error("Error deleting Land file:", err);
+    // });
+
+    farmer.confidenceScore = confidenceScore;
+    farmer.statusMatch = matchResult.match;
+    farmer.documents.aadhaarPath = aadhaarFilePath;
+    farmer.documents.landPath = landFilePath;
+    farmer.appliedForReview = true;
+
+    await farmer.save();
+
+    res.json({
+      extractedData,
+      confidenceScore,
+      match: matchResult.match,
+      fullText: combinedText,
+    });
+  } catch (error) {
+    console.error("OCR processing error:", error);
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
+const parceOCR = (text) => {
+  let name = null;
+  let aadhaar = null;
+  let land = null;
+
+  // Match aadhaar with regex to extract aadhaar number only
+  const aadhaarMatch = text.match(/\b\d{4}\s?\d{4}\s?\d{4}\b/);
+
+  if (aadhaarMatch) {
+    aadhaar = aadhaarMatch[0].trim();
+    if (aadhaar.length === 12 && !aadhaar.includes(" ")) {
+      aadhaar = aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3");
+    }
+  }
+
+  // Extract fiels "Name"
+  const nameMatch = text.match(/Name:\s*(.*)/i);
+
+  if (nameMatch) {
+    name = nameMatch[1].split("\n")[0].trim();
+  }
+
+  // Extract land record
+  if (text.includes("7/12")) {
+    const landMatch = text.match(/(7\/12\s*Extract:\s*.*)/i);
+    if (landMatch) {
+      land = landMatch[1].trim();
+    } else {
+      land = "7/12 Extract found";
+    }
+  }
+
+  return { aadhaar, name, land };
+};
+
+const computeConfidence = (data) => {
+  let score = 0;
+
+  if (data.aadhaar) score += 1;
+  if (data.name) score += 1;
+  if (data.land) score += 1;
+
+  return score;
+};
+
+const matchFarmer = async (data, farmer, res) => {
+  try {
+    // check if aadhaar matches
+    if (data.aadhaar && data.aadhaar === farmer?.documents?.aadhaar) {
+      // compare registered name
+      if (data.name && farmer.name === data.name) {
+        return { match: true, farmer };
+      } else {
+        return { match: false, message: "Name does not match" };
+      }
+    } else {
+      return { match: false, message: "Aadhaar does not match" };
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500);
+    throw new Error(err.message);
+  }
+};
+
 export {
   farmerLogin,
   farmerRegister,
@@ -209,4 +336,5 @@ export {
   getFarmerDetails,
   getAllFarmer,
   getFarmerById,
+  uploadDocumentsForVerification,
 };

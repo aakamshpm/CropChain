@@ -25,8 +25,21 @@ const farmerSchema = mongoose.Schema(
     },
     farmSizeInAcres: { type: Number },
     cropsGrown: [{ type: String }],
-  },
 
+    documents: {
+      aadhaarPath: { type: String },
+      landPath: { type: String },
+    },
+    verificationStatus: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+    confidenceScore: { type: Number },
+    statusMatch: { type: Boolean },
+    appliedForReview: { type: Boolean, default: false },
+    verifiedAt: { type: Date },
+  },
   { timestamps: true }
 );
 

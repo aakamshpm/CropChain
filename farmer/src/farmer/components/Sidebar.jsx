@@ -7,6 +7,7 @@ import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import ChecklistRtlOutlinedIcon from "@mui/icons-material/ChecklistRtlOutlined";
+import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import { logoutFarmer } from "../auth/farmerActions";
 import { clearCredentials } from "../auth/authSlice";
 
@@ -35,6 +36,11 @@ const Sidebar = () => {
       path: `/orders`,
       icon: <ChecklistRtlOutlinedIcon />,
       name: "Orders",
+    },
+    {
+      path: `/verify`,
+      icon: <AssignmentTurnedInOutlinedIcon />,
+      name: "Verify",
     },
   ];
 

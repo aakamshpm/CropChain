@@ -11,6 +11,7 @@ import {
   updateAddress,
   updatePD,
   updateProfilePicture,
+  uploadDocumentsForVerification,
 } from "../controllers/farmerController.js";
 import { farmerRegister } from "../controllers/farmerController.js";
 
@@ -31,6 +32,15 @@ router.post(
   protect(["farmer"]),
   upload.single("profilePicture"),
   updateProfilePicture
+);
+router.post(
+  "/upload-docs",
+  protect(["farmer"]),
+  upload.fields([
+    { name: "aadhaar", maxCount: 1 },
+    { name: "land", maxCount: 1 },
+  ]),
+  uploadDocumentsForVerification
 );
 
 router.post("/add-farm", protect(["farmer"]), addFarm);
