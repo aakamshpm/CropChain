@@ -5,6 +5,7 @@ import {
   addFarm,
   farmerLogin,
   farmerLogout,
+  fetchAppliedFarmers,
   getAllFarmer,
   getFarmerById,
   getFarmerDetails,
@@ -42,6 +43,7 @@ router.post(
   ]),
   uploadDocumentsForVerification
 );
+router.get("/fetch-applied-farmers", protect(["admin"]), fetchAppliedFarmers);
 
 router.post("/add-farm", protect(["farmer"]), addFarm);
 

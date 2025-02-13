@@ -13,6 +13,8 @@ import PrivateRoutes from "./routes/PrivateRoutes.jsx";
 import Login from "./pages/Login.jsx";
 import Home from "./pages/Home.jsx";
 import { SnackbarProvider } from "notistack";
+import VerifyFarmers from "./pages/VerifyFarmers.jsx";
+import FarmerDetails from "./pages/FarmerDetails.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,6 +22,8 @@ const router = createBrowserRouter(
       <Route path="/" element={<App />}>
         <Route element={<PrivateRoutes />}>
           <Route index element={<Home />} />
+          <Route path="/verify-farmers" element={<VerifyFarmers />} />
+          <Route path="/verify-farmers/:farmerId" element={<FarmerDetails />} />
         </Route>
 
         <Route element={<PublicRoutes />}>

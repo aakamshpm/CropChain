@@ -189,7 +189,7 @@ const getAllFarmer = asyncHandler(async (req, res) => {
 });
 
 const getFarmerById = asyncHandler(async (req, res) => {
-  const farmerId = req.body;
+  const { farmerId } = req.query;
   try {
     const farmer = await Farmer.findById(farmerId).select("-password");
     res.status(200).json({ farmer });
@@ -229,34 +229,54 @@ const uploadDocumentsForVerification = asyncHandler(async (req, res) => {
     // Extract neccessary fields
     const extractedData = parceOCR(combinedText);
     const confidenceScore = computeConfidence(extractedData);
-    const matchResult = matchFarmer(extractedData, farmer, res);
+    const matchResult = await matchFarmer(extractedData, farmer, res);
 
-    // delete uploaded files
-    // fs.unlink(aadhaarFilePath, (err) => {
-    //   if (err) console.error("Error deleting Aadhaar file:", err);
-    // });
-    // fs.unlink(landFilePath, (err) => {
-    //   if (err) console.error("Error deleting Land file:", err);
-    // });
-
+    farmer.extractedOCR = extractedData;
     farmer.confidenceScore = confidenceScore;
     farmer.statusMatch = matchResult.match;
-    farmer.documents.aadhaarPath = aadhaarFilePath;
-    farmer.documents.landPath = landFilePath;
     farmer.appliedForReview = true;
 
+    if (confidenceScore < 2 || !matchResult.match) {
+      farmer.verificationStatus = "rejected";
+      // delete uploaded files
+      fs.unlink(aadhaarFilePath, (err) => {
+        if (err) console.error("Error deleting Aadhaar file:", err);
+      });
+      fs.unlink(landFilePath, (err) => {
+        if (err) console.error("Error deleting Land file:", err);
+      });
+    } else {
+      farmer.documents.aadhaarPath = aadhaarFilePath;
+      farmer.documents.landPath = landFilePath;
+      farmer.verificationStatus = "pending";
+    }
     await farmer.save();
 
     res.json({
       extractedData,
       confidenceScore,
-      match: matchResult.match,
+      match: matchResult,
       fullText: combinedText,
+      verificationStatus: farmer.verificationStatus,
     });
   } catch (error) {
     console.error("OCR processing error:", error);
     res.status(500);
     throw new Error(error.message);
+  }
+});
+
+// Fetch farmers applied for verification
+const fetchAppliedFarmers = asyncHandler(async (req, res) => {
+  try {
+    const farmers = await Farmer.find({
+      appliedForReview: true,
+      verificationStatus: "pending",
+    });
+    res.status(200).json({ data: farmers });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
   }
 });
 
@@ -308,7 +328,10 @@ const computeConfidence = (data) => {
 const matchFarmer = async (data, farmer, res) => {
   try {
     // check if aadhaar matches
-    if (data.aadhaar && data.aadhaar === farmer?.documents?.aadhaar) {
+    if (
+      data.aadhaar &&
+      data.aadhaar.replace(/\s+/g, "") === farmer?.aadhaarNumber
+    ) {
       // compare registered name
       if (data.name && farmer.name === data.name) {
         return { match: true, farmer };
@@ -337,4 +360,5 @@ export {
   getAllFarmer,
   getFarmerById,
   uploadDocumentsForVerification,
+  fetchAppliedFarmers,
 };

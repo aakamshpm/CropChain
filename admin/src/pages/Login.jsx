@@ -75,7 +75,8 @@ const Login = () => {
       // Backend request
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/admin/login`,
-        { firebaseToken }
+        { firebaseToken },
+        { withCredentials: true }
       );
 
       localStorage.setItem("token", response.data.token);

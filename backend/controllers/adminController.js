@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import Admin from "../models/Admin.js";
+import Farmer from "../models/Farmer.js";
 import admin from "../config/firebase.js";
 import generateToken from "../utils/generateToken.js";
 
@@ -34,4 +35,20 @@ const loginAdmin = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerAdmin, loginAdmin };
+const verifyFarmer = asyncHandler(async (req, res) => {
+  try {
+    const farmer = await Farmer.findById(req.params.farmerId);
+    if (!farmer) {
+      res.status(404);
+      throw new Error("Farmer not found.");
+    }
+    farmer.verificationStatus = "approved";
+    farmer.verifiedAt = Date.now();
+    await farmer.save();
+    res.status(200).json({ message: "Farmer verified!" });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+export { registerAdmin, loginAdmin, verifyFarmer };

@@ -15,7 +15,7 @@ const farmerSchema = mongoose.Schema(
       postalCode: { type: String },
     },
     profilePicture: { type: String, default: "" },
-    bio: { type: String, maxLength: 500 },
+    aadhaarNumber: { type: String },
 
     // Farm Details
     farmName: { type: String },
@@ -35,11 +35,13 @@ const farmerSchema = mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
+    extractedOCR: { type: Object },
     confidenceScore: { type: Number },
     statusMatch: { type: Boolean },
     appliedForReview: { type: Boolean, default: false },
     verifiedAt: { type: Date },
   },
+
   { timestamps: true }
 );
 

@@ -3,6 +3,7 @@ import axios from "axios";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DescriptionIcon from "@mui/icons-material/Description";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 import ErrorIcon from "@mui/icons-material/Error";
 
 const Verify = () => {
@@ -81,7 +82,7 @@ const Verify = () => {
       setLoading(false);
     }
   };
-
+  console.log(result);
   if (!farmer) {
     return (
       <div>
@@ -106,9 +107,52 @@ const Verify = () => {
               You have already applied for verification.
             </div>
 
-            <div>OCR Results</div>
+            <div className="p-1">
+              <h3 className="text-lg font-semibold">OCR Results</h3>
+              <div className="ml-4 whitespace-pre-wrap text-sm bg-gray-100 p-2 rounded-lg">
+                {farmer?.extractedOCR ? (
+                  Object.entries(farmer.extractedOCR).map(([key, value]) => (
+                    <div key={key} className="mb-1">
+                      <span className="font-medium capitalize">{key}: </span>
+                      <span>{value}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p>No data available</p>
+                )}
+              </div>
+            </div>
 
-            <p>Please wait untill manual review is Complete</p>
+            <div className="p-1">
+              <h3 className="text-lg font-semibold">Verification Status</h3>
+              <div className="ml-4 text-sm mt-2 rounded-lg">
+                {farmer?.verificationStatus === "approved" ? (
+                  <div className="bg-green-100 text-green-800 p-2 rounded-md">
+                    <span className="font-medium">Status: </span>Approved
+                    {farmer.verifiedAt && (
+                      <p className="text-xs text-gray-600">
+                        Verified At:{" "}
+                        {new Date(farmer.verifiedAt).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                ) : farmer?.verificationStatus === "rejected" ? (
+                  <div className="bg-red-100 text-red-800 p-2 rounded-md">
+                    <span className="font-medium">Status: </span>Rejected
+                    {farmer.verifiedAt && (
+                      <p className="text-xs text-gray-600">
+                        Verified At:{" "}
+                        {new Date(farmer.verifiedAt).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-gray-100 text-gray-800 p-2 rounded-md">
+                    <span className="font-medium">Status: </span>Pending
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -209,9 +253,19 @@ const Verify = () => {
         )}
 
         {result && (
-          <div className="mt-6 p-6 bg-green-50 border border-green-200 rounded-lg text-green-800">
+          <div
+            className={`mt-6 p-6  border border-green-200 rounded-lg ${
+              result.verificationStatus === "rejected"
+                ? "bg-red-50"
+                : "bg-green-50"
+            }  text-green-800`}
+          >
             <h2 className="text-2xl font-bold mb-4 flex items-center">
-              <CheckCircleIcon className="mr-2 text-green-500" />
+              {result.verificationStatus !== "rejected" ? (
+                <CheckCircleIcon className="mr-2 text-green-500" />
+              ) : (
+                <CancelIcon className="mr-2 text-red-500" />
+              )}
               Verification Result
             </h2>
             <div className="space-y-4">
@@ -241,7 +295,7 @@ const Verify = () => {
               <div>
                 <h3 className="text-lg font-semibold">Match Status</h3>
                 <p className="ml-4">
-                  {result.match ? "Matched" : "Not Matched"}
+                  {result?.match.match ? "Matched" : result?.match.message}
                 </p>
               </div>
 
