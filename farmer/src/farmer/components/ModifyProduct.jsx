@@ -22,6 +22,7 @@ const ModifyProduct = ({
   modify,
   preview,
   setPreview,
+  refetch,
 }) => {
   const { data: response, error, success } = useSelector((state) => state.auth);
 
@@ -32,6 +33,11 @@ const ModifyProduct = ({
     name: Yup.string().required("Name is required"),
     description: Yup.string().required("Description is required"),
     pricePerKg: Yup.number()
+      .typeError("Please enter a valid number")
+      .required("Price is required")
+      .positive("Enter a positive number")
+      .integer("Enter valid number"),
+    retailerPrice: Yup.number()
       .typeError("Please enter a valid number")
       .required("Price is required")
       .positive("Enter a positive number")
@@ -114,6 +120,7 @@ const ModifyProduct = ({
               description: product?.description || "",
               harvestDate: product?.harvestDate?.split("T")[0] || "",
               pricePerKg: product?.pricePerKg || "",
+              retailerPrice: product?.retailerPrice || "",
               quantityAvailableInKg: product?.quantityAvailableInKg || "",
               category: product?.category || "",
               images: product?.images || [],
@@ -142,6 +149,7 @@ const ModifyProduct = ({
               }
 
               actions.setSubmitting(false);
+              refetch();
               handleClose();
             }}
           >
@@ -190,6 +198,19 @@ const ModifyProduct = ({
                     margin="normal"
                     error={touched.pricePerKg && Boolean(errors.pricePerKg)}
                     helperText={<ErrorMessage name="pricePerKg" />}
+                  />
+                  <TextField
+                    fullWidth
+                    label="Retailer Price Per 100 KG"
+                    name="retailerPrice"
+                    value={values.retailerPrice}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    margin="normal"
+                    error={
+                      touched.retailerPrice && Boolean(errors.retailerPrice)
+                    }
+                    helperText={<ErrorMessage name="retailerPrice" />}
                   />
                   <TextField
                     fullWidth

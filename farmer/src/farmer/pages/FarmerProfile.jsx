@@ -34,7 +34,7 @@ const Profile = () => {
       postalCode: "",
     },
     profilePicture: "",
-    bio: "",
+    aadhaarNumber: "",
 
     farmName: "",
     farmLocation: {
@@ -53,7 +53,7 @@ const Profile = () => {
           name,
           profilePicture,
           phoneNumber,
-          bio,
+          aadhaarNumber,
           farmName,
           farmSizeInAcres,
           cropsGrown,
@@ -63,7 +63,7 @@ const Profile = () => {
       } = response;
       setFarmerData({
         name: name || "",
-        bio: bio || "",
+        aadhaarNumber: aadhaarNumber || "",
         profilePicture: profilePicture || "",
         phoneNumber: phoneNumber || "",
         farmName: farmName || "",
@@ -178,13 +178,13 @@ const Profile = () => {
                 />
               </div>
 
-              {/* Bio  */}
+              {/* aadhaarNumber  */}
               <InputField
-                name="bio"
+                name="aadhaarNumber"
                 type="text"
-                label="Bio"
-                value={farmerData.bio}
-                placeHolder="Enter your bio"
+                label="Aadhaar Number"
+                value={farmerData.aadhaarNumber}
+                placeHolder="Enter your Aadhaar"
                 onChangeHandler={onChangeHandler}
               />
             </div>
@@ -196,7 +196,7 @@ const Profile = () => {
                     data: {
                       name: farmerData.name,
                       phoneNumber: farmerData.phoneNumber,
-                      bio: farmerData.bio,
+                      aadhaarNumber: farmerData.aadhaarNumber,
                     },
                   })
                 )

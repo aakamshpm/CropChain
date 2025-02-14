@@ -6,6 +6,7 @@ import {
   getAllProducts,
   getProductById,
   getProductsByFarmer,
+  removeAllProductsFromFarmer,
   removeProduct,
   searchForProducts,
   updateProduct,
@@ -19,6 +20,11 @@ router.get("/search", searchForProducts);
 router.get("/:productId", getProductById);
 router.post("/add", protect(["farmer"]), upload.array("images"), addProduct);
 router.post("/update/:productId", protect(["farmer"]), updateProduct);
+router.delete(
+  "/farmer/remove-all",
+  protect(["farmer"]),
+  removeAllProductsFromFarmer
+);
 router.delete("/remove/:productId", protect(["farmer"]), removeProduct);
 
 export default router;

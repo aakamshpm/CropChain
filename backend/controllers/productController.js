@@ -168,6 +168,23 @@ const removeProduct = asyncHandler(async (req, res) => {
   }
 });
 
+// Remove all products-Farmer
+const removeAllProductsFromFarmer = asyncHandler(async (req, res) => {
+  try {
+    const result = await Product.deleteMany({ farmer: req.farmerId });
+
+    if (result.deletedCount === 0) {
+      return res
+        .status(404)
+        .json({ message: "No products found for the given farmer" });
+    }
+
+    res.status(200).json({ message: "Products removed successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Search products
 const searchForProducts = asyncHandler(async (req, res) => {
   const { search } = req.query;
@@ -195,5 +212,6 @@ export {
   getProductsByFarmer,
   updateProduct,
   removeProduct,
+  removeAllProductsFromFarmer,
   searchForProducts,
 };
