@@ -46,9 +46,18 @@ const VerifyFarmers = () => {
   const handleViewDetails = (farmerId) => {
     navigate(`/verify-farmers/${farmerId}`);
   };
-
   if (loading) {
-    return <Typography>Loading...</Typography>;
+    return (
+      <div className="flex justify-center items-center min-h-screen w-full">
+        <div className="flex flex-col items-center space-y-4">
+          {/* Spinner */}
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <Typography variant="h6" className="text-gray-700 font-semibold">
+            Loading Farmers...
+          </Typography>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
@@ -71,7 +80,7 @@ const VerifyFarmers = () => {
                     Name
                   </TableCell>
                   <TableCell className="font-semibold text-gray-700">
-                    Aadhaar
+                    Aadhaar Number
                   </TableCell>
                   <TableCell className="font-semibold text-gray-700">
                     Confidence Score
@@ -91,7 +100,7 @@ const VerifyFarmers = () => {
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <TableCell>{farmer.name}</TableCell>
-                    <TableCell>{farmer.documents?.aadhaar || "N/A"}</TableCell>
+                    <TableCell>{farmer.aadhaarNumber || "N/A"}</TableCell>
                     <TableCell>{farmer.confidenceScore || "N/A"}</TableCell>
                     <TableCell>
                       <span

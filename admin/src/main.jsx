@@ -15,6 +15,9 @@ import Home from "./pages/Home.jsx";
 import { SnackbarProvider } from "notistack";
 import VerifyFarmers from "./pages/VerifyFarmers.jsx";
 import FarmerDetails from "./pages/FarmerDetails.jsx";
+import ViewFarmers from "./pages/ViewFarmers.jsx";
+import ViewConsumers from "./pages/ViewConsumers.jsx";
+import ViewRetailers from "./pages/ViewRetailers.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +27,9 @@ const router = createBrowserRouter(
           <Route index element={<Home />} />
           <Route path="/verify-farmers" element={<VerifyFarmers />} />
           <Route path="/verify-farmers/:farmerId" element={<FarmerDetails />} />
+          <Route path="/view-farmers" element={<ViewFarmers />} />
+          <Route path="/consumers" element={<ViewConsumers />} />
+          <Route path="/retailers" element={<ViewRetailers />} />
         </Route>
 
         <Route element={<PublicRoutes />}>

@@ -92,4 +92,20 @@ const getConsumerDetails = asyncHandler(async (req, res) => {
   }
 });
 
-export { loginConsumer, registerConsumer, logoutConsumer, getConsumerDetails };
+const getAllConsumers = asyncHandler(async (req, res) => {
+  try {
+    const consumers = await Consumer.find().select("-password");
+    res.status(200).json({ consumers });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+export {
+  loginConsumer,
+  registerConsumer,
+  logoutConsumer,
+  getConsumerDetails,
+  getAllConsumers,
+};

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getAllConsumers,
   getConsumerDetails,
   loginConsumer,
   logoutConsumer,
@@ -14,5 +15,6 @@ router.post("/login", loginConsumer);
 router.post("/logout", logoutConsumer);
 
 router.get("/", protect(["consumer"]), getConsumerDetails);
+router.get("/get-all", protect(["admin"]), getAllConsumers);
 
 export default router;

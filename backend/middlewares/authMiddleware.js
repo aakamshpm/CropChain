@@ -3,7 +3,20 @@ import asyncHandler from "express-async-handler";
 
 const protect = (allowedRoles = []) => {
   return asyncHandler(async (req, res, next) => {
-    let token = req.cookies.jwt;
+    const roleToTokenMap = {
+      admin: "adminJwt",
+      consumer: "consumerJwt",
+      retailer: "retailerJwt",
+      farmer: "farmerJwt",
+    };
+
+    let token = null;
+    for (const role of allowedRoles) {
+      if (roleToTokenMap[role] && req.cookies[roleToTokenMap[role]]) {
+        token = req.cookies[roleToTokenMap[role]];
+        break;
+      }
+    }
 
     if (token) {
       try {

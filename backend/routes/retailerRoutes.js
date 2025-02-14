@@ -1,6 +1,7 @@
 import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
 import {
+  fetchAllRetailer,
   getRetailerDetails,
   loginRetailer,
   logoutRetailer,
@@ -14,5 +15,6 @@ router.post("/login", loginRetailer);
 router.post("/logout", logoutRetailer);
 
 router.get("/", protect(["retailer"]), getRetailerDetails);
+router.get("/fetch-all", protect(["admin"]), fetchAllRetailer);
 
 export default router;

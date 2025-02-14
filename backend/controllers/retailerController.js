@@ -94,4 +94,20 @@ const getRetailerDetails = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerRetailer, loginRetailer, logoutRetailer, getRetailerDetails };
+const fetchAllRetailer = asyncHandler(async (req, res) => {
+  try {
+    const response = await Retailer.find().select("-password");
+    res.status(200).json({ data: response });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+export {
+  registerRetailer,
+  loginRetailer,
+  logoutRetailer,
+  getRetailerDetails,
+  fetchAllRetailer,
+};
