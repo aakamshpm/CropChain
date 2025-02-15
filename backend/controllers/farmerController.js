@@ -5,6 +5,7 @@ import generateToken from "../utils/generateToken.js";
 import Farmer from "../models/Farmer.js";
 import Product from "../models/Product.js";
 import Tesseract from "tesseract.js";
+import { computeConfidence, matchFarmer, parceOCR } from "../utils/utils.js";
 
 //register Farmer
 const farmerRegister = asyncHandler(async (req, res) => {
@@ -280,71 +281,69 @@ const fetchAppliedFarmers = asyncHandler(async (req, res) => {
   }
 });
 
-const parceOCR = (text) => {
-  let name = null;
-  let aadhaar = null;
-  let land = null;
+// Add or Update a Rating
+const addOrUpdateRating = async (req, res) => {
+  const { farmerId } = req.params;
+  const { userId, rating, comment } = req.body;
 
-  // Match aadhaar with regex to extract aadhaar number only
-  const aadhaarMatch = text.match(/\b\d{4}\s?\d{4}\s?\d{4}\b/);
-
-  if (aadhaarMatch) {
-    aadhaar = aadhaarMatch[0].trim();
-    if (aadhaar.length === 12 && !aadhaar.includes(" ")) {
-      aadhaar = aadhaar.replace(/(\d{4})(\d{4})(\d{4})/, "$1 $2 $3");
-    }
-  }
-
-  // Extract fiels "Name"
-  const nameMatch = text.match(/Name:\s*(.*)/i);
-
-  if (nameMatch) {
-    name = nameMatch[1].split("\n")[0].trim();
-  }
-
-  // Extract land record
-  if (text.includes("7/12")) {
-    const landMatch = text.match(/(7\/12\s*Extract:\s*.*)/i);
-    if (landMatch) {
-      land = landMatch[1].trim();
-    } else {
-      land = "7/12 Extract found";
-    }
-  }
-
-  return { aadhaar, name, land };
-};
-
-const computeConfidence = (data) => {
-  let score = 0;
-
-  if (data.aadhaar) score += 1;
-  if (data.name) score += 1;
-  if (data.land) score += 1;
-
-  return score;
-};
-
-const matchFarmer = async (data, farmer, res) => {
   try {
-    // check if aadhaar matches
-    if (
-      data.aadhaar &&
-      data.aadhaar.replace(/\s+/g, "") === farmer?.aadhaarNumber
-    ) {
-      // compare registered name
-      if (data.name && farmer.name === data.name) {
-        return { match: true, farmer };
-      } else {
-        return { match: false, message: "Name does not match" };
-      }
-    } else {
-      return { match: false, message: "Aadhaar does not match" };
+    // Validate rating
+    if (rating < 1 || rating > 5) {
+      res.status(400);
+      throw new Error("Rating must be between 1 and 5.");
     }
-  } catch (err) {
-    console.log(err);
+
+    // Find the farmer
+    const farmer = await Farmer.findById(farmerId);
+    if (!farmer) {
+      res.status(404);
+      throw new Error("Farmer not found");
+    }
+
+    // Check if the user has already rated the farmer
+    const existingRatingIndex = farmer.ratings.findIndex(
+      (r) => r.userId.toString() === userId
+    );
+
+    if (existingRatingIndex !== -1) {
+      // Update existing rating
+      farmer.ratings[existingRatingIndex].rating = rating;
+      farmer.ratings[existingRatingIndex].comment = comment || "";
+    } else {
+      // Add new rating
+      farmer.ratings.push({ userId, rating, comment });
+    }
+
+    // Calculate the average rating
+    const totalRatings = farmer.ratings.length;
+    const sumRatings = farmer.ratings.reduce((sum, r) => sum + r.rating, 0);
+    farmer.averageRating = sumRatings / totalRatings;
+
+    // Save the updated farmer
+    await farmer.save();
+
+    res.status(200).json({ message: "Rating submitted successfully.", farmer });
+  } catch (error) {
     res.status(500);
-    throw new Error(err.message);
+    throw new Error(error.message);
+  }
+};
+
+// Get Farmer's Average Rating
+const getAverageRating = async (req, res) => {
+  const { farmerId } = req.params;
+
+  try {
+    const farmer = await Farmer.findById(farmerId);
+    if (!farmer) {
+      res.status(404);
+      throw new Error("Farmer not found");
+    }
+
+    res.status(200).json({ averageRating: farmer.averageRating });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
   }
 };
 
@@ -361,4 +360,6 @@ export {
   getFarmerById,
   uploadDocumentsForVerification,
   fetchAppliedFarmers,
+  addOrUpdateRating,
+  getAverageRating,
 };
