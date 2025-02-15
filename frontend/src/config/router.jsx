@@ -16,6 +16,7 @@ import OrderSuccess from "../pages/OrderSuccess";
 import OrderHistory from "../pages/OrderHistory";
 import ViewFarmers from "../pages/ViewFarmers";
 import SearchProducts from "../pages/SearchProducts";
+import FarmerDetails from "../pages/FarmerDetails";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -23,6 +24,7 @@ export const router = createBrowserRouter(
       {/* Public Routes */}
       <Route index element={<UserHome />} />
       <Route path="/farmers" element={<ViewFarmers />} />
+      <Route path="/farmer/:farmerId" element={<FarmerDetails />} />
       <Route path="/product/:id" element={<ProductView />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
