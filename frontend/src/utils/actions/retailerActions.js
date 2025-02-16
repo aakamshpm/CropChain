@@ -47,13 +47,13 @@ const retailerLogin = createAsyncThunk(
 );
 const retailerLogout = createAsyncThunk(
   "retailer/logout",
-  async (data, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await axios.post(
         `${retailerURL}/logout`,
-        {}, // Empty body
+        {},
         {
-          withCredentials: true, // Ensure credentials are included
+          withCredentials: true,
         }
       );
 

@@ -1,156 +1,344 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import { Typography, Paper, Avatar, Chip, Divider } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  Typography,
+  Paper,
+  Avatar,
+  Chip,
+  Divider,
+  Container,
+  Box,
+  Rating,
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CropIcon from "@mui/icons-material/Agriculture";
 import HomeIcon from "@mui/icons-material/Home";
+import PhoneIcon from "@mui/icons-material/Phone";
+import {
+  fetchFarmerDetails,
+  addOrUpdateRating,
+  getAverageRating,
+} from "../utils/farmerSlice";
 
 const FarmerDetails = () => {
   const { farmerId } = useParams();
-  const [farmer, setFarmer] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const {
+    farmerData: farmer,
+    loading,
+    error,
+    averageRating,
+  } = useSelector((state) => state.farmer);
+
+  const { userId } = useSelector((state) => state.user);
+
+  const [ratingValue, setRatingValue] = useState(0);
+  const [comment, setComment] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   useEffect(() => {
-    const fetchFarmerDetails = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_SERVER_URL}/api/farmer/${farmerId}`
-        );
-        console.log(response);
-        setFarmer(response.data);
-      } catch (err) {
-        setError(
-          err.response?.data?.message || "Failed to fetch farmer details."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+    dispatch(fetchFarmerDetails(farmerId));
+    dispatch(getAverageRating(farmerId));
 
-    fetchFarmerDetails();
-  }, [farmerId]);
+    if (userId && farmer && farmer.ratings) {
+      const userRating = farmer.ratings.find((r) => r.userId === userId);
+      console.log(userRating);
+      if (userRating) {
+        setRatingValue(userRating.rating);
+      } else {
+        setRatingValue(0);
+      }
+    }
+  }, [dispatch, farmerId, userId]);
+
+  const handleRateFarmer = () => {
+    dispatch(
+      addOrUpdateRating({ farmerId, userId, rating: ratingValue, comment })
+    )
+      .unwrap()
+      .then(() => {
+        setSnackbarMessage("Rating submitted successfully!");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        dispatch(getAverageRating(farmerId)); // Refresh the average rating
+      })
+      .catch((error) => {
+        setSnackbarMessage(`Failed to submit rating: ${error.message}`);
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      });
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <Typography>Loading...</Typography>
-      </div>
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <Typography color="error">{error}</Typography>
-      </div>
+      </Box>
     );
   }
 
   if (!farmer) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <Typography>Farmer not found.</Typography>
-      </div>
+      </Box>
     );
   }
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-4xl mx-auto">
-        <Paper className="p-6 shadow-lg">
+    <Box
+      sx={{
+        backgroundColor: "#f5f5f5",
+        minHeight: "100vh",
+        py: 6,
+      }}
+    >
+      <Container maxWidth="lg">
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            borderRadius: 4,
+          }}
+        >
           {/* Farmer Header */}
-          <div className="flex flex-col items-center text-center mb-6">
-            <Avatar
-              src={farmer.profilePicture}
-              alt={farmer.name}
-              className="w-24 h-24 mb-4"
-            />
-            <Typography variant="h4" className="font-bold">
-              {farmer.name}
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            textAlign="center"
+            mb={4}
+          >
+            {farmer?.profilePicture && (
+              <Avatar
+                src={
+                  `${import.meta.env.VITE_API_SERVER_URL}/uploads/${
+                    farmer.profilePicture
+                  }` || "/default-avatar.png"
+                }
+                alt={farmer.name}
+                sx={{
+                  width: 150,
+                  height: 150,
+                  mb: 2,
+                }}
+              />
+            )}
+            <Typography variant="h4" fontWeight="bold">
+              {farmer.name || "N/A"}
               {farmer.verificationStatus === "approved" && (
-                <VerifiedIcon className="text-green-500 ml-2" />
+                <VerifiedIcon sx={{ color: "green", ml: 1 }} />
               )}
             </Typography>
-            <Typography variant="subtitle1" className="text-gray-600">
-              {farmer.farmName}
+            <Typography variant="subtitle1" color="textSecondary">
+              {farmer.farmName || "N/A"}
             </Typography>
-          </div>
+          </Box>
 
-          <Divider className="my-4" />
+          <Divider sx={{ my: 4 }} />
 
-          {/* Personal Details */}
+          {/* Personal and Farm Details */}
           <Grid container spacing={4}>
+            {/* Personal Details */}
             <Grid item xs={12} md={6}>
-              <Typography variant="h6" className="font-semibold mb-2">
-                <HomeIcon className="mr-2" />
+              <Typography variant="h6" fontWeight="bold" mb={2}>
+                <HomeIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                 Personal Details
               </Typography>
-              <Typography>
-                <strong>Phone:</strong> {farmer.phoneNumber}
-              </Typography>
-              {/* <Typography>
-                <strong>Address:</strong> {farmer?.address.buildingName},{" "}
-                {farmer?.address.street}, {farmer?.address.city},{" "}
-                {farmer?.address.state}, {farmer?.address.postalCode},{" "}
-                {farmer?.address.country}
-              </Typography> */}
+              <Box sx={{ pl: 3 }}>
+                <Typography>
+                  <PhoneIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+                  <strong>Phone:</strong> {farmer.phoneNumber || "N/A"}
+                </Typography>
+                <Typography mt={2}>
+                  <strong>Address:</strong>{" "}
+                  {farmer?.address
+                    ? `${farmer.address.buildingName || ""}, ${
+                        farmer.address.street || ""
+                      }, ${farmer.address.city || ""}, ${
+                        farmer.address.state || ""
+                      }, ${farmer.address.postalCode || ""}, ${
+                        farmer.address.country || ""
+                      }`
+                    : "N/A"}
+                </Typography>
+              </Box>
             </Grid>
 
             {/* Farm Details */}
-            {/* <Grid item xs={12} md={6}>
-              <Typography variant="h6" className="font-semibold mb-2">
-                <CropIcon className="mr-2" />
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" fontWeight="bold" mb={2}>
+                <CropIcon sx={{ mr: 1, verticalAlign: "middle" }} />
                 Farm Details
               </Typography>
-              <Typography>
-                <strong>Farm Size:</strong> {farmer.farmSizeInAcres} acres
-              </Typography>
-              <Typography>
-                <strong>Location:</strong>{" "}
-                <LocationOnIcon className="text-red-500" />{" "}
-                {farmer.farmLocation.latitude}, {farmer.farmLocation.longitude}
-              </Typography>
-              <Typography>
-                <strong>Crops Grown:</strong>{" "}
-                {farmer.cropsGrown.join(", ") || "N/A"}
-              </Typography>
-            </Grid> */}
+              <Box sx={{ pl: 3 }}>
+                <Typography>
+                  <strong>Farm Size:</strong>{" "}
+                  {farmer.farmSizeInAcres
+                    ? `${farmer.farmSizeInAcres} acres`
+                    : "N/A"}
+                </Typography>
+                <Typography mt={2}>
+                  <strong>Location:</strong>{" "}
+                  {farmer.farmLocation ? (
+                    <>
+                      <LocationOnIcon
+                        sx={{ color: "red", mr: 1, verticalAlign: "middle" }}
+                      />
+                      {farmer.farmLocation.latitude},{" "}
+                      {farmer.farmLocation.longitude}
+                    </>
+                  ) : (
+                    "N/A"
+                  )}
+                </Typography>
+                <Typography mt={2}>
+                  <strong>Crops Grown:</strong>{" "}
+                  {farmer.cropsGrown?.length > 0
+                    ? farmer.cropsGrown.join(", ")
+                    : "N/A"}
+                </Typography>
+              </Box>
+            </Grid>
           </Grid>
 
-          <Divider className="my-4" />
+          <Divider sx={{ my: 4 }} />
+
+          {/* Rating Section */}
+
+          {userId && (
+            <Box textAlign="center" mb={4}>
+              <Typography variant="h6" fontWeight="bold" mb={2}>
+                Rate This Farmer
+              </Typography>
+              <Rating
+                name="farmer-rating"
+                value={ratingValue}
+                onChange={(event, newValue) => setRatingValue(newValue)}
+                size="large"
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                label="Add a comment (optional)"
+                variant="outlined"
+                fullWidth
+                multiline
+                rows={3}
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+                sx={{ mb: 2 }}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleRateFarmer}
+                disabled={ratingValue === 0}
+              >
+                Submit Rating
+              </Button>
+            </Box>
+          )}
+
+          {/* Average Rating */}
+          <Box textAlign="center">
+            <Typography variant="h6" fontWeight="bold" mb={2}>
+              Average Rating
+            </Typography>
+            <Rating
+              name="average-rating"
+              value={averageRating || 0}
+              readOnly
+              precision={0.1}
+              size="large"
+              sx={{ mb: 2 }}
+            />
+            <Typography variant="body1">
+              {averageRating
+                ? `${averageRating.toFixed(1)} out of 5`
+                : "No ratings yet"}
+            </Typography>
+          </Box>
 
           {/* Verification Status */}
-          <div className="text-center">
+          <Box textAlign="center" mt={4}>
             <Chip
               label={
                 farmer.verificationStatus === "approved"
                   ? "Verified Farmer"
                   : farmer.verificationStatus === "pending"
                   ? "Verification Pending"
-                  : "Verification Rejected"
+                  : farmer.verificationStatus === "rejected"
+                  ? "Verification Rejected"
+                  : "N/A"
               }
               color={
                 farmer.verificationStatus === "approved"
                   ? "success"
                   : farmer.verificationStatus === "pending"
                   ? "warning"
-                  : "error"
+                  : farmer.verificationStatus === "rejected"
+                  ? "error"
+                  : "default"
               }
               icon={
                 farmer.verificationStatus === "approved" ? (
                   <VerifiedIcon />
                 ) : null
               }
-              className="mt-4"
+              sx={{ mt: 2 }}
             />
-          </div>
+          </Box>
         </Paper>
-      </div>
-    </div>
+      </Container>
+
+      {/* Snackbar for Notifications */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };
 

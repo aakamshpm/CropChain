@@ -3,8 +3,7 @@ import { retailerLogin, retailerRegister } from "./actions/retailerActions";
 import { consumerLogin, consumerRegister } from "./actions/consumerActions";
 
 const initialState = {
-  response: {},
-  userToken: "",
+  userId: null,
   loading: false,
   success: false,
   error: null,
@@ -14,9 +13,11 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    setCredentials: (state, action) => {
+      state.userId = action.payload;
+    },
     clearCredentials: (state) => {
-      state.response = {};
-      state.token = "";
+      state.userId = null;
       localStorage.removeItem("token");
     },
     resetMessageState: (state) => {
@@ -33,8 +34,6 @@ const userSlice = createSlice({
       builder.addCase(retailerRegister.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.response = action.payload;
-        state.userToken = action.payload.token;
         state.success = true;
       }),
       builder.addCase(retailerRegister.rejected, (state, action) => {
@@ -50,8 +49,6 @@ const userSlice = createSlice({
       builder.addCase(retailerLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.response = action.payload;
-        state.userToken = action.payload.token;
         state.success = true;
       }),
       builder.addCase(retailerLogin.rejected, (state, action) => {
@@ -67,8 +64,6 @@ const userSlice = createSlice({
       builder.addCase(consumerRegister.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.response = action.payload;
-        state.userToken = action.payload.token;
         state.success = true;
       }),
       builder.addCase(consumerRegister.rejected, (state, action) => {
@@ -84,8 +79,6 @@ const userSlice = createSlice({
       builder.addCase(consumerLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.response = action.payload;
-        state.userToken = action.payload.token;
         state.success = true;
       }),
       builder.addCase(consumerLogin.rejected, (state, action) => {
@@ -95,5 +88,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { clearCredentials, resetMessageState } = userSlice.actions;
+export const { setCredentials, clearCredentials, resetMessageState } =
+  userSlice.actions;
 export default userSlice.reducer;

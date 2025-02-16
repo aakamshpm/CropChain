@@ -49,12 +49,15 @@ const consumerLogin = createAsyncThunk(
 //logout consumer
 const consumerLogout = createAsyncThunk(
   "consumer/logout",
-  async (data, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${consumerURL}/logout`, {
-        ...config,
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        `${consumerURL}/logout`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
 
       return response.data;
     } catch (error) {

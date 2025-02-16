@@ -5,25 +5,13 @@ const generateToken = (res, userId, role) => {
     expiresIn: "1d",
   });
 
-  res.cookie(
-    `${
-      role === "admin"
-        ? "adminJwt"
-        : role === "consumer"
-        ? "consumerJwt"
-        : role === "farmer"
-        ? "farmerJwt"
-        : "retailerJwt"
-    }`,
-    token,
-    {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use 'secure' only in production
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    }
-  );
-
+  res.cookie("jwt", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // Use 'secure' in production
+    sameSite: "strict",
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    path: "/", // Ensure path consistency
+  });
   return token;
 };
 

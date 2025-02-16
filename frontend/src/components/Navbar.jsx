@@ -8,9 +8,10 @@ import { TextField } from "@mui/material";
 import { isUserAuthenticated } from "../utils/userAuth";
 import { useDispatch } from "react-redux";
 import { clearCartData, getCartDataAsync } from "../utils/cartSlice";
-import { clearCredentials } from "../utils/userSlice";
+import { clearCredentials, setCredentials } from "../utils/userSlice";
 import { consumerLogout } from "../utils/actions/consumerActions";
 import { retailerLogout } from "../utils/actions/retailerActions";
+import { getUserIdFromToken } from "../utils/utils";
 
 const Navbar = () => {
   const role = isUserAuthenticated();
@@ -20,15 +21,18 @@ const Navbar = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const onLogout = () => {
-    {
+  const onLogout = async () => {
+    try {
       role === "retailer"
-        ? dispatch(retailerLogout())
-        : dispatch(consumerLogout());
+        ? await dispatch(retailerLogout()).unwrap()
+        : await dispatch(consumerLogout()).unwrap();
+
+      dispatch(clearCredentials());
+      dispatch(clearCartData());
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
     }
-    dispatch(clearCredentials());
-    dispatch(clearCartData());
-    navigate("/login");
   };
 
   const searchProducts = () => {
@@ -40,7 +44,12 @@ const Navbar = () => {
   useEffect(() => {
     if (role) {
       dispatch(getCartDataAsync());
+      const userId = getUserIdFromToken();
+      userId && dispatch(setCredentials(userId));
       setSearchTerm("");
+    } else {
+      document.cookie =
+        "consumerJwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=localhost;";
     }
   }, [dispatch, role]);
 

@@ -324,6 +324,7 @@ const addOrUpdateRating = async (req, res) => {
 
     res.status(200).json({ message: "Rating submitted successfully.", farmer });
   } catch (error) {
+    console.log(error);
     res.status(500);
     throw new Error(error.message);
   }

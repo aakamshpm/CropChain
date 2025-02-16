@@ -5,7 +5,7 @@ import Consumer from "../models/Consumer.js";
 
 const registerConsumer = asyncHandler(async (req, res) => {
   try {
-    const { name, phoneNumber, password, address } = req.body; // TODO:: add shop address
+    const { name, phoneNumber, password, address } = req.body;
 
     if (!name || !phoneNumber || !password) {
       res.status(400);
@@ -67,11 +67,12 @@ const loginConsumer = asyncHandler(async (req, res) => {
 const logoutConsumer = asyncHandler(async (req, res) => {
   res.cookie("jwt", "", {
     httpOnly: true,
-    sameSite: "None",
-    secure: true,
-    expires: new Date(0),
+    secure: process.env.NODE_ENV === "production", // Match 'secure' flag
+    sameSite: "strict", // Match 'sameSite' attribute
+    expires: new Date(0), // Set expiry to the past
+    path: "/", // Match the path
   });
-  res.json({ message: "Logout successfull" });
+  res.status(200).json({ message: "Logged out successfully" });
 });
 
 const getConsumerDetails = asyncHandler(async (req, res) => {

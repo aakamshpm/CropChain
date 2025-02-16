@@ -40,8 +40,22 @@ const farmerSchema = mongoose.Schema(
     statusMatch: { type: Boolean },
     appliedForReview: { type: Boolean, default: false },
     verifiedAt: { type: Date },
-  },
 
+    // Rating System
+    ratings: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        rating: { type: Number, required: true, min: 1, max: 5 },
+        comment: { type: String },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    averageRating: { type: Number, default: 0 },
+  },
   { timestamps: true }
 );
 
