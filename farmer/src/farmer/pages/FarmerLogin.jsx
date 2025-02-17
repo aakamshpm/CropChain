@@ -4,121 +4,166 @@ import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { loginFarmer } from "../auth/farmerActions";
 import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
-import { useForm } from "react-hook-form";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 import "react-phone-number-input/style.css";
 import { resetMessageState } from "../auth/authSlice";
+import { FiSmartphone, FiLock } from "react-icons/fi";
 
 const Login = () => {
-  const [data, setData] = useState({
-    phoneNumber: "",
-    password: "",
-  });
-
+  const [isLoading, setIsLoading] = useState(false);
   const { error, success } = useSelector((state) => state.auth);
 
-  const formSchema = Yup.object().shape({
+  const validationSchema = Yup.object().shape({
     phoneNumber: Yup.string()
       .required("Phone is required")
       .test("is-valid-phone", "Invalid phone number", (value) =>
-        isValidPhoneNumber(data.phoneNumber)
+        isValidPhoneNumber(value)
       ),
     password: Yup.string().required("Password is required"),
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-  } = useForm({ mode: "onChange", resolver: yupResolver(formSchema) });
-
-  watch();
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { enqueueSnackbar } = useSnackbar();
 
-  const onLogin = () => {
-    dispatch(loginFarmer(data));
+  const handleSubmit = async (values, { setSubmitting }) => {
+    setIsLoading(true);
+    try {
+      await dispatch(loginFarmer(values)).unwrap();
+    } finally {
+      setSubmitting(false);
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     if (success) {
       enqueueSnackbar("Login success", { variant: "success" });
       dispatch(resetMessageState());
-
       navigate("/");
     }
 
     if (error) {
-      enqueueSnackbar(error, {
-        variant: "error",
-      });
+      enqueueSnackbar(error, { variant: "error" });
       dispatch(resetMessageState());
     }
   }, [success, error, dispatch]);
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="flex flex-col items-center justify-center p-8 border-[1px] border-black rounded-lg">
-        <h1 className="text-primary-color font-semibold text-2xl mb-4">
-          Farmer Login
-        </h1>
-        <div className="flex flex-col p-2">
-          <label htmlFor="phoneNumber"> Phone Number</label>
-          <PhoneInput
-            defaultCountry="IN"
-            name="phoneNumber"
-            className="input-field"
-            placeholder="Enter your phone number"
-            {...register("phoneNumber")}
-            value={data.phoneNumber}
-            onChange={(value) => {
-              setData((prev) => ({ ...prev, phoneNumber: value }));
-            }}
-          />
-          {errors.phoneNumber && (
-            <p className="text-xs text-red-600 mt-1">
-              {errors.phoneNumber.message}
-            </p>
-          )}
-
-          <label htmlFor="password">Password</label>
-          <input
-            name="password"
-            value={data.password}
-            className="input-field"
-            {...register("password")}
-            onChange={(e) =>
-              setData((prev) => {
-                return {
-                  ...prev,
-                  [e.target.name]: e.target.value,
-                };
-              })
-            }
-            type="password"
-            placeholder="Enter your password"
-          />
-          {errors.password && (
-            <p className="text-xs text-red-600 mt-1">
-              {errors.password.message}
-            </p>
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 transition-all duration-300 hover:shadow-xl">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-gray-500">Sign in to your CropChain account</p>
         </div>
-        <button className="btn-primary" onClick={handleSubmit(onLogin)}>
-          Login
-        </button>
-        <p className="mt-3">
-          New to CropChain?{" "}
-          <Link className="underline" to="/register">
-            Register
-          </Link>{" "}
-          now!
-        </p>
+
+        <Formik
+          initialValues={{ phoneNumber: "", password: "" }}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ values, setFieldValue, isSubmitting }) => (
+            <Form className="space-y-6">
+              <div className="space-y-4">
+                {/* Phone Number Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <FiSmartphone className="w-5 h-5" />
+                    </span>
+                    <PhoneInput
+                      defaultCountry="IN"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+                      placeholder="Enter phone number"
+                      name="phoneNumber"
+                      value={values.phoneNumber}
+                      onChange={(value) => setFieldValue("phoneNumber", value)}
+                    />
+                  </div>
+                  <ErrorMessage name="phoneNumber">
+                    {(msg) => (
+                      <p className="text-red-500 text-sm mt-1">{msg}</p>
+                    )}
+                  </ErrorMessage>
+                </div>
+
+                {/* Password Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <FiLock className="w-5 h-5" />
+                    </span>
+                    <Field
+                      name="password"
+                      type="password"
+                      placeholder="Enter password"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+                    />
+                  </div>
+                  <ErrorMessage name="password">
+                    {(msg) => (
+                      <p className="text-red-500 text-sm mt-1">{msg}</p>
+                    )}
+                  </ErrorMessage>
+                </div>
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={isLoading || isSubmitting}
+                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Logging in...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
+              </button>
+
+              <div className="text-center text-sm text-gray-600">
+                Don't have an account?{" "}
+                <Link
+                  to="/register"
+                  className="text-green-600 hover:text-green-700 font-medium"
+                >
+                  Create account
+                </Link>
+              </div>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );
