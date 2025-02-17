@@ -6,7 +6,20 @@ const productSchema = mongoose.Schema({
   pricePerKg: { type: Number, required: true },
   retailerPrice: { type: Number },
   quantityAvailableInKg: { type: Number, required: true },
-  category: { type: String, required: true },
+  category: {
+    type: String,
+    enum: [
+      "Fruits",
+      "Vegetables",
+      "Grains & Cereals",
+      "Dairy Products",
+      "Seeds & Nuts",
+      "Plant-based Products",
+      "Honey & Bee Products",
+      "Others",
+    ],
+    required: true,
+  },
   harvestDate: { type: Date },
   images: [{ type: String }],
   farmer: {
