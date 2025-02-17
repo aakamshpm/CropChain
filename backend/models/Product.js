@@ -14,6 +14,20 @@ const productSchema = mongoose.Schema({
     ref: "Farmer",
     required: true,
   }, // Reference to Farmer
+
+  // Rating System
+  ratings: [
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+      },
+      rating: { type: Number, required: true, min: 1, max: 5 },
+      comment: { type: String },
+      createdAt: { type: Date, default: Date.now },
+    },
+  ],
+  averageRating: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
 });
 

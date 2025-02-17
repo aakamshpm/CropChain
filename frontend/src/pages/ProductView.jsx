@@ -32,61 +32,45 @@ const ProductView = () => {
       return;
     }
 
-    if (!cartItems?.[id]) {
-      try {
-        if (role === "consumer")
-          await dispatch(
-            addToCartAsync({
-              productId: id,
-              cartFarmerId: product?.farmer?._id,
-            })
-          ).unwrap();
+    const isProductInCart = !!cartItems?.[id];
+    const MIN_RETAILER_QUANTITY = 100;
 
-        if (role === "retailer") {
-          if (retailerCartQuantity < 100) {
-            enqueueSnackbar("Add a minimum of 100kg", { variant: "error" });
-            setRetailerCartQuantity(100);
-          } else {
-            await dispatch(
-              updateRetailerCart({
-                productId: id,
-                cartFarmerId: product?.farmer?._id,
-                quantity: retailerCartQuantity,
-              })
-            ).unwrap();
-          }
+    try {
+      if (role === "consumer") {
+        if (isProductInCart) {
+          navigate("/cart");
+          return;
         }
-      } catch (error) {
-        enqueueSnackbar(error?.message || "Failed to add item to cart", {
-          variant: "error",
-        });
-        return;
-      }
-    } else if (role === "retailer") {
-      try {
-        if (retailerCartQuantity < 100) {
-          enqueueSnackbar("Add a minimum of 100KG", { variant: "error" });
-          setRetailerCartQuantity(100);
-        } else {
-          await dispatch(
-            updateRetailerCart({
-              productId: id,
-              cartFarmerId: product?.farmer?._id,
-              quantity: retailerCartQuantity,
-            })
-          ).unwrap();
-          enqueueSnackbar("Cart updated!", {
-            variant: "success",
-          });
+        await dispatch(
+          addToCartAsync({
+            productId: id,
+            cartFarmerId: product?.farmer?._id,
+          })
+        ).unwrap();
+        enqueueSnackbar("Item added to cart!", { variant: "success" });
+      } else if (role === "retailer") {
+        if (retailerCartQuantity < MIN_RETAILER_QUANTITY) {
+          enqueueSnackbar("Add a minimum of 100kg", { variant: "error" });
+          setRetailerCartQuantity(MIN_RETAILER_QUANTITY);
+          return;
         }
-      } catch (err) {
-        enqueueSnackbar(err?.message || "Failed to add item to cart", {
-          variant: "error",
-        });
-        return;
+
+        await dispatch(
+          updateRetailerCart({
+            productId: id,
+            cartFarmerId: product?.farmer?._id,
+            quantity: retailerCartQuantity,
+          })
+        ).unwrap();
+
+        enqueueSnackbar(
+          isProductInCart ? "Cart updated!" : "Item added to cart!",
+          { variant: "success" }
+        );
       }
-    } else {
-      navigate("/cart");
+    } catch (error) {
+      const errorMessage = error.message || "Failed to update cart";
+      enqueueSnackbar(errorMessage, { variant: "error" });
     }
   };
 

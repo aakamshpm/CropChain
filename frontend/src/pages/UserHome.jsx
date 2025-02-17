@@ -3,11 +3,10 @@ import {
   useGetAllFarmersQuery,
 } from "../utils/userServices";
 import ProductWidget from "../components/ProductWidget";
-import FarmerDetails from "../components/FarmerDetails";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Box, CardMedia, CircularProgress } from "@mui/material";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { Box, CardMedia } from "@mui/material";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const UserHome = () => {
   const {
@@ -23,37 +22,7 @@ const UserHome = () => {
 
   const farmers = farmersData?.farmers || [];
 
-  const [selectedFarmer, setSelectedFarmer] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [farmerProducts, setFarmerProducts] = useState([]);
-  const [productsLoading, setProductsLoading] = useState(false);
-
-  const handleOpen = async (farmer) => {
-    setSelectedFarmer(farmer);
-    setOpen(true);
-
-    try {
-      setProductsLoading(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_SERVER_URL}/api/product/farmer/`,
-        {
-          params: { farmer: farmer._id },
-          withCredentials: true,
-        }
-      );
-      setFarmerProducts(response.data.data);
-    } catch (err) {
-      console.error("Failed to fetch products:", err);
-      setFarmerProducts([]);
-    } finally {
-      setProductsLoading(false);
-    }
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedFarmer(null);
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
     refetch();
@@ -94,7 +63,7 @@ const UserHome = () => {
               <div
                 key={farmer._id}
                 className="border rounded-lg shadow-md p-4 min-w-[250px] bg-white cursor-pointer"
-                onClick={() => handleOpen(farmer)} // Fixed onClick event
+                onClick={() => navigate(`/farmer/${farmer._id}`)}
               >
                 {farmer.profilePicture ? (
                   <CardMedia
@@ -127,16 +96,6 @@ const UserHome = () => {
           )}
         </div>
       </div>
-
-      {/* Farmer Details Modal */}
-      <FarmerDetails
-        open={open}
-        handleClose={handleClose}
-        selectedFarmer={selectedFarmer}
-        productsLoading={productsLoading}
-        error={error}
-        farmerProducts={farmerProducts}
-      />
     </div>
   );
 };

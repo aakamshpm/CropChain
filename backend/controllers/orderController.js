@@ -61,6 +61,7 @@ const createOrder = asyncHandler(async (req, res) => {
         totalAmount: totalAmount + 2,
         paymentMode,
         paymentId: razorpayOrder.id,
+        cartFarmerId: null,
       });
 
       res.status(200).json({

@@ -7,25 +7,17 @@ import {
   CardContent,
   CardMedia,
   useTheme,
-  useMediaQuery,
   CircularProgress,
 } from "@mui/material";
 import axios from "axios";
-import FarmerDetails from "../components/FarmerDetails";
+import { useNavigate } from "react-router-dom";
 
 const ViewFarmers = () => {
   const [farmers, setFarmers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [selectedFarmer, setSelectedFarmer] = useState(null);
-  const [open, setOpen] = useState(false);
 
-  const [farmerProducts, setFarmerProducts] = useState([]);
-  const [productsLoading, setProductsLoading] = useState(false);
-
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFarmers = async () => {
@@ -46,33 +38,6 @@ const ViewFarmers = () => {
 
     fetchFarmers();
   }, []);
-
-  const handleOpen = async (farmer) => {
-    setSelectedFarmer(farmer);
-    setOpen(true);
-
-    try {
-      setProductsLoading(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_SERVER_URL}/api/product/farmer/`,
-        {
-          params: { farmer: farmer._id },
-          withCredentials: true,
-        }
-      );
-      setFarmerProducts(response.data.data);
-    } catch (err) {
-      console.error("Failed to fetch products:", err);
-      setFarmerProducts([]); // Clear products on error
-    } finally {
-      setProductsLoading(false);
-    }
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedFarmer(null);
-  };
 
   if (loading)
     return (
@@ -125,7 +90,7 @@ const ViewFarmers = () => {
                 boxShadow: 3,
               },
             }}
-            onClick={() => handleOpen(farmer)}
+            onClick={() => navigate(`/farmer/${farmer._id}`)}
           >
             {farmer.profilePicture ? (
               <CardMedia
@@ -165,15 +130,6 @@ const ViewFarmers = () => {
           </Card>
         ))}
       </Box>
-
-      {/* Farmer Details Modal */}
-      <FarmerDetails
-        selectedFarmer={selectedFarmer}
-        productsLoading={productsLoading}
-        handleClose={handleClose}
-        open={open}
-        farmerProducts={farmerProducts}
-      />
     </Box>
   );
 };

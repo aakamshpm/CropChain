@@ -4,7 +4,7 @@ import axios from "axios";
 const orderUrl = "http://localhost:8000/api/order";
 
 const initialState = {
-  orderData: {},
+  orderData: null,
   loading: false,
   success: null,
   error: null,
@@ -86,7 +86,7 @@ const orderSlice = createSlice({
       .addCase(fetchOrderByID.fulfilled, (state, action) => {
         state.loading = false;
         state.orderData = action.payload;
-        state.error = false;
+        state.error = null;
       })
       .addCase(fetchOrderByID.rejected, (state, action) => {
         state.loading = false;

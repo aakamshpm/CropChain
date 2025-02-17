@@ -111,14 +111,17 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(addToCartAsync.fulfilled, (state, action) => {
-        state.cartFarmerId = action.payload.cartFarmerId;
+        if (!state.cartFarmerId) {
+          state.cartFarmerId = action.payload.cartFarmerId; // Only update if null
+        }
         state.loading = false;
         state.success = true;
       })
       .addCase(addToCartAsync.rejected, (state, action) => {
         const { productId } = action.meta.arg;
-        state.cartItems[productId] = (state.cartItems[productId] || 0) - 1;
-
+        if (state.cartItems[productId] !== undefined) {
+          state.cartItems[productId] -= 1;
+        }
         state.loading = false;
         state.success = false;
         state.error = action.payload;
@@ -132,7 +135,7 @@ const cartSlice = createSlice({
       .addCase(getCartDataAsync.fulfilled, (state, action) => {
         const { cartData, cartFarmerId } = action.payload;
         state.cartItems = cartData;
-        state.cartFarmerId = cartFarmerId;
+        state.cartFarmerId = cartFarmerId || null; // Ensure null if undefined
         state.loading = false;
         state.success = true;
       })
@@ -148,6 +151,7 @@ const cartSlice = createSlice({
 
           if (state.cartItems[productId] <= 0) {
             delete state.cartItems[productId];
+            state.cartFarmerId = null;
           }
         }
         state.loading = true;
@@ -159,16 +163,19 @@ const cartSlice = createSlice({
       })
       .addCase(decrementCartItemAsync.rejected, (state, action) => {
         const productId = action.meta.arg;
-        state.cartItems[productId] = (state.cartItems[productId] || 0) + 1;
-
+        if (state.cartItems[productId] !== undefined) {
+          state.cartItems[productId] += 1; // Rollback if failed
+        }
+        state.loading = false;
         state.error = action.payload;
       })
 
       .addCase(removeCartItemAsync.fulfilled, (state, action) => {
         const { productId } = action.payload;
-
         if (state.cartItems[productId]) delete state.cartItems[productId];
-
+        state.cartFarmerId = Object.keys(state.cartItems).length
+          ? state.cartFarmerId
+          : null; // Update cartFarmerId
         state.loading = false;
         state.success = true;
       })
@@ -185,7 +192,7 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(updateRetailerCart.fulfilled, (state, action) => {
-        const { cartFarmerId } = action.payload;
+        const { cartFarmerId } = action.meta.arg;
         state.cartFarmerId = cartFarmerId;
         state.loading = false;
         state.success = true;

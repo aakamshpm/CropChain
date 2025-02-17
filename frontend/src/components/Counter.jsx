@@ -10,14 +10,18 @@ const Counter = ({ productId, count, cartFarmerId, quantityAvailable }) => {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const removeItem = () => {
+  const removeItem = async () => {
     if (!isAuthenticated) {
       enqueueSnackbar("Please Sign In / Sign Up before continuing", {
         variant: "warning",
       });
     } else {
       if (count) {
-        dispatch(decrementCartItemAsync(productId));
+        try {
+          dispatch(decrementCartItemAsync(productId)).unwrap();
+        } catch (err) {
+          enqueueSnackbar(err, { variant: "error" });
+        }
       }
     }
   };

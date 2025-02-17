@@ -132,9 +132,12 @@ const removeAllFromCart = asyncHandler(async (req, res) => {
   try {
     const cartData = {};
     userRole === "consumer"
-      ? await Consumer.findByIdAndUpdate(userId, { cartFarmerId: "", cartData })
+      ? await Consumer.findByIdAndUpdate(userId, {
+          cartFarmerId: null,
+          cartData,
+        })
       : await Retailer.findByIdAndUpdate(userId, {
-          cartFarmerId: "",
+          cartFarmerId: null,
           cartData,
         });
 
@@ -170,7 +173,7 @@ const updateRetailerCart = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Retailer not found" });
     }
     if (
-      String(retailerData.cartFarmerId) &&
+      retailerData.cartFarmerId &&
       cartFarmerId !== String(retailerData.cartFarmerId)
     ) {
       return res

@@ -51,7 +51,6 @@ const FarmerDetails = () => {
 
     if (userId && farmer && farmer.ratings) {
       const userRating = farmer.ratings.find((r) => r.userId === userId);
-      console.log(userRating);
       if (userRating) {
         setRatingValue(userRating.rating);
       } else {
