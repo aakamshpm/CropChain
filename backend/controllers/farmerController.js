@@ -80,42 +80,79 @@ const farmerLogin = asyncHandler(async (req, res) => {
   }
 });
 
-// Logout farmer
-const farmerLogout = asyncHandler(async (req, res) => {
-  res.cookie("jwt", "", { httpOnly: true, expiresIn: new Date(0) });
-  res.json({ message: "Logout successfull" });
-});
-
-// Update personal details
-const updatePD = asyncHandler(async (req, res) => {
-  const { name, phoneNumber, bio } = req.body;
+const updateFarmerProfile = asyncHandler(async (req, res) => {
+  const {
+    name,
+    phoneNumber,
+    aadhaarNumber,
+    // Personal details
+    buildingName,
+    street,
+    city,
+    state,
+    country,
+    postalCode,
+    // Address fields
+    farmName,
+    farmSizeInAcres,
+    cropsGrown,
+    latitude,
+    longitude,
+    // Farm details
+  } = req.body;
 
   try {
-    await Farmer.findByIdAndUpdate(req.farmerId, { name, phoneNumber, bio });
-    res.status(200).json({ message: "Personal data updated" });
+    const updateData = {};
+
+    // Update personal details if provided
+    if (name || phoneNumber || aadhaarNumber) {
+      updateData.name = name;
+      updateData.phoneNumber = phoneNumber;
+      updateData.aadhaarNumber = aadhaarNumber;
+    }
+
+    // Update address
+    if (buildingName || street || city || state || country || postalCode) {
+      updateData.address = {
+        buildingName,
+        street,
+        city,
+        state,
+        country,
+        postalCode,
+      };
+    }
+
+    // Update farm details if provided
+    if (farmName || farmSizeInAcres || cropsGrown || longitude || latitude) {
+      updateData.farmName = farmName;
+
+      updateData.farmSizeInAcres = farmSizeInAcres;
+      updateData.cropsGrown = cropsGrown;
+
+      updateData.farmLocation = {};
+      updateData.farmLocation.longitude = longitude;
+      updateData.farmLocation.latitude = latitude;
+    }
+
+    // Perform the update if there is any data to update
+    if (Object.keys(updateData).length > 0) {
+      await Farmer.findByIdAndUpdate(req.farmerId, updateData);
+      res.status(200).json({ message: "Farmer profile updated successfully" });
+    } else {
+      res.status(400);
+      throw new Error("No valid fields provided for update");
+    }
   } catch (err) {
     res.status(500);
     throw new Error(err.message);
   }
 });
 
-// Add address fields
-const updateAddress = asyncHandler(async (req, res) => {
-  const { buildingName, street, city, state, country, postalCode } = req.body;
-  if ((!buildingName, !street, !city, !state, !country, !postalCode)) {
-    res.status(400);
-    throw new Error("Enter all fields");
-  }
-
-  try {
-    await Farmer.findByIdAndUpdate(req.farmerId, {
-      address: { buildingName, street, city, state, country, postalCode },
-    });
-    res.status(200).json({ message: "Address updated" });
-  } catch (err) {
-    res.status(400);
-    throw new Error("Updating Address error occurred");
-  }
+// Logout farmer
+const farmerLogout = asyncHandler(async (req, res) => {
+  res.cookie("jwt", "", { httpOnly: true, expiresIn: new Date(0) });
+  res.json({ message: "Logout successfull" });
 });
 
 // Add profile picture
@@ -143,27 +180,6 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500);
     throw new Error("Something went wrong");
-  }
-});
-
-//add a farm
-const addFarm = asyncHandler(async (req, res) => {
-  const { farmName, farmLocation, farmSizeInAcres, cropsGrown } = req.body;
-
-  try {
-    await Farmer.findByIdAndUpdate(req.farmerId, {
-      farmName,
-      farmLocation: {
-        latitude: farmLocation?.latitude,
-        longitude: farmLocation?.longitude,
-      },
-      farmSizeInAcres,
-      cropsGrown,
-    });
-    res.status(200).json({ message: "Farm details updated!" });
-  } catch (err) {
-    res.status(500);
-    throw new Error(err.message);
   }
 });
 
@@ -294,7 +310,7 @@ const addOrUpdateRating = async (req, res) => {
     }
 
     // Find the farmer
-    const farmer = await Farmer.findById(farmerId);
+    const farmer = await Farmer.findById(farmerId).select("-password");
     if (!farmer) {
       res.status(404);
       throw new Error("Farmer not found");
@@ -352,10 +368,8 @@ export {
   farmerLogin,
   farmerRegister,
   farmerLogout,
-  updatePD,
-  updateAddress,
+  updateFarmerProfile,
   updateProfilePicture,
-  addFarm,
   getFarmerDetails,
   getAllFarmer,
   getFarmerById,

@@ -1,17 +1,57 @@
 import { useEffect, useRef, useState } from "react";
 import { useGetFarmerDetailsQuery } from "../auth/authService";
 import PhoneInput from "react-phone-number-input";
-import InputField from "../components/InputField";
-import AddToPhotosOutlinedIcon from "@mui/icons-material/AddToPhotosOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 import { updateFarmerData, uploadProfilePhoto } from "../auth/farmerActions";
 import { resetMessageState } from "../auth/authSlice";
-import { Box, Chip, Stack } from "@mui/material";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import {
+  Box,
+  Chip,
+  Button,
+  IconButton,
+  MenuItem,
+  TextField,
+  Paper,
+  InputAdornment,
+} from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import {
+  Person as PersonIcon,
+  Phone as PhoneIcon,
+  Home as HomeIcon,
+  LocationCity as CityIcon,
+  Map as MapIcon,
+  Flag as FlagIcon,
+  LocalPostOffice as PostalIcon,
+  Agriculture as FarmIcon,
+  Straighten as MeasureIcon,
+  Public as GlobeIcon,
+  CameraAlt as CameraIcon,
+  Save as SaveIcon,
+  Image as ImageIcon,
+  Crop as CropIcon,
+} from "@mui/icons-material";
 import CropManage from "../components/CropManage";
 
 const Profile = () => {
+  const CITIES_IN_KERALA = [
+    "Alappuzha",
+    "Ernakulam",
+    "Idukki",
+    "Kannur",
+    "Kasaragod",
+    "Kollam",
+    "Kottayam",
+    "Kozhikode",
+    "Malappuram",
+    "Palakkad",
+    "Pathanamthitta",
+    "Thiruvananthapuram",
+    "Thrissur",
+    "Wayanad",
+  ];
+
   const formDataRef = useRef(new FormData());
   const { data: response, isLoading, refetch } = useGetFarmerDetailsQuery();
 
@@ -22,7 +62,6 @@ const Profile = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false); // Toggle for the modal
   const [preview, setPreview] = useState(null);
-  const [cropName, setCropName] = useState("");
   const [farmerData, setFarmerData] = useState({
     name: "",
     phoneNumber: "",
@@ -129,11 +168,31 @@ const Profile = () => {
     }
   };
 
+  const handleUpdateProfile = () => {
+    const updateData = {
+      name: farmerData.name,
+      phoneNumber: farmerData.phoneNumber,
+      aadhaarNumber: farmerData.aadhaarNumber,
+      buildingName: farmerData.address.buildingName,
+      street: farmerData.address.street,
+      city: farmerData.address.city,
+      state: farmerData.address.state,
+      country: farmerData.address.country,
+      postalCode: farmerData.address.postalCode,
+      farmName: farmerData.farmName,
+      farmSizeInAcres: farmerData.farmSizeInAcres,
+      latitude: farmerData.farmLocation.latitude,
+      longitude: farmerData.farmLocation.longitude,
+      cropsGrown: farmerData.cropsGrown,
+    };
+
+    dispatch(updateFarmerData(updateData));
+  };
+
   useEffect(() => {
     if (success) {
-      console.log(success);
       enqueueSnackbar(data?.message || "Success", { variant: "success" });
-      dispatch(resetMessageState()); // reset success and error state to null to prevent popping up during each component mount
+      dispatch(resetMessageState()); // Reset success and error state to null
     }
     if (error) {
       enqueueSnackbar(error, {
@@ -146,296 +205,335 @@ const Profile = () => {
   if (!response) {
     return <p>Loading ...</p>;
   }
+
   return (
-    <div className="flex flex-col p-4 w-full">
-      <h1 className="text-3xl font-bold">Profile</h1>
-      <div className="flex">
-        <div className="flex flex-col">
-          <section className="mt-3">
-            <h2 className="font-semibold mb-1">Personal Details</h2>
-            <div className="grid grid-cols-3 gap-3">
-              {/* Name  */}
-              <InputField
-                name="name"
-                type="text"
-                label="Name"
-                value={farmerData?.name}
-                placeHolder="Enter your name"
-                onChangeHandler={onChangeHandler}
-              />
+    <div className="flex flex-col p-10 w-full">
+      <h1 className="text-3xl font-bold mb-6 flex items-center gap-2">
+        <PersonIcon fontSize="large" /> Farmer Profile
+      </h1>
 
-              <div className="phone-input">
-                <label>Phone Number</label>
-                <PhoneInput
-                  defaultCountry="IN"
-                  name="phoneNumber"
-                  className="input-field"
-                  placeholder="Enter your phone number"
-                  value={farmerData?.phoneNumber}
-                  onChange={(value) => {
-                    setFarmerData((prev) => ({ ...prev, phoneNumber: value }));
-                  }}
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={8}>
+          <Paper elevation={3} className="p-6 rounded-lg">
+            {/* Personal Details Section */}
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <PersonIcon Box /> Personal Information
+              </h2>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Full Name"
+                    value={farmerData.name}
+                    onChange={onChangeHandler}
+                    name="name"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PersonIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <div className="phone-input">
+                    <TextField
+                      fullWidth
+                      label="Phone Number"
+                      value={farmerData.phoneNumber}
+                      onChange={(e) =>
+                        setFarmerData({
+                          ...farmerData,
+                          phoneNumber: e.target.value,
+                        })
+                      }
+                      slotProps={{
+                        input: {
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <PhoneIcon />
+                            </InputAdornment>
+                          ),
+                          inputComponent: PhoneInput,
+                          inputProps: {
+                            international: true,
+                            defaultCountry: "IN",
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Aadhaar Number"
+                    value={farmerData.aadhaarNumber}
+                    onChange={onChangeHandler}
+                    name="aadhaarNumber"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <ImageIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </section>
+
+            {/* Address Section */}
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <HomeIcon /> Address Details
+              </h2>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Building Name"
+                    value={farmerData.address.buildingName}
+                    onChange={(e) => onChangeHandler(e, "address")}
+                    name="buildingName"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <HomeIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Street"
+                    value={farmerData.address.street}
+                    onChange={(e) => onChangeHandler(e, "address")}
+                    name="street"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <MapIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="City"
+                    value={farmerData.address.city}
+                    onChange={(e) => onChangeHandler(e, "address")}
+                    name="city"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <CityIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  >
+                    {CITIES_IN_KERALA.map((city) => (
+                      <MenuItem key={city} value={city}>
+                        {city}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Postal Code"
+                    value={farmerData.address.postalCode}
+                    onChange={(e) => onChangeHandler(e, "address")}
+                    name="postalCode"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PostalIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </section>
+
+            {/* Farm Details Section */}
+            <section className="mb-8">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <FarmIcon /> Farm Information
+              </h2>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Farm Name"
+                    value={farmerData.farmName}
+                    onChange={onChangeHandler}
+                    name="farmName"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <FarmIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Farm Size (Acres)"
+                    value={farmerData.farmSizeInAcres}
+                    onChange={onChangeHandler}
+                    name="farmSizeInAcres"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <MeasureIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Latitude"
+                    value={farmerData.farmLocation.latitude}
+                    onChange={(e) => onChangeHandler(e, "farmLocation")}
+                    name="latitude"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <GlobeIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Longitude"
+                    value={farmerData.farmLocation.longitude}
+                    onChange={(e) => onChangeHandler(e, "farmLocation")}
+                    name="longitude"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <GlobeIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Box className="flex flex-col">
+                    <Chip
+                      icon={<CropIcon />}
+                      label={`Manage Crops (${farmerData.cropsGrown.length})`}
+                      onClick={() => setIsModalOpen(true)}
+                      variant="outlined"
+                      color="primary"
+                      sx={{
+                        py: 2,
+                        fontSize: "1rem",
+                        "& .MuiChip-icon": { ml: 1 },
+                      }}
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+            </section>
+
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<SaveIcon />}
+              onClick={handleUpdateProfile}
+              sx={{ mt: 3 }}
+            >
+              Update Profile
+            </Button>
+          </Paper>
+        </Grid>
+
+        {/* Profile Picture Section */}
+        <Grid item xs={12} md={4}>
+          <Paper elevation={3} className="p-6 rounded-lg text-center">
+            <div className="relative inline-block">
+              {preview && (
+                <img
+                  className="w-48 h-48 object-cover rounded-full mb-4 shadow-lg"
+                  src={preview}
+                  alt="Profile"
                 />
-              </div>
-
-              {/* aadhaarNumber  */}
-              <InputField
-                name="aadhaarNumber"
-                type="text"
-                label="Aadhaar Number"
-                value={farmerData.aadhaarNumber}
-                placeHolder="Enter your Aadhaar"
-                onChangeHandler={onChangeHandler}
-              />
-            </div>
-            <button
-              onClick={() =>
-                dispatch(
-                  updateFarmerData({
-                    endpoint: "update-pd",
-                    data: {
-                      name: farmerData.name,
-                      phoneNumber: farmerData.phoneNumber,
-                      aadhaarNumber: farmerData.aadhaarNumber,
-                    },
-                  })
-                )
-              }
-              className="mt-3 btn-primary"
-            >
-              Save Personal details
-            </button>
-          </section>
-
-          <section className="mt-3">
-            <h2 className="font-semibold mb-1">Address</h2>
-            <div className="grid grid-cols-3 gap-3">
-              {/* Building Name  */}
-              <InputField
-                name="buildingName"
-                type="text"
-                label="Building Name"
-                value={farmerData?.address?.buildingName}
-                placeHolder="Enter building name or number"
-                onChangeHandler={onChangeHandler}
-                parentKey="address"
-              />
-
-              {/* Street */}
-              <InputField
-                name="street"
-                type="text"
-                label="Street"
-                value={farmerData?.address?.street}
-                placeHolder="Enter your street"
-                onChangeHandler={onChangeHandler}
-                parentKey="address"
-              />
-
-              {/* City */}
-              <InputField
-                name="city"
-                type="text"
-                label="City"
-                value={farmerData?.address?.city}
-                placeHolder="Enter your city"
-                onChangeHandler={onChangeHandler}
-                parentKey="address"
-              />
-
-              {/* State */}
-              <InputField
-                name="state"
-                type="text"
-                label="State"
-                value={farmerData?.address?.state}
-                placeHolder="Enter your State"
-                onChangeHandler={onChangeHandler}
-                parentKey="address"
-              />
-
-              {/* Country */}
-              <InputField
-                name="country"
-                type="text"
-                label="Country"
-                value={farmerData?.address?.country}
-                placeHolder="Enter your Country"
-                onChangeHandler={onChangeHandler}
-                parentKey="address"
-              />
-
-              {/* Postal */}
-              <InputField
-                name="postalCode"
-                type="text"
-                label="Postal Code"
-                value={farmerData?.address?.postalCode}
-                placeHolder="Enter your Postal code"
-                onChangeHandler={onChangeHandler}
-                parentKey="address"
-              />
-            </div>
-            <button
-              onClick={() =>
-                dispatch(
-                  updateFarmerData({
-                    endpoint: "update-address",
-                    data: {
-                      buildingName: farmerData.address.buildingName,
-                      street: farmerData.address.street,
-                      city: farmerData.address.city,
-                      postalCode: farmerData.address.postalCode,
-                      state: farmerData.address.state,
-                      country: farmerData.address.country,
-                    },
-                  })
-                )
-              }
-              className="mt-3 btn-primary"
-            >
-              Update Address
-            </button>
-          </section>
-
-          <section className="mt-3">
-            <h2 className="font-semibold mb-1">Farm Details</h2>
-            <div className="grid grid-cols-3 gap-3">
-              {/* Farm name */}
-              <InputField
-                name="farmName"
-                type="text"
-                label="Farm Name"
-                value={farmerData?.farmName}
-                placeHolder="Enter your farm name"
-                onChangeHandler={onChangeHandler}
-              />
-
-              {/* Farm size */}
-              <InputField
-                name="farmSizeInAcres"
-                type="text"
-                label="Farm Size (in Acres)"
-                value={farmerData?.farmSizeInAcres}
-                placeHolder="Enter your farm size"
-                onChangeHandler={onChangeHandler}
-              />
-            </div>
-          </section>
-          <section className=" mt-3">
-            <h3 className="font-semibold mt-3">Farm Location</h3>
-            <div className="grid grid-cols-3 gap-3">
-              <InputField
-                name="latitude"
-                type="text"
-                label="Latitude"
-                value={farmerData?.farmLocation?.latitude}
-                placeHolder="Enter latitude"
-                onChangeHandler={onChangeHandler}
-                parentKey="farmLocation"
-              />
-
-              <InputField
-                name="longitude"
-                type="text"
-                label="Longitude"
-                value={farmerData?.farmLocation?.longitude}
-                placeHolder="Enter longitude"
-                onChangeHandler={onChangeHandler}
-                parentKey="farmLocation"
-              />
-              <Box className="flex flex-col">
-                <label>Crop Grown</label>
-                <Chip
-                  label={
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      gap={1}
-                    >
-                      <span>{`${farmerData.cropsGrown.length}-Crops`}</span>
-                      <ArrowForwardIosIcon fontSize="small" />
-                    </Stack>
-                  }
-                  variant="outlined"
+              )}
+              <label
+                htmlFor="profile-photo"
+                className="absolute bottom-2 right-2"
+              >
+                <IconButton
+                  color="primary"
+                  component="span"
                   sx={{
-                    marginTop: "4px",
-                    marginBottom: "10px",
-                    height: "40px",
-                    fontSize: "1rem",
-                    padding: "8px",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
+                    backgroundColor: "primary.main",
+                    "&:hover": { backgroundColor: "primary.dark" },
                   }}
-                  onClick={() => setIsModalOpen(true)}
-                />
-              </Box>
-              {/* Add/View Crop Component  */}
-              <CropManage
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
-                cropsGrown={farmerData.cropsGrown}
-                farmerData={farmerData}
-                setFarmerData={setFarmerData}
-              />
+                >
+                  <CameraIcon sx={{ color: "white" }} />
+                </IconButton>
+              </label>
             </div>
-            <button
-              onClick={() =>
-                dispatch(
-                  updateFarmerData({
-                    endpoint: "add-farm",
-                    data: {
-                      farmName: farmerData.farmName,
-                      farmSizeInAcres: farmerData.farmSizeInAcres,
-                      farmLocation: {
-                        latitude: farmerData.farmLocation.latitude,
-                        longitude: farmerData.farmLocation.longitude,
-                      },
-                      cropsGrown: farmerData.cropsGrown,
-                    },
-                  })
-                )
-              }
-              className="mt-3 btn-primary"
+
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              id="profile-photo"
+              onChange={handleProfileUpload}
+            />
+
+            <Button
+              variant="outlined"
+              color="primary"
+              fullWidth
+              startIcon={<ImageIcon />}
+              onClick={() => dispatch(uploadProfilePhoto(formDataRef.current))}
+              sx={{ mt: 2 }}
             >
-              Save Farm details
-            </button>
-          </section>
-        </div>
+              Upload Profile Picture
+            </Button>
+          </Paper>
+        </Grid>
+      </Grid>
 
-        <div className="flex flex-col ml-10 items-center">
-          {preview && (
-            <img
-              className="w-48 h-48 object-cover rounded-full mb-3 shadow-md"
-              src={preview}
-            />
-          )}
-          <label htmlFor="profile-photo">
-            <AddToPhotosOutlinedIcon
-              fontSize="large"
-              className="bg-black rounded-full p-2 mb-1 text-white cursor-pointer transition-transform hover:scale-105"
-            />
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            id="profile-photo"
-            onChange={handleProfileUpload}
-          />
-
-          <button
-            onClick={() => {
-              dispatch(uploadProfilePhoto(formDataRef.current));
-            }}
-            className="mt-3 btn-primary"
-          >
-            Upload photo
-          </button>
-        </div>
-      </div>
+      <CropManage
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        cropsGrown={farmerData.cropsGrown}
+        farmerData={farmerData}
+        setFarmerData={setFarmerData}
+      />
     </div>
   );
 };

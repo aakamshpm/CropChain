@@ -95,7 +95,7 @@ const farmerSlice = createSlice({
       })
       .addCase(addOrUpdateRating.fulfilled, (state, action) => {
         state.loading = false;
-        state.farmerData = action.payload; // Update farmer data with new rating
+        state.farmerData = action.payload.farmer; // Update farmer data with new rating
         state.success = true;
       })
       .addCase(addOrUpdateRating.rejected, (state, action) => {

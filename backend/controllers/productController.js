@@ -10,6 +10,7 @@ const addProduct = asyncHandler(async (req, res) => {
       name,
       description,
       pricePerKg,
+      retailerPrice,
       quantityAvailableInKg,
       category,
       harvestDate,
@@ -20,7 +21,8 @@ const addProduct = asyncHandler(async (req, res) => {
         !description ||
         !pricePerKg ||
         !quantityAvailableInKg ||
-        !category,
+        !retailerPrice,
+      !category,
       !harvestDate)
     ) {
       res.status(400);
@@ -38,6 +40,7 @@ const addProduct = asyncHandler(async (req, res) => {
       name,
       description,
       pricePerKg,
+      retailerPrice,
       quantityAvailableInKg,
       category,
       harvestDate,
@@ -126,20 +129,56 @@ const getProductsByFarmer = asyncHandler(async (req, res) => {
 //update an existing product
 const updateProduct = asyncHandler(async (req, res) => {
   const { productId } = req.params;
+  const { farmerId } = req;
 
   try {
-    let product = await Product.findById(productId);
+    const product = await Product.findOne({ _id: productId, farmer: farmerId });
     if (!product) {
       res.status(400);
-      throw new Error("No product found!");
+      throw new Error(
+        "No product found or you are not authorized to update this product!"
+      );
     }
 
-    product = await Product.findByIdAndUpdate(
-      { _id: productId, farmer: req.farmerId },
-      req.body,
-      { new: true }
-    );
-    res.status(200).json({ message: "Product updated", data: product });
+    const {
+      name,
+      description,
+      pricePerKg,
+      retailerPrice,
+      quantityAvailableInKg,
+      category,
+      harvestDate,
+    } = req.body;
+
+    // Update fields only if they are provided
+    if (name) product.name = name;
+    if (description) product.description = description;
+    if (pricePerKg) product.pricePerKg = pricePerKg;
+    if (retailerPrice) product.retailerPrice = retailerPrice;
+    if (quantityAvailableInKg)
+      product.quantityAvailableInKg = quantityAvailableInKg;
+    if (category) product.category = category;
+    if (harvestDate) product.harvestDate = harvestDate;
+
+    // Handle uploaded files
+    if (req.files && req.files.length > 0) {
+      // Delete existing images if needed
+      if (product.images) {
+        product.images.forEach((imagePath) => {
+          fs.unlink(imagePath, (unlinkErr) => {
+            if (unlinkErr) console.error(`Error deleting file: ${imagePath}`);
+          });
+        });
+      }
+
+      product.images = req.files.map((file) => file.filename);
+    }
+
+    // Save updated product to the database
+    const updatedProduct = await product.save();
+    res
+      .status(200)
+      .json({ message: "Product updated successfully", data: updatedProduct });
   } catch (err) {
     res.status(500);
     throw new Error(err.message);
@@ -171,8 +210,8 @@ const removeProduct = asyncHandler(async (req, res) => {
 // Remove all products-Farmer
 const removeAllProductsFromFarmer = asyncHandler(async (req, res) => {
   try {
+    console.log(req.farmerId);
     const result = await Product.deleteMany({ farmer: req.farmerId });
-
     if (result.deletedCount === 0) {
       return res
         .status(404)

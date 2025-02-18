@@ -6,7 +6,6 @@ import {
   uploadProfilePhoto,
   logoutFarmer,
 } from "./farmerActions";
-import { addProduct, updateProduct } from "./productActions";
 import { changeOrderStatusAsync } from "./orderActions";
 
 const initialState = {
@@ -21,8 +20,11 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    setCredentials: (state, action) => {
+      state.data = action.payload;
+    },
     clearCredentials: (state) => {
-      state.data = {};
+      state.data = null;
       state.token = "";
       localStorage.removeItem("token");
       localStorage.removeItem("role");
@@ -115,38 +117,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       });
 
-    //add-product
-    builder.addCase(addProduct.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    }),
-      builder.addCase(addProduct.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = null;
-        state.data = action.payload;
-        state.success = true;
-      }),
-      builder.addCase(addProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
-
-    //update product
-    builder.addCase(updateProduct.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    }),
-      builder.addCase(updateProduct.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = null;
-        state.data = action.payload;
-        state.success = true;
-      }),
-      builder.addCase(updateProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
-
     // change order-status
     builder.addCase(changeOrderStatusAsync.pending, (state) => {
       state.loading = true;
@@ -165,5 +135,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearCredentials, resetMessageState } = authSlice.actions;
+export const { setCredentials, clearCredentials, resetMessageState } =
+  authSlice.actions;
 export default authSlice.reducer;

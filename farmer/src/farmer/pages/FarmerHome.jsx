@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux";
 import {
   LocalOfferOutlined,
   AssignmentTurnedInOutlined,
@@ -7,6 +8,10 @@ import {
 } from "@mui/icons-material";
 
 const Home = () => {
+  const {
+    data: { name },
+  } = useSelector((state) => state.auth);
+
   // Temporary data - replace with real data from API
   const stats = [
     {
@@ -47,7 +52,7 @@ const Home = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">
-          Welcome back, Farmer Name
+          Welcome back, {name}
         </h1>
         <p className="text-gray-600">Here's your farming dashboard overview</p>
       </div>

@@ -9,6 +9,17 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const UserHome = () => {
+  const PRODUCT_CATEGORIES = [
+    "Fruits",
+    "Vegetables",
+    "Grains & Cereals",
+    "Dairy Products",
+    "Seeds & Nuts",
+    "Plant-based Products",
+    "Honey & Bee Products",
+    "Others",
+  ];
+
   const {
     data: products,
     isLoading: loadingProducts,
@@ -28,6 +39,25 @@ const UserHome = () => {
     refetch();
   }, [products]);
 
+  // Group products with predefined categories
+  const groupedProducts = PRODUCT_CATEGORIES.reduce((acc, category) => {
+    acc[category] = [];
+    return acc;
+  }, {});
+
+  // Add products to their categories
+  products?.data?.forEach((product) => {
+    const category = PRODUCT_CATEGORIES.includes(product.category)
+      ? product.category
+      : "Others";
+    groupedProducts[category].push(product);
+  });
+
+  // Filter out empty categories
+  const nonEmptyCategories = PRODUCT_CATEGORIES.filter(
+    (category) => groupedProducts[category]?.length > 0
+  );
+
   if (loadingProducts || loadingFarmers) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -38,17 +68,24 @@ const UserHome = () => {
 
   return (
     <div className="px-24 py-5">
-      {/* Products Section */}
+      {/* Products Section organized by categories */}
       <div>
         <h2 className="text-2xl font-bold mb-4">Available Products</h2>
-        {products?.data.length === 0 ? (
+        {nonEmptyCategories.length === 0 ? (
           <p className="text-gray-600">No products available</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products?.data?.map((product, i) => (
-              <ProductWidget product={product} key={i} />
-            ))}
-          </div>
+          nonEmptyCategories.map((category) => (
+            <div key={category} className="mb-8">
+              <h3 className="text-xl font-semibold mb-4 capitalize">
+                {category} ({groupedProducts[category].length})
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {groupedProducts[category].map((product, i) => (
+                  <ProductWidget product={product} key={i} />
+                ))}
+              </div>
+            </div>
+          ))
         )}
       </div>
 
@@ -68,7 +105,7 @@ const UserHome = () => {
                 {farmer.profilePicture ? (
                   <CardMedia
                     component="img"
-                    image={`${import.meta.env.VITE_API_SERVER_URL}/uploads/${
+                    image={`${import.meta.env.VITE_API_IMAGE_URL}/${
                       farmer.profilePicture
                     }`}
                     alt={`${farmer.name}'s profile`}

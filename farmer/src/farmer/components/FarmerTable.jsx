@@ -18,37 +18,35 @@ import {
 import { useDispatch } from "react-redux";
 import { removeProduct } from "../auth/productActions";
 
-const FarmerTable = ({
-  data,
-  setSelectedProduct,
-  setModify,
-  handleOpen,
-  refetch,
-}) => {
+const FarmerTable = ({ data, onEdit, refetch }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
   const dispatch = useDispatch();
 
-  const handleViewProduct = (product) => {
-    setModify(true);
-    setSelectedProduct(product);
-    handleOpen();
-  };
-
+  // Handle delete click
   const handleDeleteClick = (productId) => {
     setProductToDelete(productId);
     setOpenDeleteDialog(true);
   };
 
+  // Handle delete confirmation
   const handleDeleteConfirm = async () => {
-    console.log("Deleting product:", productToDelete);
-
-    await dispatch(removeProduct(productToDelete)).unwrap();
-    refetch();
-    setOpenDeleteDialog(false);
+    try {
+      await dispatch(removeProduct(productToDelete)).unwrap();
+      refetch(); // Refetch data after successful deletion
+      enqueueSnackbar("Product deleted successfully", { variant: "success" });
+    } catch (error) {
+      enqueueSnackbar(error?.message || "Failed to delete product", {
+        variant: "error",
+      });
+    } finally {
+      setOpenDeleteDialog(false);
+      setProductToDelete(null);
+    }
   };
 
+  // Handle delete cancellation
   const handleDeleteCancel = () => {
     setOpenDeleteDialog(false);
     setProductToDelete(null);
@@ -65,6 +63,7 @@ const FarmerTable = ({
               <TableCell align="right">Description</TableCell>
               <TableCell align="right">Category</TableCell>
               <TableCell align="right">Price per KG</TableCell>
+              <TableCell align="right">Retailer Price per KG</TableCell>
               <TableCell align="right">Quantity Available (kg)</TableCell>
               <TableCell align="right">Remove Product</TableCell>
             </TableRow>
@@ -76,7 +75,7 @@ const FarmerTable = ({
                 key={i}
                 hover
                 style={{ cursor: "pointer" }}
-                onClick={() => handleViewProduct(product)}
+                onClick={() => onEdit(product)} // Use the onEdit prop
               >
                 <TableCell component="th" scope="row">
                   {i + 1}
@@ -87,6 +86,7 @@ const FarmerTable = ({
                 <TableCell align="right">{product.description}</TableCell>
                 <TableCell align="right">{product.category}</TableCell>
                 <TableCell align="right">{product.pricePerKg}</TableCell>
+                <TableCell align="right">{product.retailerPrice}</TableCell>
                 <TableCell align="right">
                   {product.quantityAvailableInKg}
                 </TableCell>
@@ -117,8 +117,7 @@ const FarmerTable = ({
         <DialogTitle id="delete-dialog-title">Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText id="delete-dialog-description">
-            Are you sure you want to delete the product{" "}
-            <strong>{productToDelete?.name}</strong>? This action cannot be
+            Are you sure you want to delete this product? This action cannot be
             undone.
           </DialogContentText>
         </DialogContent>

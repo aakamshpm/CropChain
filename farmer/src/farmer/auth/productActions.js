@@ -32,6 +32,7 @@ const addProduct = createAsyncThunk(
 const updateProduct = createAsyncThunk(
   "auth/update-product",
   async (data, { rejectWithValue }) => {
+    console.log(data);
     try {
       const response = await axios.post(
         `${productURL}/update/${data.get("id")}`,
@@ -47,7 +48,6 @@ const updateProduct = createAsyncThunk(
     }
   }
 );
-
 // remove a product
 const removeProduct = createAsyncThunk(
   "product/remove",

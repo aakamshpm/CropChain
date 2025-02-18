@@ -23,7 +23,6 @@ const OrdersTable = ({ orders }) => {
   const { error } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  console.log(orders);
   useEffect(() => {
     if (orders) setOrderStatus(orders.status);
   }, []);

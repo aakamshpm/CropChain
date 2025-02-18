@@ -9,8 +9,26 @@ const farmerSchema = mongoose.Schema(
     address: {
       buildingName: { type: String },
       street: { type: String },
-      city: { type: String },
-      state: { type: String },
+      city: {
+        type: String,
+        enum: [
+          "Alappuzha",
+          "Ernakulam",
+          "Idukki",
+          "Kannur",
+          "Kasaragod",
+          "Kollam",
+          "Kottayam",
+          "Kozhikode",
+          "Malappuram",
+          "Palakkad",
+          "Pathanamthitta",
+          "Thiruvananthapuram",
+          "Thrissur",
+          "Wayanad",
+        ],
+      },
+      state: { type: String, default: "Kerala" },
       country: { type: String, default: "India" },
       postalCode: { type: String },
     },
@@ -19,12 +37,14 @@ const farmerSchema = mongoose.Schema(
 
     // Farm Details
     farmName: { type: String },
-    farmLocation: {
-      latitude: { type: Number },
-      longitude: { type: Number },
-    },
+
     farmSizeInAcres: { type: Number },
     cropsGrown: [{ type: String }],
+
+    farmLocation: {
+      longitude: { type: String },
+      latitude: { type: String },
+    },
 
     documents: {
       aadhaarPath: { type: String },

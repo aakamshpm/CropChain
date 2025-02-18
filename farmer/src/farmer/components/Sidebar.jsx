@@ -9,12 +9,16 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import ChecklistRtlOutlinedIcon from "@mui/icons-material/ChecklistRtlOutlined";
 import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
 import { logoutFarmer } from "../auth/farmerActions";
-import { clearCredentials } from "../auth/authSlice";
+import { clearCredentials, setCredentials } from "../auth/authSlice";
+import { useGetFarmerDetailsQuery } from "../auth/authService";
+import { useEffect } from "react";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
+
+  const { data } = useGetFarmerDetailsQuery();
 
   const sidebarOption = [
     {
@@ -53,6 +57,19 @@ const Sidebar = () => {
       enqueueSnackbar(err || "Logout failed", { variant: "error" });
     }
   };
+
+  useEffect(() => {
+    if (data?.data) {
+      dispatch(
+        setCredentials({
+          id: data.data._id,
+          name: data.data.name,
+          phoneNumber: data.data.phoneNumber,
+          city: data.data.city,
+        })
+      );
+    }
+  }, [data]);
 
   return (
     <>

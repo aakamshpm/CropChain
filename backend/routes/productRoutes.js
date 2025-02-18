@@ -19,7 +19,12 @@ router.get("/farmer", getProductsByFarmer);
 router.get("/search", searchForProducts);
 router.get("/:productId", getProductById);
 router.post("/add", protect(["farmer"]), upload.array("images"), addProduct);
-router.post("/update/:productId", protect(["farmer"]), updateProduct);
+router.post(
+  "/update/:productId",
+  protect(["farmer"]),
+  upload.array("images"),
+  updateProduct
+);
 router.delete(
   "/farmer/remove-all",
   protect(["farmer"]),

@@ -69,10 +69,9 @@ const logoutFarmer = createAsyncThunk(
 // update personal details
 const updateFarmerData = createAsyncThunk(
   "auth/update-farmer-data",
-  async ({ endpoint, data }, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${farmerURL}/${endpoint}`, data, {
-        ...config,
+      const response = await axios.post(`${farmerURL}/update-profile`, data, {
         withCredentials: true,
       });
       return response.data;

@@ -2,7 +2,6 @@ import express from "express";
 import upload from "../middlewares/uploadMiddleware.js";
 import { protect } from "../middlewares/authMiddleware.js";
 import {
-  addFarm,
   addOrUpdateRating,
   farmerLogin,
   farmerLogout,
@@ -11,11 +10,10 @@ import {
   getAverageRating,
   getFarmerById,
   getFarmerDetails,
-  updateAddress,
-  updatePD,
   updateProfilePicture,
   uploadDocumentsForVerification,
   farmerRegister,
+  updateFarmerProfile,
 } from "../controllers/farmerController.js";
 
 const router = express.Router();
@@ -34,11 +32,8 @@ router.get("/", protect(["farmer"]), getFarmerDetails); // Get logged-in farmer'
 router.get("/get-one", getFarmerById); // Get farmer by ID (public)
 router.get("/get-all", getAllFarmer); // Get all farmers (public)
 
-// Update farmer's personal details
-router.post("/update-pd", protect(["farmer"]), updatePD);
-
-// Update farmer's address
-router.post("/update-address", protect(["farmer"]), updateAddress);
+// Update farmer's profile (personal details, address, and farm details)
+router.post("/update-profile", protect(["farmer"]), updateFarmerProfile);
 
 // Upload farmer's profile picture
 router.post(
@@ -58,11 +53,6 @@ router.post(
   ]),
   uploadDocumentsForVerification
 );
-
-// ======================
-// Farm Management Routes
-// ======================
-router.post("/add-farm", protect(["farmer"]), addFarm); // Add a farm
 
 // ======================
 // Admin-Only Routes

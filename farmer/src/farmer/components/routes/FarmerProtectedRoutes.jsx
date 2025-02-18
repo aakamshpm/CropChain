@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { isAuthenticated } from "../../auth/authUtils";
 import Sidebar from "../Sidebar";
+import { SnackbarProvider } from "notistack";
 
 const FarmerProtectedRoutes = () => {
   return isAuthenticated() ? (
@@ -9,7 +10,9 @@ const FarmerProtectedRoutes = () => {
         <Sidebar />
       </div>
       <div className="content">
-        <Outlet />
+        <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
+          <Outlet />
+        </SnackbarProvider>
       </div>
     </div>
   ) : (

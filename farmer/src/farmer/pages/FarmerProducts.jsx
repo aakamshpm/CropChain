@@ -10,68 +10,81 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
+import { MdOutlineInventory2 } from "react-icons/md";
 import FarmerTable from "../components/FarmerTable";
 import ModifyProduct from "../components/ModifyProduct";
-import { getFarmerIdFromToken } from "../../utils/utils";
 import { removeAllProductsFromFarmer } from "../auth/productActions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 
 const Products = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-
-  const farmerId = getFarmerIdFromToken();
-
-  const { data, isLoading, refetch } = useGetProductsByFarmerQuery(farmerId);
-
-  const [open, setOpen] = useState(false);
+  const [openModifyDialog, setOpenModifyDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [modify, setModify] = useState(false);
   const [preview, setPreview] = useState(null);
+
+  const { id } = useSelector((state) => state.auth.data);
+
+  // Single product for state handling in ModifyProducts
+  const { product } = useSelector((state) => state.product);
+
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
-  // Handlers for opening and closing the modal
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => setOpen(false);
+  // Fetch products data
+  const {
+    data: productsData,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetProductsByFarmerQuery(id);
 
-  const handleAddProduct = () => {
-    setPreview(null);
-    setModify(false);
+  // Handle opening and closing the modify product dialog
+  const handleModifyDialogOpen = (product = null) => {
+    setSelectedProduct(product);
+    setPreview(product ? product.image : null);
+    setOpenModifyDialog(true);
+  };
+
+  const handleModifyDialogClose = () => {
+    setOpenModifyDialog(false);
     setSelectedProduct(null);
-
-    handleOpen();
+    setPreview(null);
   };
 
-  const handleDeleteClick = (productId) => {
-    setOpenDeleteDialog(true);
-  };
+  // Handle delete confirmation dialog
+  const handleDeleteDialogOpen = () => setOpenDeleteDialog(true);
+  const handleDeleteDialogClose = () => setOpenDeleteDialog(false);
 
-  const handleDeleteConfirm = async () => {
-    console.log("Deleting products");
-
+  // Handle delete all products
+  const handleDeleteAllProducts = async () => {
     try {
       await dispatch(removeAllProductsFromFarmer()).unwrap();
-    } catch (error) {
-      enqueueSnackbar(error || "Error deleting products", { variant: "error" });
-    } finally {
+      enqueueSnackbar("All products deleted successfully", {
+        variant: "success",
+      });
       refetch();
-      setOpenDeleteDialog(false);
+    } catch (error) {
+      enqueueSnackbar(error || "Failed to delete products", {
+        variant: "error",
+      });
+    } finally {
+      handleDeleteDialogClose();
     }
   };
 
-  const handleDeleteCancel = () => {
-    setOpenDeleteDialog(false);
-  };
-
+  // Refetch products when the product state changes
   useEffect(() => {
     refetch();
-  }, [open]);
+  }, [product, refetch]);
+  // Show loading state
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
-  if (isLoading || !data) {
-    return <p>Loading ...</p>;
+  // Show error state
+  if (isError) {
+    return <p>Error loading products. Please try again later.</p>;
   }
 
   return (
@@ -79,43 +92,47 @@ const Products = () => {
       <div className="flex justify-between">
         <h1 className="text-3xl font-bold">Products</h1>
         <div className="flex">
-          <Button className="mr-2" variant="text" onClick={handleAddProduct}>
+          <Button
+            className="mr-2"
+            variant="text"
+            onClick={() => handleModifyDialogOpen()}
+          >
             <AddCircleIcon />
           </Button>
-          <Button
-            variant="text"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent row click event
-              handleDeleteClick();
-            }}
-          >
+          <Button variant="text" onClick={handleDeleteDialogOpen}>
             <DeleteIcon className="text-red-500" />
           </Button>
         </div>
       </div>
+
+      {/* Modify Product Dialog */}
       <ModifyProduct
-        handleClose={handleClose}
+        open={openModifyDialog}
+        handleClose={handleModifyDialogClose}
         product={selectedProduct}
-        open={open}
-        modify={modify}
-        setModify={setModify}
+        modify={!!selectedProduct} // Set modify mode if a product is selected
         preview={preview}
         setPreview={setPreview}
         refetch={refetch}
       />
 
-      <FarmerTable
-        data={data.data}
-        setSelectedProduct={setSelectedProduct}
-        setModify={setModify}
-        handleOpen={handleOpen}
-        refetch={refetch}
-      />
+      {productsData?.data.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-[600px] p-6">
+          <MdOutlineInventory2 className="text-6xl text-gray-500 mb-4" />
+          <p className="text-lg text-gray-700">No Products Found</p>
+        </div>
+      ) : (
+        <FarmerTable
+          data={productsData?.data || []}
+          onEdit={handleModifyDialogOpen}
+          refetch={refetch}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <Dialog
         open={openDeleteDialog}
-        onClose={handleDeleteCancel}
+        onClose={handleDeleteDialogClose}
         aria-labelledby="delete-dialog-title"
         aria-describedby="delete-dialog-description"
       >
@@ -127,10 +144,10 @@ const Products = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteCancel} color="primary">
+          <Button onClick={handleDeleteDialogClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleDeleteConfirm} color="error" autoFocus>
+          <Button onClick={handleDeleteAllProducts} color="error" autoFocus>
             Delete
           </Button>
         </DialogActions>

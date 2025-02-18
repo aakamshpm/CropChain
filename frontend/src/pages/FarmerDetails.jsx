@@ -45,6 +45,8 @@ const FarmerDetails = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
+  console.log(farmer);
+
   useEffect(() => {
     dispatch(fetchFarmerDetails(farmerId));
     dispatch(getAverageRating(farmerId));
@@ -80,7 +82,6 @@ const FarmerDetails = () => {
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
-
   if (loading) {
     return (
       <Box

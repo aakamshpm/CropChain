@@ -31,35 +31,49 @@ const ModifyProduct = ({
   setPreview,
   refetch,
 }) => {
-  const { data: response, error, success } = useSelector((state) => state.auth);
+  const CATEGORIES = [
+    "Fruits",
+    "Vegetables",
+    "Grains & Cereals",
+    "Dairy Products",
+    "Seeds & Nuts",
+    "Plant-based Products",
+    "Honey & Bee Products",
+    "Others",
+  ];
+
+  const {
+    product: response,
+    error,
+    success,
+  } = useSelector((state) => state.product);
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
 
+  // Validation schema for form fields
   const validationSchema = Yup.object({
-    harvestDate: Yup.string().required("Harvest Date is required"),
     name: Yup.string().required("Name is required"),
     description: Yup.string().required("Description is required"),
     pricePerKg: Yup.number()
       .typeError("Please enter a valid number")
       .required("Price is required")
-      .positive("Enter a positive number")
-      .integer("Enter valid number"),
+      .positive("Enter a positive number"),
     retailerPrice: Yup.number()
       .typeError("Please enter a valid number")
-      .required("Price is required")
-      .positive("Enter a positive number")
-      .integer("Enter valid number"),
-    category: Yup.string().required("Category is required"),
+      .required("Retailer price is required")
+      .positive("Enter a positive number"),
     quantityAvailableInKg: Yup.number()
       .typeError("Please enter a valid number")
       .required("Quantity is required")
-      .positive("Enter a positive number")
-      .integer("Enter valid number"),
+      .positive("Enter a positive number"),
+    category: Yup.string().required("Category is required"),
+    harvestDate: Yup.date().required("Harvest date is required"),
     images: Yup.array()
       .of(Yup.mixed().required("File is required"))
       .min(1, "At least one image is required"),
   });
 
+  // Modal styles
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -74,6 +88,7 @@ const ModifyProduct = ({
     overflowY: "auto",
   };
 
+  // Backdrop styles
   const backdropStyle = {
     position: "fixed",
     top: 0,
@@ -84,6 +99,7 @@ const ModifyProduct = ({
     zIndex: 1,
   };
 
+  // Set preview image if product exists
   useEffect(() => {
     if (product && product?.images[0]) {
       setPreview(
@@ -92,16 +108,14 @@ const ModifyProduct = ({
     }
   }, [product]);
 
+  // Handle success and error messages
   useEffect(() => {
     if (success) {
       enqueueSnackbar(response?.message, { variant: "success" });
+      dispatch(resetMessageState());
     }
-    dispatch(resetMessageState());
-
     if (error) {
-      enqueueSnackbar(error, {
-        variant: "error",
-      });
+      enqueueSnackbar(error, { variant: "error" });
       dispatch(resetMessageState());
     }
   }, [success, error, dispatch]);
@@ -116,18 +130,18 @@ const ModifyProduct = ({
     >
       <Box sx={modalStyle}>
         <Typography id="popup-title" variant="h6" component="h2" mb={3}>
-          {modify ? "Update your product" : "Add your product"}
+          {modify ? "Update Product" : "Add Product"}
         </Typography>
 
         <Formik
           initialValues={{
             name: product?.name || "",
             description: product?.description || "",
-            harvestDate: product?.harvestDate?.split("T")[0] || "",
             pricePerKg: product?.pricePerKg || "",
             retailerPrice: product?.retailerPrice || "",
             quantityAvailableInKg: product?.quantityAvailableInKg || "",
             category: product?.category || "",
+            harvestDate: product?.harvestDate?.split("T")[0] || "", // Format date for input
             images: product?.images || [],
           }}
           validationSchema={validationSchema}
@@ -136,13 +150,16 @@ const ModifyProduct = ({
             Object.keys(values).forEach((key) => {
               if (key !== "images") formData.append(key, values[key]);
             });
-            formData.append("id", product?._id);
+            if (modify) formData.append("id", product?._id); // Add product ID for updates
             values.images.forEach((file) => {
               formData.append("images", file);
             });
-            !modify
-              ? dispatch(addProduct(formData))
-              : dispatch(updateProduct(formData));
+
+            // Dispatch add or update action
+            modify
+              ? dispatch(updateProduct(formData))
+              : dispatch(addProduct(formData));
+
             actions.setSubmitting(false);
             refetch();
             handleClose();
@@ -182,7 +199,7 @@ const ModifyProduct = ({
                   />
                 </Box>
 
-                {/* Prices and Quantity */}
+                {/* Price, Retailer Price, and Quantity */}
                 <Box display="flex" gap={2}>
                   <TextField
                     fullWidth
@@ -218,7 +235,7 @@ const ModifyProduct = ({
                   />
                   <TextField
                     fullWidth
-                    label="Quantity Available"
+                    label="Quantity Available (kg)"
                     name="quantityAvailableInKg"
                     value={values.quantityAvailableInKg}
                     onChange={handleChange}
@@ -228,11 +245,6 @@ const ModifyProduct = ({
                       Boolean(errors.quantityAvailableInKg)
                     }
                     helperText={<ErrorMessage name="quantityAvailableInKg" />}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">kg</InputAdornment>
-                      ),
-                    }}
                   />
                 </Box>
 
@@ -249,16 +261,7 @@ const ModifyProduct = ({
                     error={touched.category && Boolean(errors.category)}
                     helperText={<ErrorMessage name="category" />}
                   >
-                    {[
-                      "Fruits",
-                      "Vegetables",
-                      "Grains & Cereals",
-                      "Dairy Products",
-                      "Seeds & Nuts",
-                      "Plant-based Products",
-                      "Honey & Bee Products",
-                      "Others",
-                    ].map((option) => (
+                    {CATEGORIES.map((option) => (
                       <MenuItem key={option} value={option}>
                         {option}
                       </MenuItem>
