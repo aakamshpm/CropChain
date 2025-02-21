@@ -114,7 +114,7 @@ const ViewFarmers = () => {
             )}
             <CardContent>
               <Typography variant="h6" fontWeight="bold" gutterBottom>
-                {farmer.name}
+                {farmer.firstName + " " + farmer.lastName}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 <strong>Farm Name:</strong> {farmer.farmName || "N/A"}

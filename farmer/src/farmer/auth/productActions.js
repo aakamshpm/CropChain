@@ -9,9 +9,27 @@ const config = {
   },
 };
 
+// fetch all farmer products
+const fetchAllProducts = createAsyncThunk(
+  "product/fetch-all",
+  async ({ farmerId }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${productURL}/farmer?farmer=${farmerId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data.data;
+    } catch (err) {
+      return rejectWithValue(err?.response?.data?.message || err?.message);
+    }
+  }
+);
+
 // add a product
 const addProduct = createAsyncThunk(
-  "auth/add-product",
+  "product/fetch-alladd-product",
   async (data, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${productURL}/add`, data, {
@@ -30,7 +48,7 @@ const addProduct = createAsyncThunk(
 
 // edit a product
 const updateProduct = createAsyncThunk(
-  "auth/update-product",
+  "product/fetch-allupdate-product",
   async (data, { rejectWithValue }) => {
     console.log(data);
     try {
@@ -79,6 +97,7 @@ const removeAllProductsFromFarmer = createAsyncThunk(
 );
 
 export {
+  fetchAllProducts,
   addProduct,
   updateProduct,
   removeProduct,

@@ -13,7 +13,9 @@ import {
   FormControlLabel,
   Radio,
   TextField,
+  MenuItem,
 } from "@mui/material";
+import { CITIES_IN_KERALA } from "../utils/constants.js";
 import { resetMessageState } from "../utils/userSlice";
 import { consumerRegister } from "../utils/actions/consumerActions";
 
@@ -42,7 +44,8 @@ const UserRegister = () => {
   const validationSchemas = [
     // Step 1: Personal Information
     Yup.object({
-      name: Yup.string().required("Name is required"),
+      firstName: Yup.string().required("First name is required"),
+      lastName: Yup.string().required("Last name is required"),
       phoneNumber: Yup.string()
         .required("Phone number is required")
         .test("is-valid-phone", "Invalid phone number", (value) =>
@@ -59,7 +62,6 @@ const UserRegister = () => {
         houseName: Yup.string().required("House name is required"),
         street: Yup.string().required("Street is required"),
         city: Yup.string().required("City is required"),
-        state: Yup.string().required("State is required"),
         postalCode: Yup.string().required("Postal code is required"),
         country: Yup.string().required("Country is required"),
       }),
@@ -77,7 +79,8 @@ const UserRegister = () => {
   ];
 
   const initialValues = {
-    name: "",
+    firstName: "",
+    lastName: "",
     phoneNumber: "+91 ",
     password: "",
     confirmPassword: "",
@@ -85,14 +88,12 @@ const UserRegister = () => {
       houseName: "",
       street: "",
       city: "",
-      state: "",
       postalCode: "",
       country: "India",
     },
     shopAddress: {
       shopName: "",
       city: "",
-      state: "",
       postalCode: "",
       country: "India",
     },
@@ -159,7 +160,9 @@ const UserRegister = () => {
               : validationSchemas[0]
           }
           onSubmit={(values, actions) => {
-            if (selectedValue === "Retailer" && currentStep < 3) {
+            if (selectedValue && currentStep < 2) {
+              setCurrentStep(currentStep + 1);
+            } else if (selectedValue === "Retailer" && currentStep < 3) {
               setCurrentStep(currentStep + 1);
             } else {
               selectedValue === "Retailer"
@@ -176,14 +179,25 @@ const UserRegister = () => {
                   <>
                     <TextField
                       fullWidth
-                      label="Full name"
-                      name="name"
-                      value={values.name}
+                      label="First name"
+                      name="firstName"
+                      value={values.firstName}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       margin="normal"
-                      error={touched.name && Boolean(errors.name)}
-                      helperText={<ErrorMessage name="name" />}
+                      error={touched.firstName && Boolean(errors.firstName)}
+                      helperText={<ErrorMessage name="firstName" />}
+                    />{" "}
+                    <TextField
+                      fullWidth
+                      label="Last name"
+                      name="lastName"
+                      value={values.lastName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      margin="normal"
+                      error={touched.lastName && Boolean(errors.lastName)}
+                      helperText={<ErrorMessage name="lastName" />}
                     />
                     <TextField
                       fullWidth
@@ -225,7 +239,7 @@ const UserRegister = () => {
                     />
                   </>
                 )}
-                {currentStep === 2 && selectedValue === "Retailer" && (
+                {currentStep === 2 && (
                   <>
                     <TextField
                       fullWidth
@@ -263,24 +277,19 @@ const UserRegister = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       margin="normal"
+                      select
                       error={
                         touched.address?.city && Boolean(errors.address?.city)
                       }
                       helperText={<ErrorMessage name="address.city" />}
-                    />
-                    <TextField
-                      fullWidth
-                      label="State"
-                      name="address.state"
-                      value={values.address.state}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      margin="normal"
-                      error={
-                        touched.address?.state && Boolean(errors.address?.state)
-                      }
-                      helperText={<ErrorMessage name="address.state" />}
-                    />
+                    >
+                      {CITIES_IN_KERALA.map((city) => (
+                        <MenuItem key={city} value={city}>
+                          {city}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+
                     <TextField
                       fullWidth
                       label="Postal Code"
@@ -289,6 +298,7 @@ const UserRegister = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       margin="normal"
+                      slotProps={{ htmlInput: { inputMode: "numeric" } }}
                       error={
                         touched.address?.postalCode &&
                         Boolean(errors.address?.postalCode)
@@ -398,7 +408,9 @@ const UserRegister = () => {
                   fontSize: "15px",
                 }}
               >
-                {selectedValue === "Retailer" && currentStep < 3
+                {selectedValue && currentStep < 2
+                  ? "Next"
+                  : selectedValue === "Retailer" && currentStep < 3
                   ? "Next"
                   : "Register"}
               </Button>

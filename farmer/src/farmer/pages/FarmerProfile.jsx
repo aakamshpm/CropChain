@@ -63,7 +63,8 @@ const Profile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Toggle for the modal
   const [preview, setPreview] = useState(null);
   const [farmerData, setFarmerData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     phoneNumber: "",
     address: {
       street: "",
@@ -89,7 +90,8 @@ const Profile = () => {
     if (response) {
       const {
         data: {
-          name,
+          firstName,
+          lastName,
           profilePicture,
           phoneNumber,
           aadhaarNumber,
@@ -101,7 +103,8 @@ const Profile = () => {
         },
       } = response;
       setFarmerData({
-        name: name || "",
+        firstName: firstName || "",
+        lastName: lastName || "",
         aadhaarNumber: aadhaarNumber || "",
         profilePicture: profilePicture || "",
         phoneNumber: phoneNumber || "",
@@ -170,7 +173,8 @@ const Profile = () => {
 
   const handleUpdateProfile = () => {
     const updateData = {
-      name: farmerData.name,
+      firstName: farmerData.firstName,
+      lastName: farmerData.lastName,
       phoneNumber: farmerData.phoneNumber,
       aadhaarNumber: farmerData.aadhaarNumber,
       buildingName: farmerData.address.buildingName,
@@ -224,16 +228,37 @@ const Profile = () => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
-                    label="Full Name"
-                    value={farmerData.name}
+                    label="First Name"
+                    value={farmerData.firstName}
                     onChange={onChangeHandler}
-                    name="name"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <PersonIcon />
-                        </InputAdornment>
-                      ),
+                    name="firstName"
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PersonIcon />
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Last Name"
+                    value={farmerData.lastName}
+                    onChange={onChangeHandler}
+                    name="lastName"
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PersonIcon />
+                          </InputAdornment>
+                        ),
+                      },
                     }}
                   />
                 </Grid>

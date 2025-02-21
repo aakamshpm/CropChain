@@ -21,7 +21,7 @@ export const fetchFarmerDetails = createAsyncThunk(
       );
       return response.data.farmer; // Return the fetched farmer data
     } catch (error) {
-      return rejectWithValue(error.response.data); // Return error message
+      return rejectWithValue(error || error?.response?.data); // Return error message
     }
   }
 );
@@ -72,7 +72,7 @@ const farmerSlice = createSlice({
   extraReducers: (builder) => {
     // Fetch Farmer Details
     builder
-      .addCase(fetchFarmerDetails.pending, (state) => {
+      .addCase(fetchFarmerDetails.pending, (state, action) => {
         state.loading = true;
         state.error = null;
       })

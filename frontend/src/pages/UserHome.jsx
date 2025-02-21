@@ -108,7 +108,9 @@ const UserHome = () => {
                     image={`${import.meta.env.VITE_API_IMAGE_URL}/${
                       farmer.profilePicture
                     }`}
-                    alt={`${farmer.name}'s profile`}
+                    alt={`${
+                      farmer.firstName + " " + farmer.lastName
+                    }'s profile`}
                     sx={{ height: "200px", objectFit: "contain" }}
                   />
                 ) : (
@@ -124,7 +126,9 @@ const UserHome = () => {
                     />
                   </Box>
                 )}
-                <h3 className="text-lg font-semibold mt-2">{farmer.name}</h3>
+                <h3 className="text-lg font-semibold mt-2">
+                  {farmer.firstName + " " + farmer.lastName}
+                </h3>
                 <p className="text-gray-600 text-sm">
                   {farmer.address?.city}, {farmer.address?.state}
                 </p>

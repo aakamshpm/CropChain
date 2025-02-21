@@ -6,7 +6,9 @@ import {
   loginRetailer,
   logoutRetailer,
   registerRetailer,
+  updateRetailerProfile,
 } from "../controllers/retailerController.js";
+import upload from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
 
@@ -16,5 +18,12 @@ router.post("/logout", logoutRetailer);
 
 router.get("/", protect(["retailer"]), getRetailerDetails);
 router.get("/fetch-all", protect(["admin"]), fetchAllRetailer);
+
+router.post(
+  "/edit-profile",
+  protect(["retailer"]),
+  upload.fields("profilePicture"),
+  updateRetailerProfile
+);
 
 export default router;

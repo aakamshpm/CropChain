@@ -46,7 +46,9 @@ const ProductWidget = ({ product }) => {
         className="flex items-center gap-2 p-4 border-t border-gray-200 hover:bg-gray-50 transition-colors duration-200"
       >
         <PersonIcon className="text-gray-600" />
-        <p className="text-sm text-gray-700 truncate">{farmer.name}</p>
+        <p className="text-sm text-gray-700 truncate">
+          {farmer.firstName + " " + farmer.lastName}
+        </p>
       </Link>
     </div>
   );

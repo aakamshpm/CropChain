@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import Order from "../models/Order.js";
 import Consumer from "../models/Consumer.js";
 import Retailer from "../models/Retailer.js";
+import Product from "../models/Product.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 
@@ -12,6 +13,15 @@ const createOrder = asyncHandler(async (req, res) => {
     if (!products) {
       res.status(400);
       throw new Error("No products found");
+    }
+
+    // Check stock availablity
+    for (const item of products) {
+      const storedProduct = await Product.findById(item.product);
+      if (storedProduct.quantityAvailableInKg < item.quantity) {
+        res.status(400);
+        throw new Error(`Insufficient stock for ${storedProduct.name}`);
+      }
     }
 
     // calculate total amount
@@ -34,6 +44,17 @@ const createOrder = asyncHandler(async (req, res) => {
         paymentMode,
         paymentStatus: true,
       });
+
+      if (req.userRole === "consumer")
+        await Consumer.findByIdAndUpdate(userId, {
+          cartData: {},
+          cartFarmerId: null,
+        });
+      else
+        await Retailer.findByIdAndUpdate(userId, {
+          cartData: {},
+          cartFarmerId: null,
+        });
 
       res.status(200).json({
         orderId: order._id,

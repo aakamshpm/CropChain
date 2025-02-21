@@ -3,7 +3,8 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const retailerSchema = mongoose.Schema(
   {
-    name: { type: String, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
     phoneNumber: {
       type: String,
       required: true,
@@ -28,8 +29,6 @@ const retailerSchema = mongoose.Schema(
     },
 
     // Shop Details
-
-    //TODO:: add required in these fields
     shopAddress: {
       shopName: { type: String },
       city: { type: String },

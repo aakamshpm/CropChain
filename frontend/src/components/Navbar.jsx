@@ -45,11 +45,8 @@ const Navbar = () => {
     if (role) {
       dispatch(getCartDataAsync());
       const userId = getUserIdFromToken();
-      userId && dispatch(setCredentials(userId));
+      userId && dispatch(setCredentials({ userId, role }));
       setSearchTerm("");
-    } else {
-      document.cookie =
-        "consumerJwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=localhost;";
     }
   }, [dispatch, role]);
 
@@ -93,12 +90,12 @@ const Navbar = () => {
 
         <div className="flex items-center">
           {role ? (
-            <>
+            <Link to="/profile" className="flex">
               <Person2OutlinedIcon sx={{ fontSize: 30 }} />
               <p className="text-lg ">
                 Profile <span>({role.toUpperCase()})</span>
               </p>
-            </>
+            </Link>
           ) : (
             <div>
               <p className="flex">

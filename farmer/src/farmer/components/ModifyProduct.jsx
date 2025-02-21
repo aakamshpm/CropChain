@@ -15,11 +15,13 @@ import {
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useSnackbar } from "notistack";
-import { useSelector } from "react-redux";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { addProduct, updateProduct } from "../auth/productActions";
-import { resetMessageState } from "../auth/authSlice";
+import {
+  addProduct,
+  fetchAllProducts,
+  updateProduct,
+} from "../auth/productActions";
 import { AttachFile, Close } from "@mui/icons-material";
 
 const ModifyProduct = ({
@@ -29,7 +31,7 @@ const ModifyProduct = ({
   modify,
   preview,
   setPreview,
-  refetch,
+  farmerId,
 }) => {
   const CATEGORIES = [
     "Fruits",
@@ -42,11 +44,6 @@ const ModifyProduct = ({
     "Others",
   ];
 
-  const {
-    product: response,
-    error,
-    success,
-  } = useSelector((state) => state.product);
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
 
@@ -108,17 +105,23 @@ const ModifyProduct = ({
     }
   }, [product]);
 
-  // Handle success and error messages
-  useEffect(() => {
-    if (success) {
+  const onSubmitAction = async (formData, actions) => {
+    let response;
+    try {
+      modify
+        ? (response = await dispatch(updateProduct(formData)).unwrap())
+        : (response = await dispatch(addProduct(formData)).unwrap());
+
+      dispatch(fetchAllProducts({ farmerId }));
+
       enqueueSnackbar(response?.message, { variant: "success" });
-      dispatch(resetMessageState());
+      actions.setSubmitting(false);
+      handleClose();
+    } catch (err) {
+      dispatch(fetchAllProducts({ farmerId }));
+      enqueueSnackbar(err?.message, { variant: "error" });
     }
-    if (error) {
-      enqueueSnackbar(error, { variant: "error" });
-      dispatch(resetMessageState());
-    }
-  }, [success, error, dispatch]);
+  };
 
   return (
     <Modal
@@ -154,15 +157,8 @@ const ModifyProduct = ({
             values.images.forEach((file) => {
               formData.append("images", file);
             });
-
             // Dispatch add or update action
-            modify
-              ? dispatch(updateProduct(formData))
-              : dispatch(addProduct(formData));
-
-            actions.setSubmitting(false);
-            refetch();
-            handleClose();
+            onSubmitAction(formData, actions);
           }}
         >
           {({

@@ -45,19 +45,21 @@ const FarmerDetails = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
-  console.log(farmer);
-
   useEffect(() => {
-    dispatch(fetchFarmerDetails(farmerId));
-    dispatch(getAverageRating(farmerId));
+    try {
+      dispatch(fetchFarmerDetails(farmerId)).unwrap();
+      dispatch(getAverageRating(farmerId));
 
-    if (userId && farmer && farmer.ratings) {
-      const userRating = farmer.ratings.find((r) => r.userId === userId);
-      if (userRating) {
-        setRatingValue(userRating.rating);
-      } else {
-        setRatingValue(0);
+      if (userId && farmer && farmer.ratings) {
+        const userRating = farmer.ratings.find((r) => r.userId === userId);
+        if (userRating) {
+          setRatingValue(userRating.rating);
+        } else {
+          setRatingValue(0);
+        }
       }
+    } catch (err) {
+      console.log(err);
     }
   }, [dispatch, farmerId, userId]);
 
@@ -161,7 +163,7 @@ const FarmerDetails = () => {
               />
             )}
             <Typography variant="h4" fontWeight="bold">
-              {farmer.name || "N/A"}
+              {farmer.firstName + " " + farmer.lastName || "N/A"}
               {farmer.verificationStatus === "approved" && (
                 <VerifiedIcon sx={{ color: "green", ml: 1 }} />
               )}

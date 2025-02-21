@@ -1,9 +1,48 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 import { retailerLogin, retailerRegister } from "./actions/retailerActions";
 import { consumerLogin, consumerRegister } from "./actions/consumerActions";
 
+const serverUrl = "http://localhost:8000/api";
+
+// Async Thunk: Fetch User Details
+export const fetchUserProfile = createAsyncThunk(
+  "farmer/fetchUserProfile",
+  async ({ role }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${serverUrl}/${role}`, {
+        withCredentials: true,
+      });
+      return response.data.data; // Return the fetched user data
+    } catch (error) {
+      return rejectWithValue(error.response.data); // Return error message
+    }
+  }
+);
+
+// Async Thunk: Update User Profile
+export const updateUserProfile = createAsyncThunk(
+  "farmer/updateUserProfile",
+  async ({ role, formData: data }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${serverUrl}/${role}/edit-profile`,
+        data,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
+        }
+      );
+      return response.data.message; // Return the fetched user data
+    } catch (error) {
+      return rejectWithValue(error.response.data); // Return error message
+    }
+  }
+);
+
 const initialState = {
   userId: null,
+  role: null,
   loading: false,
   success: false,
   error: null,
@@ -14,10 +53,13 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action) => {
-      state.userId = action.payload;
+      const { userId, role } = action.payload;
+      state.userId = userId;
+      state.role = role;
     },
     clearCredentials: (state) => {
       state.userId = null;
+      state.role = null;
       localStorage.removeItem("token");
     },
     resetMessageState: (state) => {
@@ -82,6 +124,36 @@ const userSlice = createSlice({
         state.success = true;
       }),
       builder.addCase(consumerLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    //fetch user data
+    builder.addCase(fetchUserProfile.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }),
+      builder.addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.success = true;
+      }),
+      builder.addCase(fetchUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Update User Profile
+    builder.addCase(updateUserProfile.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }),
+      builder.addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.success = true;
+      }),
+      builder.addCase(updateUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

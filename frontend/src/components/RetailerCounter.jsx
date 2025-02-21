@@ -1,13 +1,16 @@
 import { TextField } from "@mui/material";
-import { useSnackbar } from "notistack";
 
 const RetailerCounter = ({ cartQuantity, setCartQuantity }) => {
+  const onChangeHandler = (e) => {
+    const { value } = e.target;
+    setCartQuantity(value);
+  };
   return (
     <div className="flex items-center">
       <TextField
         type="number"
         value={cartQuantity}
-        onChange={(e) => setCartQuantity(e.target.value)}
+        onChange={onChangeHandler}
         slotProps={{
           htmlInput: {
             min: 100,

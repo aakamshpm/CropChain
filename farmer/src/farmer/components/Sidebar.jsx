@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
@@ -12,6 +12,7 @@ import { logoutFarmer } from "../auth/farmerActions";
 import { clearCredentials, setCredentials } from "../auth/authSlice";
 import { useGetFarmerDetailsQuery } from "../auth/authService";
 import { useEffect } from "react";
+import { fetchAllProducts } from "../auth/productActions";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const Sidebar = () => {
       dispatch(
         setCredentials({
           id: data.data._id,
-          name: data.data.name,
+          name: data.data.firstName + " " + data.data.lastName,
           phoneNumber: data.data.phoneNumber,
           city: data.data.city,
         })

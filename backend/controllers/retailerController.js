@@ -5,10 +5,17 @@ import generateToken from "../utils/generateToken.js";
 
 const registerRetailer = asyncHandler(async (req, res) => {
   try {
-    const { name, phoneNumber, password, address, shopAddress, shopCategory } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      phoneNumber,
+      password,
+      address,
+      shopAddress,
+      shopCategory,
+    } = req.body;
 
-    if (!name || !phoneNumber || !password) {
+    if (!firstName || !lastName || !phoneNumber || !password) {
       res.status(400);
       throw new Error("Please fill every field");
     }
@@ -22,7 +29,8 @@ const registerRetailer = asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const retailer = await Retailer.create({
-      name,
+      firstName,
+      lastName,
       phoneNumber,
       password: hashedPassword,
       address,
@@ -104,10 +112,14 @@ const fetchAllRetailer = asyncHandler(async (req, res) => {
   }
 });
 
+// Update Retailer account details
+const updateRetailerProfile = asyncHandler(async (req, res) => {});
+
 export {
   registerRetailer,
   loginRetailer,
   logoutRetailer,
   getRetailerDetails,
   fetchAllRetailer,
+  updateRetailerProfile,
 };

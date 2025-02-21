@@ -1,13 +1,14 @@
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcryptjs";
+import fs from "fs";
 import generateToken from "../utils/generateToken.js";
 import Consumer from "../models/Consumer.js";
 
 const registerConsumer = asyncHandler(async (req, res) => {
   try {
-    const { name, phoneNumber, password, address } = req.body;
+    const { firstName, lastaName, phoneNumber, password, address } = req.body;
 
-    if (!name || !phoneNumber || !password) {
+    if (!firstName || !lastaName || !phoneNumber || !password) {
       res.status(400);
       throw new Error("Please fill every field");
     }
@@ -21,7 +22,8 @@ const registerConsumer = asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const consumer = await Consumer.create({
-      name,
+      firstName,
+      lastaName,
       phoneNumber,
       password: hashedPassword,
       address,
@@ -75,6 +77,33 @@ const logoutConsumer = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 });
 
+// Update Consumer account details
+const updateConsumerProfile = asyncHandler(async (req, res) => {
+  const { firstName, lastName, phoneNumber } = req.body;
+  const profilePicture = req.file;
+
+  try {
+    const consumer = await Consumer.findById(req.consumerId);
+
+    if (profilePicture && consumer.profilePicture) {
+      fs.unlinkSync(`./uploads/${consumer.profilePicture}`);
+    }
+
+    if (profilePicture) consumer.profilePicture = profilePicture.filename;
+
+    consumer.firstName = firstName;
+    consumer.lastName = lastName;
+    consumer.phoneNumber = phoneNumber;
+
+    await consumer.save();
+
+    res.status(200).json({ message: "Profile updated successfuly" });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
 const getConsumerDetails = asyncHandler(async (req, res) => {
   try {
     const consumer = await Consumer.findById(req.consumerId).select(
@@ -107,6 +136,7 @@ export {
   loginConsumer,
   registerConsumer,
   logoutConsumer,
+  updateConsumerProfile,
   getConsumerDetails,
   getAllConsumers,
 };

@@ -31,17 +31,17 @@ const Counter = ({ productId, count, cartFarmerId, quantityAvailable }) => {
       enqueueSnackbar("Please Sign In / Sign Up before continuing", {
         variant: "warning",
       });
-    } else if (quantityAvailable > 0) {
-      try {
-        await dispatch(addToCartAsync({ productId, cartFarmerId })).unwrap();
-      } catch (err) {
-        enqueueSnackbar(err || "Error", {
-          variant: "error",
-        });
-      }
-    } else {
-      enqueueSnackbar("Out of stock!", {
-        variant: "warning",
+    }
+
+    if (quantityAvailable < productId) {
+      enqueueSnackbar("Stock exceeded!", { variant: "error" });
+    }
+
+    try {
+      await dispatch(addToCartAsync({ productId, cartFarmerId })).unwrap();
+    } catch (err) {
+      enqueueSnackbar(err || "Error", {
+        variant: "error",
       });
     }
   };

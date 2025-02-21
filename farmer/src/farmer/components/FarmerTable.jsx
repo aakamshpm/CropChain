@@ -17,10 +17,13 @@ import {
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { removeProduct } from "../auth/productActions";
+import { useSnackbar } from "notistack";
 
-const FarmerTable = ({ data, onEdit, refetch }) => {
+const FarmerTable = ({ data, onEdit, farmerId }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const dispatch = useDispatch();
 
@@ -34,9 +37,10 @@ const FarmerTable = ({ data, onEdit, refetch }) => {
   const handleDeleteConfirm = async () => {
     try {
       await dispatch(removeProduct(productToDelete)).unwrap();
-      refetch(); // Refetch data after successful deletion
+      dispatch(fetchAllProducts({ farmerId }));
       enqueueSnackbar("Product deleted successfully", { variant: "success" });
     } catch (error) {
+      dispatch(fetchAllProducts({ farmerId }));
       enqueueSnackbar(error?.message || "Failed to delete product", {
         variant: "error",
       });

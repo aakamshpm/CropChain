@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
+import { SnackbarProvider } from "notistack";
 import { isAuthenticated } from "../../auth/authUtils";
 import Sidebar from "../Sidebar";
-import { SnackbarProvider } from "notistack";
 
 const FarmerProtectedRoutes = () => {
   return isAuthenticated() ? (

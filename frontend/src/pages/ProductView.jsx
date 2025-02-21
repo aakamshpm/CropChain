@@ -12,7 +12,7 @@ import RetailerCounter from "../components/RetailerCounter";
 
 const ProductView = () => {
   const { id } = useParams();
-  const { data, isLoading } = useGetProductByIdQuery(id);
+  const { data, refetch, isLoading } = useGetProductByIdQuery(id);
 
   const [product, setProduct] = useState(null);
   const [quantityAvailable, setQuantityAvailable] = useState(null);
@@ -25,6 +25,7 @@ const ProductView = () => {
   const { cartItems } = useSelector((state) => state.cart);
 
   const handleCart = async () => {
+    console.log(cartItems);
     if (!role) {
       enqueueSnackbar("Please Sign In / Sign Up before continuing", {
         variant: "warning",
@@ -32,6 +33,10 @@ const ProductView = () => {
       return;
     }
 
+    if (role === "retailer " && quantityAvailable < retailerCartQuantity) {
+      enqueueSnackbar("Quantity exceeds stock available", { variant: "error" });
+      return;
+    }
     const isProductInCart = !!cartItems?.[id];
     const MIN_RETAILER_QUANTITY = 100;
 
@@ -84,6 +89,7 @@ const ProductView = () => {
         setRetailerCartQuantity(cartItems[data?.product._id] || 100);
       }
     }
+    refetch();
   }, [data, cartItems, role]);
 
   const averageRating = product?.ratings?.length
@@ -159,6 +165,7 @@ const ProductView = () => {
                   <RetailerCounter
                     cartQuantity={retailerCartQuantity}
                     setCartQuantity={setRetailerCartQuantity}
+                    quantityAvailable={quantityAvailable}
                   />
                   <p className="text-sm mt-2 text-gray-500">
                     Minimum order quantity:{" "}
@@ -199,7 +206,10 @@ const ProductView = () => {
                   {new Date(product?.harvestDate).toLocaleDateString()}
                 </li>
                 <li>Farm: {product?.farmer?.farmName}</li>
-                <li>Farmer: {product?.farmer?.name}</li>
+                <li>
+                  Farmer:{" "}
+                  {product?.farmer?.firstName + " " + product?.farmer?.lastName}
+                </li>
               </ul>
             </div>
           </div>

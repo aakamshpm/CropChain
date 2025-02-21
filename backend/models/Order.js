@@ -52,5 +52,29 @@ const orderSchema = mongoose.Schema(
   { timeStamp: true }
 );
 
+orderSchema.pre("save", function (next) {
+  this.wasNew = this.isNew;
+  next();
+});
+
+orderSchema.post("save", async function (doc, next) {
+  try {
+    if (doc.wasNew) {
+      const Product = mongoose.model("Product");
+
+      for (const item of doc.products) {
+        await Product.findByIdAndUpdate(
+          item.product,
+          { $inc: { quantityAvailableInKg: -item.quantity } },
+          { new: true }
+        );
+      }
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 const Order = mongoose.model("Order", orderSchema);
 export default Order;

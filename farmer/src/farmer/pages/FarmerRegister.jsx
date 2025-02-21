@@ -15,7 +15,8 @@ const Register = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
+    firstName: Yup.string().required("First name is required"),
+    lastName: Yup.string().required("Last name is required"),
     phoneNumber: Yup.string()
       .required("Phone is required")
       .test("is-valid-phone", "Invalid phone number", (value) =>
@@ -57,7 +58,8 @@ const Register = () => {
 
         <Formik
           initialValues={{
-            name: "",
+            firstName: "",
+            lastName: "",
             phoneNumber: "",
             password: "",
             confirmPassword: "",
@@ -71,20 +73,42 @@ const Register = () => {
                 {/* Name Input */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name
+                    First Name
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                       <FiUser className="w-5 h-5" />
                     </span>
                     <Field
-                      name="name"
+                      name="firstName"
                       type="text"
-                      placeholder="Enter your full name"
+                      placeholder="Enter your first name"
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
                     />
                   </div>
-                  <ErrorMessage name="name">
+                  <ErrorMessage name="firstName">
+                    {(msg) => (
+                      <p className="text-red-500 text-sm mt-1">{msg}</p>
+                    )}
+                  </ErrorMessage>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Last Name
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <FiUser className="w-5 h-5" />
+                    </span>
+                    <Field
+                      name="lastName"
+                      type="text"
+                      placeholder="Enter your last name"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+                    />
+                  </div>
+                  <ErrorMessage name="lastName">
                     {(msg) => (
                       <p className="text-red-500 text-sm mt-1">{msg}</p>
                     )}

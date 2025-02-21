@@ -13,7 +13,10 @@ import {
 import { MdOutlineInventory2 } from "react-icons/md";
 import FarmerTable from "../components/FarmerTable";
 import ModifyProduct from "../components/ModifyProduct";
-import { removeAllProductsFromFarmer } from "../auth/productActions";
+import {
+  fetchAllProducts,
+  removeAllProductsFromFarmer,
+} from "../auth/productActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 
@@ -25,19 +28,10 @@ const Products = () => {
 
   const { id } = useSelector((state) => state.auth.data);
 
-  // Single product for state handling in ModifyProducts
-  const { product } = useSelector((state) => state.product);
+  const { products, loading, error } = useSelector((state) => state.product);
 
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
-
-  // Fetch products data
-  const {
-    data: productsData,
-    isLoading,
-    isError,
-    refetch,
-  } = useGetProductsByFarmerQuery(id);
 
   // Handle opening and closing the modify product dialog
   const handleModifyDialogOpen = (product = null) => {
@@ -63,7 +57,7 @@ const Products = () => {
       enqueueSnackbar("All products deleted successfully", {
         variant: "success",
       });
-      refetch();
+      dispatch(fetchAllProducts({ farmerId: id }));
     } catch (error) {
       enqueueSnackbar(error || "Failed to delete products", {
         variant: "error",
@@ -73,17 +67,19 @@ const Products = () => {
     }
   };
 
-  // Refetch products when the product state changes
   useEffect(() => {
-    refetch();
-  }, [product, refetch]);
+    if (id) {
+      dispatch(fetchAllProducts({ farmerId: id }));
+    }
+  }, [dispatch, id]);
+
   // Show loading state
-  if (isLoading) {
+  if (loading) {
     return <p>Loading...</p>;
   }
 
   // Show error state
-  if (isError) {
+  if (error) {
     return <p>Error loading products. Please try again later.</p>;
   }
 
@@ -113,19 +109,19 @@ const Products = () => {
         modify={!!selectedProduct} // Set modify mode if a product is selected
         preview={preview}
         setPreview={setPreview}
-        refetch={refetch}
+        farmerId={id}
       />
 
-      {productsData?.data.length === 0 ? (
+      {products.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[600px] p-6">
           <MdOutlineInventory2 className="text-6xl text-gray-500 mb-4" />
           <p className="text-lg text-gray-700">No Products Found</p>
         </div>
       ) : (
         <FarmerTable
-          data={productsData?.data || []}
+          data={products || []}
           onEdit={handleModifyDialogOpen}
-          refetch={refetch}
+          farmerId={id}
         />
       )}
 

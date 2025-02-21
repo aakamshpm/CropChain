@@ -9,8 +9,8 @@ import { computeConfidence, matchFarmer, parceOCR } from "../utils/utils.js";
 
 //register Farmer
 const farmerRegister = asyncHandler(async (req, res) => {
-  const { name, phoneNumber, password } = req.body;
-  if ((!name, !phoneNumber, !password)) {
+  const { firstName, lastName, phoneNumber, password } = req.body;
+  if (!firstName || !lastName || !phoneNumber || !password) {
     res.status(400);
     throw new Error("Please fill every fields");
   }
@@ -23,7 +23,8 @@ const farmerRegister = asyncHandler(async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, salt);
   try {
     const farmer = await Farmer.create({
-      name,
+      firstName,
+      lastName,
       phoneNumber,
       password: hashedPassword,
     });
@@ -33,7 +34,8 @@ const farmerRegister = asyncHandler(async (req, res) => {
         message: "Farmer registration successful",
         data: {
           id: farmer._id,
-          name: farmer.name,
+          firstName: farmer.firstName,
+          lastName: farmer.lastName,
           phoneNumber: farmer.phoneNumber,
           token,
         },
@@ -82,7 +84,8 @@ const farmerLogin = asyncHandler(async (req, res) => {
 
 const updateFarmerProfile = asyncHandler(async (req, res) => {
   const {
-    name,
+    firstName,
+    lastName,
     phoneNumber,
     aadhaarNumber,
     // Personal details
@@ -105,8 +108,9 @@ const updateFarmerProfile = asyncHandler(async (req, res) => {
     const updateData = {};
 
     // Update personal details if provided
-    if (name || phoneNumber || aadhaarNumber) {
-      updateData.name = name;
+    if (firstName || lastName || phoneNumber || aadhaarNumber) {
+      updateData.firstName = firstName;
+      updateData.lastName = lastName;
       updateData.phoneNumber = phoneNumber;
       updateData.aadhaarNumber = aadhaarNumber;
     }
@@ -166,7 +170,7 @@ const updateProfilePicture = asyncHandler(async (req, res) => {
   try {
     // update existing profile picture
     if (farmer.profilePicture) {
-      fs.unlinkSync(`./uploads/profile-pictures/${farmer.profilePicture}`);
+      fs.unlinkSync(`./uploads/${farmer.profilePicture}`);
     }
 
     // add new profile picture

@@ -82,6 +82,7 @@ const Cart = () => {
                               productId={product._id}
                               count={cartItems[product._id]}
                               cartFarmerId={product.farmer._id}
+                              quantityAvailable={product.quantityAvailableInKg}
                             />
                           )}
 
