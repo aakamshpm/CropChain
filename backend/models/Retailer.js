@@ -23,7 +23,7 @@ const retailerSchema = mongoose.Schema(
       houseName: { type: String },
       street: { type: String },
       city: { type: String },
-      state: { type: String },
+      state: { type: String, default: "Kerala" },
       country: { type: String, default: "India" },
       postalCode: { type: String },
     },
@@ -32,7 +32,7 @@ const retailerSchema = mongoose.Schema(
     shopAddress: {
       shopName: { type: String },
       city: { type: String },
-      state: { type: String },
+      state: { type: String, default: "Kerala" },
       postalCode: { type: String },
       country: { type: String, default: "India" },
     },

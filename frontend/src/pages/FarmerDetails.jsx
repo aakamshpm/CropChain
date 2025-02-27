@@ -1,21 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Typography,
-  Paper,
-  Avatar,
-  Chip,
-  Divider,
-  Container,
-  Box,
-  Rating,
-  TextField,
-  Button,
-  Snackbar,
-  Alert,
-} from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Typography, Box, Rating, Snackbar, Alert } from "@mui/material";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CropIcon from "@mui/icons-material/Agriculture";
@@ -26,6 +12,8 @@ import {
   addOrUpdateRating,
   getAverageRating,
 } from "../utils/farmerSlice";
+import { fetchProductsByFarmer } from "../utils/productSlice";
+import ProductWidget from "../components/ProductWidget";
 
 const FarmerDetails = () => {
   const { farmerId } = useParams();
@@ -37,7 +25,7 @@ const FarmerDetails = () => {
     averageRating,
   } = useSelector((state) => state.farmer);
 
-  const { userId } = useSelector((state) => state.user);
+  const { id: userId } = useSelector((state) => state.user.userData);
 
   const [ratingValue, setRatingValue] = useState(0);
   const [comment, setComment] = useState("");
@@ -45,23 +33,61 @@ const FarmerDetails = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
-  useEffect(() => {
-    try {
-      dispatch(fetchFarmerDetails(farmerId)).unwrap();
-      dispatch(getAverageRating(farmerId));
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [productsError, setProductsError] = useState(null);
 
-      if (userId && farmer && farmer.ratings) {
-        const userRating = farmer.ratings.find((r) => r.userId === userId);
-        if (userRating) {
-          setRatingValue(userRating.rating);
-        } else {
-          setRatingValue(0);
-        }
+  useEffect(() => {
+    // Fetch initial data
+    const loadData = async () => {
+      try {
+        await dispatch(fetchFarmerDetails(farmerId)).unwrap();
+        dispatch(getAverageRating(farmerId));
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
+    };
+    loadData();
+  }, [dispatch, farmerId]);
+
+  // fetch farmer products
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setProductsLoading(true);
+        const productsData = await dispatch(
+          fetchProductsByFarmer(farmerId)
+        ).unwrap();
+        setProducts(productsData);
+        setProductsError(null);
+      } catch (error) {
+        setProductsError(error.message);
+        setProducts([]);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+
+    if (farmerId) {
+      loadProducts();
     }
-  }, [dispatch, farmerId, userId]);
+  }, [dispatch, farmerId]);
+
+  // fetch rating info
+  useEffect(() => {
+    if (userId && farmer?.ratings) {
+      const userRating = farmer.ratings.find((r) => r.userId === userId);
+      setRatingValue(userRating?.rating || 0);
+    }
+  }, [userId, farmer]);
+
+  // Image handler
+  const getProductImage = (product) => {
+    if (product.images?.length > 0) {
+      return `${import.meta.env.VITE_API_IMAGE_URL}/${product.images[0]}`;
+    }
+    return "https://placehold.co/600x400?text=No+Image+Available";
+  };
 
   const handleRateFarmer = () => {
     dispatch(
@@ -84,6 +110,7 @@ const FarmerDetails = () => {
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
+
   if (loading) {
     return (
       <Box
@@ -124,72 +151,49 @@ const FarmerDetails = () => {
   }
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "#f5f5f5",
-        minHeight: "100vh",
-        py: 6,
-      }}
-    >
-      <Container maxWidth="lg">
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            borderRadius: 4,
-          }}
-        >
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-lg p-8">
           {/* Farmer Header */}
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            textAlign="center"
-            mb={4}
-          >
+          <div className="flex flex-col items-center text-center mb-8">
             {farmer?.profilePicture && (
-              <Avatar
+              <img
                 src={
                   `${import.meta.env.VITE_API_SERVER_URL}/uploads/${
                     farmer.profilePicture
                   }` || "/default-avatar.png"
                 }
                 alt={farmer.name}
-                sx={{
-                  width: 150,
-                  height: 150,
-                  mb: 2,
-                }}
+                className="w-32 h-32 rounded-full mb-4 object-cover border-4 border-white shadow-lg"
               />
             )}
-            <Typography variant="h4" fontWeight="bold">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               {farmer.firstName + " " + farmer.lastName || "N/A"}
               {farmer.verificationStatus === "approved" && (
-                <VerifiedIcon sx={{ color: "green", ml: 1 }} />
+                <VerifiedIcon className="text-green-500 ml-2" />
               )}
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              {farmer.farmName || "N/A"}
-            </Typography>
-          </Box>
+            </h1>
+            <p className="text-lg text-gray-600">{farmer.farmName || "N/A"}</p>
+          </div>
 
-          <Divider sx={{ my: 4 }} />
+          <hr className="my-8 border-gray-200" />
 
           {/* Personal and Farm Details */}
-          <Grid container spacing={4}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             {/* Personal Details */}
-            <Grid item xs={12} md={6}>
-              <Typography variant="h6" fontWeight="bold" mb={2}>
-                <HomeIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+            <div>
+              <h3 className="text-xl font-semibold mb-4 flex items-center">
+                <HomeIcon className="mr-2 text-gray-600" />
                 Personal Details
-              </Typography>
-              <Box sx={{ pl: 3 }}>
-                <Typography>
-                  <PhoneIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-                  <strong>Phone:</strong> {farmer.phoneNumber || "N/A"}
-                </Typography>
-                <Typography mt={2}>
-                  <strong>Address:</strong>{" "}
+              </h3>
+              <div className="space-y-2 pl-8">
+                <p className="flex items-center text-gray-700">
+                  <PhoneIcon className="mr-2 text-gray-500" />
+                  <span className="font-medium">Phone:</span>
+                  <span className="ml-2">{farmer.phoneNumber || "N/A"}</span>
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-medium">Address:</span>{" "}
                   {farmer?.address
                     ? `${farmer.address.buildingName || ""}, ${
                         farmer.address.street || ""
@@ -199,135 +203,137 @@ const FarmerDetails = () => {
                         farmer.address.country || ""
                       }`
                     : "N/A"}
-                </Typography>
-              </Box>
-            </Grid>
+                </p>
+              </div>
+            </div>
 
             {/* Farm Details */}
-            <Grid item xs={12} md={6}>
-              <Typography variant="h6" fontWeight="bold" mb={2}>
-                <CropIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+            <div>
+              <h3 className="text-xl font-semibold mb-4 flex items-center">
+                <CropIcon className="mr-2 text-gray-600" />
                 Farm Details
-              </Typography>
-              <Box sx={{ pl: 3 }}>
-                <Typography>
-                  <strong>Farm Size:</strong>{" "}
+              </h3>
+              <div className="space-y-2 pl-8">
+                <p className="text-gray-700">
+                  <span className="font-medium">Farm Size:</span>{" "}
                   {farmer.farmSizeInAcres
                     ? `${farmer.farmSizeInAcres} acres`
                     : "N/A"}
-                </Typography>
-                <Typography mt={2}>
-                  <strong>Location:</strong>{" "}
-                  {farmer.farmLocation ? (
-                    <>
-                      <LocationOnIcon
-                        sx={{ color: "red", mr: 1, verticalAlign: "middle" }}
-                      />
-                      {farmer.farmLocation.latitude},{" "}
-                      {farmer.farmLocation.longitude}
-                    </>
-                  ) : (
-                    "N/A"
-                  )}
-                </Typography>
-                <Typography mt={2}>
-                  <strong>Crops Grown:</strong>{" "}
+                </p>
+                <p className="flex items-center text-gray-700">
+                  <LocationOnIcon className="mr-2 text-red-500" />
+                  <span className="font-medium">Location:</span>{" "}
+                  {farmer.farmLocation
+                    ? `${farmer.farmLocation.latitude}, ${farmer.farmLocation.longitude}`
+                    : "N/A"}
+                </p>
+                <p className="text-gray-700">
+                  <span className="font-medium">Crops Grown:</span>{" "}
                   {farmer.cropsGrown?.length > 0
                     ? farmer.cropsGrown.join(", ")
                     : "N/A"}
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
+                </p>
+              </div>
+            </div>
+          </div>
 
-          <Divider sx={{ my: 4 }} />
+          <hr className="my-8 border-gray-200" />
+
+          {/* Products Section */}
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-4">Farm Products</h3>
+            {productsLoading ? (
+              <p className="text-center text-gray-600">Loading products...</p>
+            ) : productsError ? (
+              <p className="text-red-500 text-center">{productsError}</p>
+            ) : products.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {products.map((product, i) => (
+                  <ProductWidget
+                    product={product}
+                    key={`local-${i}`}
+                    imageUrl={getProductImage(product)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-600">No products available</p>
+            )}
+          </div>
 
           {/* Rating Section */}
-
           {userId && (
-            <Box textAlign="center" mb={4}>
-              <Typography variant="h6" fontWeight="bold" mb={2}>
-                Rate This Farmer
-              </Typography>
+            <div className="text-center mb-8">
+              <h3 className="text-xl font-semibold mb-4">Rate This Farmer</h3>
               <Rating
                 name="farmer-rating"
                 value={ratingValue}
                 onChange={(event, newValue) => setRatingValue(newValue)}
                 size="large"
-                sx={{ mb: 2 }}
+                className="mb-4"
               />
-              <TextField
-                label="Add a comment (optional)"
-                variant="outlined"
-                fullWidth
-                multiline
-                rows={3}
+              <textarea
+                placeholder="Add a comment (optional)"
+                className="w-full p-3 border rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows="3"
                 value={comment}
-                onChange={(event) => setComment(event.target.value)}
-                sx={{ mb: 2 }}
+                onChange={(e) => setComment(e.target.value)}
               />
-              <Button
-                variant="contained"
-                color="primary"
+              <button
                 onClick={handleRateFarmer}
                 disabled={ratingValue === 0}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Submit Rating
-              </Button>
-            </Box>
+              </button>
+            </div>
           )}
 
           {/* Average Rating */}
-          <Box textAlign="center">
-            <Typography variant="h6" fontWeight="bold" mb={2}>
-              Average Rating
-            </Typography>
+          <div className="text-center mb-8">
+            <h3 className="text-xl font-semibold mb-2">Average Rating</h3>
             <Rating
               name="average-rating"
               value={averageRating || 0}
               readOnly
               precision={0.1}
               size="large"
-              sx={{ mb: 2 }}
+              className="mb-2"
             />
-            <Typography variant="body1">
+            <p className="text-gray-700">
               {averageRating
                 ? `${averageRating.toFixed(1)} out of 5`
                 : "No ratings yet"}
-            </Typography>
-          </Box>
+            </p>
+          </div>
 
           {/* Verification Status */}
-          <Box textAlign="center" mt={4}>
-            <Chip
-              label={
+          <div className="text-center">
+            <span
+              className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
                 farmer.verificationStatus === "approved"
-                  ? "Verified Farmer"
+                  ? "bg-green-100 text-green-800"
                   : farmer.verificationStatus === "pending"
-                  ? "Verification Pending"
+                  ? "bg-yellow-100 text-yellow-800"
                   : farmer.verificationStatus === "rejected"
-                  ? "Verification Rejected"
-                  : "N/A"
-              }
-              color={
-                farmer.verificationStatus === "approved"
-                  ? "success"
-                  : farmer.verificationStatus === "pending"
-                  ? "warning"
-                  : farmer.verificationStatus === "rejected"
-                  ? "error"
-                  : "default"
-              }
-              icon={
-                farmer.verificationStatus === "approved" ? (
-                  <VerifiedIcon />
-                ) : null
-              }
-              sx={{ mt: 2 }}
-            />
-          </Box>
-        </Paper>
-      </Container>
+                  ? "bg-red-100 text-red-800"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+            >
+              {farmer.verificationStatus === "approved" && (
+                <VerifiedIcon className="mr-1 h-4 w-4" />
+              )}
+              {farmer.verificationStatus === "approved"
+                ? "Verified Farmer"
+                : farmer.verificationStatus === "pending"
+                ? "Verification Pending"
+                : farmer.verificationStatus === "rejected"
+                ? "Verification Rejected"
+                : "N/A"}
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Snackbar for Notifications */}
       <Snackbar
@@ -340,7 +346,7 @@ const FarmerDetails = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </Box>
+    </div>
   );
 };
 

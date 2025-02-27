@@ -9,7 +9,9 @@ import {
   Radio,
   RadioGroup,
   TextField,
+  Tooltip,
 } from "@mui/material";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import * as Yup from "yup";
 import { useSnackbar } from "notistack";
 import axios from "axios";
@@ -17,24 +19,15 @@ import { useGetProductsQuery } from "../utils/userServices";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { placeOrderAsync } from "../utils/orderSlice";
 import { clearCartData } from "../utils/cartSlice";
-import { isUserAuthenticated } from "../utils/userAuth";
-import { fetchRetailerData } from "../utils/actions/retailerActions";
 
 const Checkout = () => {
   const { cartItems, cartFarmerId } = useSelector((state) => state.cart);
-
-  const role = isUserAuthenticated();
-  const [retailerData, setRetailerData] = useState(null);
-  const [deliveryAddress, setDeliveryAddress] = useState("home"); // "home" or "shop"
-  const [isRetailerDataLoading, setIsRetailerDataLoading] = useState(false);
-
+  const { userData, address } = useSelector((state) => state.user);
+  const [deliveryOption, setDeliveryOption] = useState("selfManaged");
   const { enqueueSnackbar } = useSnackbar();
-
   const [paymentMode, setPaymentMode] = useState("cod");
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { data: products, isLoading, isError } = useGetProductsQuery();
 
   const getTotalCartAmount = () => {
@@ -63,30 +56,12 @@ const Checkout = () => {
   });
 
   useEffect(() => {
-    if (cartItems) {
-      if (Object.keys(cartItems).length === 0) navigate("/cart");
+    if (cartItems && Object.keys(cartItems).length === 0) {
+      navigate("/cart");
     }
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (role === "retailer") {
-          setIsRetailerDataLoading(true);
-          const data = await dispatch(fetchRetailerData()).unwrap();
-          setRetailerData(data.data);
-        }
-        setIsRetailerDataLoading(false);
-      } catch (error) {
-        setIsRetailerDataLoading(false);
-        enqueueSnackbar(error.message, { variant: "error" });
-      }
-    };
-
-    fetchData();
-  }, [role]);
-
-  const placeOrder = async (address) => {
+  const placeOrder = async (formAddress) => {
     let orderedProducts = [];
 
     products?.data.forEach((product) => {
@@ -99,23 +74,19 @@ const Checkout = () => {
       }
     });
 
-    // Determine the delivery address based on the selected option
-    const selectedAddress =
-      role === "retailer"
-        ? deliveryAddress === "home"
-          ? retailerData.address
-          : retailerData.shopAddress
-        : address; // Use address for non-retailers
-
-    let orderData = {
+    const orderData = {
       farmerId: cartFarmerId,
       products: orderedProducts,
       paymentMode,
-      address: selectedAddress,
+      address: formAddress,
+      deliveryOption,
+      deliveryCharge: deliveryOption === "cropchain0" ? 0 : 40,
     };
 
     try {
       const orderResponse = await dispatch(placeOrderAsync(orderData)).unwrap();
+
+      console.log(orderResponse);
 
       if (!orderResponse) {
         throw new Error("Order response is undefined or invalid");
@@ -125,8 +96,8 @@ const Checkout = () => {
         enqueueSnackbar(orderResponse?.message || "Order placed successfully", {
           variant: "success",
         });
-        dispatch(clearCartData());
         navigate(`/order-success?orderId=${orderResponse?.orderId}`);
+        dispatch(clearCartData());
       } else {
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -185,34 +156,23 @@ const Checkout = () => {
     }
   };
 
-  if (isRetailerDataLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="h-[40em] px-28 py-5">
+    <div className="h-[50em] px-28 py-5">
       <div className="flex w-full justify-center gap-10 mt-3">
         <div className="flex flex-col gap-3 h-full">
           <h2 className="text-2xl font-semibold ">Billing Information</h2>
-
           <Formik
             initialValues={{
-              firstName: retailerData?.name?.split(" ")[0] || "",
-              lastName: retailerData?.name?.split(" ")[1] || "",
-              phoneNumber: retailerData?.phoneNumber || "",
-              houseName: retailerData?.address?.houseName || "",
-              street: retailerData?.address?.street || "",
-              city: retailerData?.address?.city || "",
-              postalCode: retailerData?.address?.postalCode || "",
+              firstName: userData?.firstName || "",
+              lastName: userData?.lastName || "",
+              phoneNumber: userData?.phoneNumber || "",
+              houseName: address?.houseName || "",
+              street: address?.street || "",
+              city: address?.city || "",
+              postalCode: address?.postalCode || "",
             }}
-            validationSchema={deliveryAddress !== "shop" && validationSchema}
-            onSubmit={(values, actions) => {
-              placeOrder(values);
-            }}
+            validationSchema={validationSchema}
+            onSubmit={(values) => placeOrder(values)}
           >
             {({ values, handleChange, handleBlur, errors, touched }) => (
               <Form className="flex flex-col gap-2">
@@ -312,58 +272,6 @@ const Checkout = () => {
                   </div>
                 </Box>
 
-                {/* Display Shop Address for Retailers */}
-                {role === "retailer" && (
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold">Shop Address</h3>
-                    <p className="text-gray-600">
-                      {retailerData?.shopAddress?.shopName},{" "}
-                      {retailerData?.shopAddress?.city},{" "}
-                      {retailerData?.shopAddress?.state},{" "}
-                      {retailerData?.shopAddress?.postalCode}
-                    </p>
-                  </div>
-                )}
-
-                {/* Choose Delivery Address for Retailers */}
-                {role === "retailer" && (
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold">Delivery Address</h3>
-                    <FormControl>
-                      <RadioGroup
-                        value={deliveryAddress}
-                        onChange={(e) => setDeliveryAddress(e.target.value)}
-                        sx={{ display: "flex", flexDirection: "row" }}
-                      >
-                        <FormControlLabel
-                          value="home"
-                          control={
-                            <Radio
-                              sx={{
-                                color: "green",
-                                "&.Mui-checked": { color: "green" },
-                              }}
-                            />
-                          }
-                          label="Home Address"
-                        />
-                        <FormControlLabel
-                          value="shop"
-                          control={
-                            <Radio
-                              sx={{
-                                color: "green",
-                                "&.Mui-checked": { color: "green" },
-                              }}
-                            />
-                          }
-                          label="Shop Address"
-                        />
-                      </RadioGroup>
-                    </FormControl>
-                  </div>
-                )}
-
                 <button id="place-order" type="submit" className="hidden" />
               </Form>
             )}
@@ -378,7 +286,7 @@ const Checkout = () => {
             {isLoading ? (
               <p>Loading...</p>
             ) : (
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-2 mt-2">
                 {products?.data.map((product, i) => {
                   if (cartItems[product._id] > 0) {
                     return (
@@ -386,7 +294,7 @@ const Checkout = () => {
                         key={i}
                         className="flex justify-between w-full items-center"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <img
                             className="w-14"
                             src={`${
@@ -417,18 +325,95 @@ const Checkout = () => {
                 ₹ {getTotalCartAmount()}.00
               </p>
             </div>
+
             <div className="w-full h-[1px] bg-[#808080] opacity-35" />
 
+            {/* Delivery Options */}
+            <div className="mt-2">
+              <h3 className="font-semibold text-lg mb-2">Delivery Method</h3>
+              <FormControl fullWidth>
+                <RadioGroup
+                  value={deliveryOption}
+                  onChange={(e) => setDeliveryOption(e.target.value)}
+                >
+                  <FormControlLabel
+                    value="selfManaged"
+                    control={
+                      <Radio
+                        sx={{
+                          color: "green",
+                          "&.Mui-checked": { color: "green" },
+                        }}
+                      />
+                    }
+                    label={
+                      <div className="flex items-center gap-1">
+                        <p className="font-medium">Self-Managed Delivery</p>
+                        <Tooltip
+                          title="Coordinate directly with the farmer via phone call or in-person meetup to arrange delivery details"
+                          arrow
+                        >
+                          <HelpOutlineIcon
+                            sx={{
+                              fontSize: "16px",
+                              color: "text.secondary",
+                              "&:hover": { color: "text.primary" },
+                            }}
+                          />
+                        </Tooltip>
+                        <p className="text-sm text-gray-600 ml-2">₹ 0.00</p>
+                      </div>
+                    }
+                  />
+
+                  <FormControlLabel
+                    value="cropChain"
+                    control={
+                      <Radio
+                        sx={{
+                          color: "green",
+                          "&.Mui-checked": { color: "green" },
+                        }}
+                      />
+                    }
+                    label={
+                      <div className="flex items-center gap-1">
+                        <p className="font-medium">CropChain Delivery</p>
+                        <Tooltip
+                          title="Professional delivery service handling pickup and drop-off. Flat ₹40 fee for reliable doorstep delivery within 2-3 business days"
+                          arrow
+                        >
+                          <HelpOutlineIcon
+                            sx={{
+                              fontSize: "16px",
+                              color: "text.secondary",
+                              "&:hover": { color: "text.primary" },
+                            }}
+                          />
+                        </Tooltip>
+                        <p className="text-sm text-gray-600 ml-2">₹ 40.00</p>
+                      </div>
+                    }
+                  />
+                </RadioGroup>
+              </FormControl>
+            </div>
+
             <div className="flex justify-between">
-              <p className="text-gray-800">Shipping: </p>
-              <p className="text-gray-800 font-semibold">₹ 2.00</p>
+              <p className="text-gray-800">Delivery Charges: </p>
+              <p className="text-gray-800 font-semibold">
+                ₹ {deliveryOption === "cropChain" ? 40 : 0}.00
+              </p>
             </div>
             <div className="w-full h-[1px] bg-[#808080] opacity-35" />
 
             <div className="flex justify-between">
               <p className="text-gray-800">Total: </p>
               <p className="text-gray-800 text-lg font-semibold">
-                ₹ {getTotalCartAmount() + 2}.00
+                ₹{" "}
+                {getTotalCartAmount() +
+                  (deliveryOption === "cropChain" ? 40 : 0)}
+                .00
               </p>
             </div>
 

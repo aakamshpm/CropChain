@@ -112,8 +112,64 @@ const fetchAllRetailer = asyncHandler(async (req, res) => {
   }
 });
 
-// Update Retailer account details
-const updateRetailerProfile = asyncHandler(async (req, res) => {});
+// Update Retailer profile details
+const updateRetailerProfile = asyncHandler(async (req, res) => {
+  const { firstName, lastName, phoneNumber } = req.body;
+  const profilePicture = req.file;
+
+  try {
+    const retailer = await Retailer.findById(req.retailerId);
+
+    if (profilePicture && retailer.profilePicture) {
+      fs.unlinkSync(`./uploads/${retailer.profilePicture}`);
+    }
+
+    if (profilePicture) retailer.profilePicture = profilePicture?.filename;
+
+    retailer.firstName = firstName;
+    retailer.lastName = lastName;
+    retailer.phoneNumber = phoneNumber;
+
+    await retailer.save();
+
+    res.status(200).json({
+      message: "Profile updated successfuly",
+      data: {
+        firstName,
+        lastName,
+        phoneNumber,
+        profilePicture: retailer.profilePicture,
+      },
+    });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+// Update Retailer address
+const updateRetailerAddress = asyncHandler(async (req, res) => {
+  const { houseName, city, street, postalCode } = req.body;
+  try {
+    await Retailer.findByIdAndUpdate(req.retailerId, {
+      address: { houseName, city, street, postalCode },
+    });
+    res.status(200).json({
+      message: "Address updated",
+      data: {
+        houseName,
+        city,
+        street,
+        postalCode,
+      },
+    });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+// Update Shop Address
 
 export {
   registerRetailer,
@@ -122,4 +178,5 @@ export {
   getRetailerDetails,
   fetchAllRetailer,
   updateRetailerProfile,
+  updateRetailerAddress,
 };

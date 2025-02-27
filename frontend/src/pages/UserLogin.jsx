@@ -13,6 +13,7 @@ import {
   Radio,
   RadioGroup,
   TextField,
+  InputAdornment,
 } from "@mui/material";
 import { resetMessageState } from "../utils/userSlice";
 import { consumerLogin } from "../utils/actions/consumerActions";
@@ -21,8 +22,10 @@ const UserLogin = () => {
   const validationSchema = Yup.object({
     phoneNumber: Yup.string()
       .required("Phone number is required")
-      .test("is-valid-phoen", "Invalid phone number", (value) =>
-        isValidPhoneNumber(value)
+      .test(
+        "is-valid-phone",
+        "Invalid phone number",
+        (value) => isValidPhoneNumber(`+91${value}`) // Validate with the prefix
       ),
     password: Yup.string().required("Password is required"),
   });
@@ -72,7 +75,7 @@ const UserLogin = () => {
                 transition: "background-color 0.3s ease",
               },
               ".MuiFormControlLabel-root[data-selected='true']::after": {
-                backgroundColor: "green", // Change the underline color for the selected option
+                backgroundColor: "green",
               },
             }}
             value={selectedValue}
@@ -82,13 +85,7 @@ const UserLogin = () => {
               <FormControlLabel
                 key={label}
                 value={label}
-                control={
-                  <Radio
-                    sx={{
-                      display: "none", // Hide the default radio icon
-                    }}
-                  />
-                }
+                control={<Radio sx={{ display: "none" }} />}
                 label={label}
                 data-selected={selectedValue === label}
               />
@@ -100,14 +97,20 @@ const UserLogin = () => {
         </h1>
         <Formik
           initialValues={{
-            phoneNumber: "+91 ",
+            phoneNumber: "", // Only store the editable part of the phone number
             password: "",
           }}
           validationSchema={validationSchema}
           onSubmit={(values, actions) => {
+            const fullPhoneNumber = `+91${values.phoneNumber}`; // Combine prefix with the input
+            const payload = {
+              phoneNumber: fullPhoneNumber,
+              password: values.password,
+            };
+
             selectedValue === "Retailer"
-              ? dispatch(retailerLogin(values))
-              : dispatch(consumerLogin(values));
+              ? dispatch(retailerLogin(payload))
+              : dispatch(consumerLogin(payload));
 
             actions.resetForm(false);
           }}
@@ -125,6 +128,14 @@ const UserLogin = () => {
                   margin="normal"
                   error={touched.phoneNumber && Boolean(errors.phoneNumber)}
                   helperText={<ErrorMessage name="phoneNumber" />}
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">+91</InputAdornment>
+                      ),
+                    },
+                    htmlInput: { maxLength: 10 },
+                  }}
                 />
 
                 <TextField

@@ -97,8 +97,11 @@ const FarmerDetails = () => {
             <Grid container spacing={4}>
               <Grid item xs={12} md={6}>
                 <Typography>
-                  <strong className="text-gray-700">Name:</strong>{" "}
-                  <span className="text-gray-600">{farmer.name}</span>
+                  <strong className="text-gray-700">First Name:</strong>{" "}
+                  <span className="text-gray-600">{farmer.firstName}</span>
+
+                  <strong className="text-gray-700 ml-4"> Last Name:</strong>{" "}
+                  <span className="text-gray-600">{farmer.lastName}</span>
                 </Typography>
               </Grid>
               <Grid item xs={12} md={6}>

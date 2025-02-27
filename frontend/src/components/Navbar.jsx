@@ -8,7 +8,12 @@ import { TextField } from "@mui/material";
 import { isUserAuthenticated } from "../utils/userAuth";
 import { useDispatch } from "react-redux";
 import { clearCartData, getCartDataAsync } from "../utils/cartSlice";
-import { clearCredentials, setCredentials } from "../utils/userSlice";
+import {
+  clearCredentials,
+  fetchUserProfile,
+  resetMessageState,
+  setCredentials,
+} from "../utils/userSlice";
 import { consumerLogout } from "../utils/actions/consumerActions";
 import { retailerLogout } from "../utils/actions/retailerActions";
 import { getUserIdFromToken } from "../utils/utils";
@@ -27,6 +32,7 @@ const Navbar = () => {
         ? await dispatch(retailerLogout()).unwrap()
         : await dispatch(consumerLogout()).unwrap();
 
+      dispatch(resetMessageState());
       dispatch(clearCredentials());
       dispatch(clearCartData());
       navigate("/login");
@@ -42,12 +48,43 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    if (role) {
-      dispatch(getCartDataAsync());
-      const userId = getUserIdFromToken();
-      userId && dispatch(setCredentials({ userId, role }));
-      setSearchTerm("");
-    }
+    const fetchData = async () => {
+      if (role) {
+        dispatch(getCartDataAsync());
+
+        try {
+          const response = await dispatch(fetchUserProfile({ role })).unwrap();
+          if (response) {
+            const {
+              _id,
+              firstName,
+              lastName,
+              phoneNumber,
+              profilePicture,
+              address,
+            } = response;
+            dispatch(
+              setCredentials({
+                role,
+                data: {
+                  id: _id,
+                  firstName,
+                  lastName,
+                  phoneNumber,
+                  profilePicture,
+                },
+                address,
+              })
+            );
+          }
+        } catch (error) {
+          console.log(error);
+        }
+        setSearchTerm("");
+      }
+    };
+
+    fetchData();
   }, [dispatch, role]);
 
   return (

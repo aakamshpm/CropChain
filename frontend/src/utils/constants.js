@@ -14,3 +14,14 @@ export const CITIES_IN_KERALA = [
   "Thrissur",
   "Wayanad",
 ];
+
+export const PRODUCT_CATEGORIES = [
+  "Fruits",
+  "Vegetables",
+  "Grains & Cereals",
+  "Dairy Products",
+  "Seeds & Nuts",
+  "Plant-based Products",
+  "Honey & Bee Products",
+  "Others",
+];

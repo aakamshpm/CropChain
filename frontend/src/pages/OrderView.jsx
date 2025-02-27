@@ -114,6 +114,19 @@ const OrderView = () => {
           </div>
           <div>
             <p className="text-gray-600">
+              <strong>Delivery Option:</strong>{" "}
+              {order.deliveryOption === "cropChain"
+                ? "CropChain Delivery"
+                : "Self-Managed Delivery"}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-600">
+              <strong>Delivery Charge:</strong> ₹ {order.deliveryCharge}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-600">
               <strong>Total Amount:</strong> ₹ {order.totalAmount}
             </p>
           </div>
@@ -188,7 +201,9 @@ const OrderView = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <p className="text-gray-600">
-              <strong>Name:</strong> {order?.farmerId?.name || "N/A"}
+              <strong>Name:</strong>{" "}
+              {order?.farmerId?.firstName + " " + order?.farmerId?.lastName ||
+                "N/A"}
             </p>
           </div>
           <div>

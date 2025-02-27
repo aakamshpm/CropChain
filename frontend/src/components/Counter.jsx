@@ -31,6 +31,7 @@ const Counter = ({ productId, count, cartFarmerId, quantityAvailable }) => {
       enqueueSnackbar("Please Sign In / Sign Up before continuing", {
         variant: "warning",
       });
+      return;
     }
 
     if (quantityAvailable < productId) {
@@ -40,7 +41,7 @@ const Counter = ({ productId, count, cartFarmerId, quantityAvailable }) => {
     try {
       await dispatch(addToCartAsync({ productId, cartFarmerId })).unwrap();
     } catch (err) {
-      enqueueSnackbar(err || "Error", {
+      enqueueSnackbar(err?.message || "Error", {
         variant: "error",
       });
     }

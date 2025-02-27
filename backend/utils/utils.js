@@ -51,7 +51,7 @@ const matchFarmer = async (data, farmer, res) => {
       data.aadhaar.replace(/\s+/g, "") === farmer?.aadhaarNumber
     ) {
       // compare registered name
-      if (data.name && farmer.name === data.name) {
+      if (data.name && ((farmer.firstName + " " + farmer.lastName) === data.name)) {
         return { match: true, farmer };
       } else {
         return { match: false, message: "Name does not match" };

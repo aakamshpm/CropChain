@@ -20,6 +20,14 @@ const SearchProducts = () => {
     }
   }, [searchTerm, dispatch]);
 
+  // Image handler
+  const getProductImage = (product) => {
+    if (product.images?.length > 0) {
+      return `${import.meta.env.VITE_API_IMAGE_URL}/${product.images[0]}`;
+    }
+    return "https://placehold.co/600x400?text=No+Image+Available";
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -49,7 +57,10 @@ const SearchProducts = () => {
           <Grid container spacing={4}>
             {products?.map((product) => (
               <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}>
-                <ProductWidget product={product} />
+                <ProductWidget
+                  product={product}
+                  imageUrl={getProductImage(product)}
+                />
               </Grid>
             ))}
           </Grid>

@@ -25,7 +25,6 @@ const ProductView = () => {
   const { cartItems } = useSelector((state) => state.cart);
 
   const handleCart = async () => {
-    console.log(cartItems);
     if (!role) {
       enqueueSnackbar("Please Sign In / Sign Up before continuing", {
         variant: "warning",

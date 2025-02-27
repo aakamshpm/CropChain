@@ -25,6 +25,22 @@ const searchProductsAsync = createAsyncThunk(
   }
 );
 
+const fetchProductsByFarmer = createAsyncThunk(
+  "products/fetchByFarmer",
+  async (farmerId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${productUrl}/farmer?farmer=${farmerId}`
+      );
+      return response.data.data;
+    } catch (error) {
+      // Handle error response
+      const errorMessage = error.response?.data?.message || error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const productSlice = createSlice({
   name: "product",
   initialState,
@@ -43,8 +59,21 @@ const productSlice = createSlice({
         state.error = true;
         state.loading = false;
       });
+    builder
+      .addCase(fetchProductsByFarmer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProductsByFarmer.fulfilled, (state, action) => {
+        state.loading = false;
+        state.products = action.payload;
+      })
+      .addCase(fetchProductsByFarmer.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
-export { searchProductsAsync };
+export { searchProductsAsync, fetchProductsByFarmer };
 export default productSlice.reducer;

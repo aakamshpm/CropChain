@@ -14,6 +14,7 @@ import {
   Radio,
   TextField,
   MenuItem,
+  InputAdornment,
 } from "@mui/material";
 import { CITIES_IN_KERALA } from "../utils/constants.js";
 import { resetMessageState } from "../utils/userSlice";
@@ -48,8 +49,11 @@ const UserRegister = () => {
       lastName: Yup.string().required("Last name is required"),
       phoneNumber: Yup.string()
         .required("Phone number is required")
-        .test("is-valid-phone", "Invalid phone number", (value) =>
-          isValidPhoneNumber(value)
+        .matches(/^[0-9]{10}$/, "Must be 10 digits")
+        .test(
+          "is-valid-phone",
+          "Invalid phone number",
+          (value) => isValidPhoneNumber(`+91${value}`) // Validate with country code
         ),
       password: Yup.string().required("Password is required"),
       confirmPassword: Yup.string()
@@ -81,7 +85,7 @@ const UserRegister = () => {
   const initialValues = {
     firstName: "",
     lastName: "",
-    phoneNumber: "+91 ",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
     address: {
@@ -160,14 +164,18 @@ const UserRegister = () => {
               : validationSchemas[0]
           }
           onSubmit={(values, actions) => {
-            if (selectedValue && currentStep < 2) {
-              setCurrentStep(currentStep + 1);
-            } else if (selectedValue === "Retailer" && currentStep < 3) {
+            if (currentStep < (selectedValue === "Retailer" ? 3 : 2)) {
               setCurrentStep(currentStep + 1);
             } else {
+              // Combine country code with phone number before submission
+              const payload = {
+                ...values,
+                phoneNumber: `+91${values.phoneNumber}`,
+              };
+
               selectedValue === "Retailer"
-                ? dispatch(retailerRegister(values))
-                : dispatch(consumerRegister(values));
+                ? dispatch(retailerRegister(payload))
+                : dispatch(consumerRegister(payload));
               actions.resetForm(false);
             }
           }}
@@ -209,6 +217,16 @@ const UserRegister = () => {
                       margin="normal"
                       error={touched.phoneNumber && Boolean(errors.phoneNumber)}
                       helperText={<ErrorMessage name="phoneNumber" />}
+                      slotProps={{
+                        input: {
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              +91
+                            </InputAdornment>
+                          ),
+                        },
+                        htmlInput: { maxLength: 10 },
+                      }}
                     />
                     <TextField
                       fullWidth

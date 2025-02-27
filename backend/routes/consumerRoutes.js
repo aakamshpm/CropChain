@@ -5,6 +5,7 @@ import {
   loginConsumer,
   logoutConsumer,
   registerConsumer,
+  updateConsumerAddress,
   updateConsumerProfile,
 } from "../controllers/consumerController.js";
 import { protect } from "../middlewares/authMiddleware.js";
@@ -25,5 +26,6 @@ router.post(
   upload.single("profilePicture"),
   updateConsumerProfile
 );
+router.post("/edit-address", protect(["consumer"]), updateConsumerAddress);
 
 export default router;

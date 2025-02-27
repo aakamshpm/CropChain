@@ -99,7 +99,7 @@ const VerifyFarmers = () => {
                     key={farmer._id}
                     className="hover:bg-gray-50 transition-colors"
                   >
-                    <TableCell>{farmer.name}</TableCell>
+                    <TableCell>{farmer.firstName + " " + farmer.lastName}</TableCell>
                     <TableCell>{farmer.aadhaarNumber || "N/A"}</TableCell>
                     <TableCell>{farmer.confidenceScore || "N/A"}</TableCell>
                     <TableCell>

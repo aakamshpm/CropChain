@@ -19,9 +19,10 @@ const consumerSchema = mongoose.Schema(
     },
     password: { type: String, required: true },
     address: {
+      houseName: { type: String },
       street: { type: String },
       city: { type: String },
-      state: { type: String },
+      state: { type: String, default: "Kerala" },
       country: { type: String, default: "India" },
       postalCode: { type: String },
     },

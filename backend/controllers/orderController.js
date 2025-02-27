@@ -8,7 +8,14 @@ import crypto from "crypto";
 
 const createOrder = asyncHandler(async (req, res) => {
   try {
-    const { farmerId, products, address, paymentMode } = req.body;
+    const {
+      farmerId,
+      products,
+      address,
+      paymentMode,
+      deliveryOption,
+      deliveryCharge,
+    } = req.body;
 
     if (!products) {
       res.status(400);
@@ -40,9 +47,11 @@ const createOrder = asyncHandler(async (req, res) => {
         placedBy: { userType, userId },
         products,
         address,
-        totalAmount: totalAmount + 2,
+        totalAmount: totalAmount + deliveryCharge,
         paymentMode,
         paymentStatus: true,
+        deliveryOption,
+        deliveryCharge,
       });
 
       if (req.userRole === "consumer")
@@ -68,7 +77,7 @@ const createOrder = asyncHandler(async (req, res) => {
       });
 
       const razorpayOrder = await razorpay.orders.create({
-        amount: (totalAmount + 2) * 100,
+        amount: (totalAmount + deliveryCharge) * 100,
         currency: "INR",
         receipt: `receipt_${new Date().getTime()}`,
       });
@@ -79,10 +88,12 @@ const createOrder = asyncHandler(async (req, res) => {
         placedBy: { userType, userId },
         products,
         address,
-        totalAmount: totalAmount + 2,
+        totalAmount: totalAmount + deliveryCharge,
         paymentMode,
         paymentId: razorpayOrder.id,
         cartFarmerId: null,
+        deliveryOption,
+        deliveryCharge,
       });
 
       res.status(200).json({

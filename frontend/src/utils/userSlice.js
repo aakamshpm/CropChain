@@ -33,7 +33,26 @@ export const updateUserProfile = createAsyncThunk(
           withCredentials: true,
         }
       );
-      return response.data.message; // Return the fetched user data
+      return response.data; // Return the fetched user data
+    } catch (error) {
+      return rejectWithValue(error.response.data); // Return error message
+    }
+  }
+);
+
+// Async Thunk: Update User Address
+export const updateUserAddress = createAsyncThunk(
+  "farmer/updateUserAddress",
+  async ({ role, address }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${serverUrl}/${role}/edit-address`,
+        address,
+        {
+          withCredentials: true,
+        }
+      );
+      return response.data; // Return the fetched user address
     } catch (error) {
       return rejectWithValue(error.response.data); // Return error message
     }
@@ -41,7 +60,8 @@ export const updateUserProfile = createAsyncThunk(
 );
 
 const initialState = {
-  userId: null,
+  userData: {},
+  address: {},
   role: null,
   loading: false,
   success: false,
@@ -53,8 +73,9 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setCredentials: (state, action) => {
-      const { userId, role } = action.payload;
-      state.userId = userId;
+      const { role, data, address } = action.payload;
+      state.userData = data;
+      state.address = address;
       state.role = role;
     },
     clearCredentials: (state) => {
@@ -149,11 +170,29 @@ const userSlice = createSlice({
       state.error = null;
     }),
       builder.addCase(updateUserProfile.fulfilled, (state, action) => {
+        console.log(action.payload);
+        state.userData = action.payload.data;
         state.loading = false;
         state.error = null;
         state.success = true;
       }),
       builder.addCase(updateUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Update User Address
+    builder.addCase(updateUserAddress.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    }),
+      builder.addCase(updateUserAddress.fulfilled, (state, action) => {
+        state.address = action.payload.data;
+        state.loading = false;
+        state.error = null;
+        state.success = true;
+      }),
+      builder.addCase(updateUserAddress.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

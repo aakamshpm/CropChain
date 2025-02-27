@@ -6,9 +6,9 @@ import Consumer from "../models/Consumer.js";
 
 const registerConsumer = asyncHandler(async (req, res) => {
   try {
-    const { firstName, lastaName, phoneNumber, password, address } = req.body;
+    const { firstName, lastName, phoneNumber, password, address } = req.body;
 
-    if (!firstName || !lastaName || !phoneNumber || !password) {
+    if (!firstName || !lastName || !phoneNumber || !password) {
       res.status(400);
       throw new Error("Please fill every field");
     }
@@ -23,7 +23,7 @@ const registerConsumer = asyncHandler(async (req, res) => {
 
     const consumer = await Consumer.create({
       firstName,
-      lastaName,
+      lastName,
       phoneNumber,
       password: hashedPassword,
       address,
@@ -77,7 +77,7 @@ const logoutConsumer = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 });
 
-// Update Consumer account details
+// Update Consumer profile details
 const updateConsumerProfile = asyncHandler(async (req, res) => {
   const { firstName, lastName, phoneNumber } = req.body;
   const profilePicture = req.file;
@@ -89,7 +89,7 @@ const updateConsumerProfile = asyncHandler(async (req, res) => {
       fs.unlinkSync(`./uploads/${consumer.profilePicture}`);
     }
 
-    if (profilePicture) consumer.profilePicture = profilePicture.filename;
+    if (profilePicture) consumer.profilePicture = profilePicture?.filename;
 
     consumer.firstName = firstName;
     consumer.lastName = lastName;
@@ -97,7 +97,37 @@ const updateConsumerProfile = asyncHandler(async (req, res) => {
 
     await consumer.save();
 
-    res.status(200).json({ message: "Profile updated successfuly" });
+    res.status(200).json({
+      message: "Profile updated successfuly",
+      data: {
+        firstName,
+        lastName,
+        phoneNumber,
+        profilePicture: consumer.profilePicture,
+      },
+    });
+  } catch (err) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+// update consumer address
+const updateConsumerAddress = asyncHandler(async (req, res) => {
+  const { houseName, city, street, postalCode } = req.body;
+  try {
+    await Consumer.findByIdAndUpdate(req.consumerId, {
+      address: { houseName, city, street, postalCode },
+    });
+    res.status(200).json({
+      message: "Address updated",
+      data: {
+        houseName,
+        city,
+        street,
+        postalCode,
+      },
+    });
   } catch (err) {
     res.status(500);
     throw new Error(err.message);
@@ -137,6 +167,7 @@ export {
   registerConsumer,
   logoutConsumer,
   updateConsumerProfile,
+  updateConsumerAddress,
   getConsumerDetails,
   getAllConsumers,
 };

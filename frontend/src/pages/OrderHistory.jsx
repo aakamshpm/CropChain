@@ -4,26 +4,12 @@ import {
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
 } from "@mui/icons-material";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
-import { useState } from "react";
-import { useSnackbar } from "notistack";
+import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import { useEffect, useState } from "react";
 
 const OrderHistory = () => {
   const { data: orders, isLoading, isError, refetch } = useGetUserOrdersQuery();
   const [sortOrder, setSortOrder] = useState("latest"); // State for sorting
-
-  const { enqueueSnackbar } = useSnackbar();
 
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
@@ -37,6 +23,10 @@ const OrderHistory = () => {
         return sortOrder === "latest" ? dateB - dateA : dateA - dateB;
       })
     : [];
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   if (isLoading) {
     return (

@@ -1,25 +1,22 @@
 import PersonIcon from "@mui/icons-material/Person";
 import { Link } from "react-router-dom";
 
-const ProductWidget = ({ product }) => {
-  const {
-    _id,
-    name,
-    category,
-    pricePerKg,
-    farmer,
-    images,
-    quantityAvailableInKg,
-  } = product;
+const ProductWidget = ({ product, imageUrl }) => {
+  const { _id, name, category, pricePerKg, farmer, quantityAvailableInKg } =
+    product;
 
   return (
     <div className="border-2 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden bg-white flex flex-col">
       {/* Product Image */}
       <Link to={`/product/${_id}`} className="flex-grow">
         <img
-          src={`${import.meta.env.VITE_API_SERVER_URL}/uploads/${images[0]}`}
-          alt="product_image"
+          src={imageUrl}
+          alt={`${name} product image`}
           className="w-full h-72 object-cover"
+          onError={(e) => {
+            e.target.src =
+              "https://placehold.co/600x400?text=No+Image+Available";
+          }}
         />
       </Link>
 

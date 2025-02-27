@@ -24,6 +24,8 @@ const OrderSuccess = () => {
     }
   }, [dispatch, orderId]);
 
+  console.log(order);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -74,10 +76,28 @@ const OrderSuccess = () => {
                 {new Date(order.orderDate).toLocaleDateString()}
               </p>
             </div>
+
+            <div className="flex justify-between">
+              <p className="text-gray-600">Delivery Option:</p>
+              <p className="text-gray-900 font-medium">
+                {order.deliveryOption === "cropChain"
+                  ? "CropChain Delivery"
+                  : "Self-Managed Delivery"}
+              </p>
+            </div>
+
+            <div className="flex justify-between">
+              <p className="text-gray-600">Delivery Charge:</p>
+              <p className="text-gray-900 font-medium">
+                ₹ {order.deliveryCharge}
+              </p>
+            </div>
+
             <div className="flex justify-between">
               <p className="text-gray-600">Total Amount:</p>
               <p className="text-gray-900 font-medium">₹ {order.totalAmount}</p>
             </div>
+
             <div className="flex justify-between">
               <p className="text-gray-600">Payment Mode:</p>
               <p className="text-gray-900 font-medium capitalize">

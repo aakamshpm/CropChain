@@ -80,7 +80,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
 
     const products = await Product.find(query).populate(
       "farmer",
-      "name farmName"
+      "firstName lastName farmName address.city"
     );
 
     res
@@ -99,7 +99,7 @@ const getProductById = asyncHandler(async (req, res) => {
   try {
     const product = await Product.findById(productId).populate(
       "farmer",
-      "name farmName"
+      "firstName lastName farmName address.city"
     );
 
     if (!product) {
@@ -118,7 +118,10 @@ const getProductById = asyncHandler(async (req, res) => {
 const getProductsByFarmer = asyncHandler(async (req, res) => {
   const { farmer } = req.query;
   try {
-    const products = await Product.find({ farmer });
+    const products = await Product.find({ farmer }).populate(
+      "farmer",
+      "firstName lastName farmName address.city"
+    );
     res.status(200).json({ data: products });
   } catch (err) {
     res.status(500);
@@ -210,7 +213,6 @@ const removeProduct = asyncHandler(async (req, res) => {
 // Remove all products-Farmer
 const removeAllProductsFromFarmer = asyncHandler(async (req, res) => {
   try {
-    console.log(req.farmerId);
     const result = await Product.deleteMany({ farmer: req.farmerId });
     if (result.deletedCount === 0) {
       return res
@@ -236,13 +238,15 @@ const searchForProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.find({
       $text: { $search: search },
-    }).populate("farmer", "name farmName");
+    }).populate("farmer", "firstName lastName farmName address.city");
     res.status(200).json(products);
   } catch (err) {
     res.status(500);
     throw new Error("Failed to search products: " + err.message);
   }
 });
+
+// fetch products based on cate
 
 export {
   addProduct,

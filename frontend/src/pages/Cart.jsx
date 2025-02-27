@@ -118,15 +118,9 @@ const Cart = () => {
                   <div className="w-full h-[1px] bg-[#808080] opacity-35" />
 
                   <div className="flex justify-between w-full my-3">
-                    <p className="text-gray-800">Shipping: </p>
-                    <p className="text-gray-800">₹ 2.00</p>
-                  </div>
-                  <div className="w-full h-[1px] bg-[#808080] opacity-35" />
-
-                  <div className="flex justify-between w-full my-3">
                     <p className="text-gray-800">Total: </p>
                     <p className="text-lg font-semibold">
-                      ₹ {getTotalCartAmount() + 2}.00
+                      ₹ {getTotalCartAmount()}.00
                     </p>
                   </div>
                   <Link
