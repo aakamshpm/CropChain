@@ -148,18 +148,20 @@ const Navbar = () => {
       <div className="bg-[#F2F2F2] px-20 py-3 flex justify-between items-center">
         <div className="flex justify-between gap-5">
           <Link to="/">Home</Link>
-          <Link to="/my-orders">Orders</Link>
+          {role && <Link to="/my-orders">Orders</Link>}
           <Link to="/farmers">Farmers</Link>
         </div>
 
-        <div className="flex justify-between gap-4">
-          <Link to="/cart">
-            <ShoppingCartOutlinedIcon />
-          </Link>
-          <button onClick={onLogout}>
-            <LogoutOutlinedIcon />
-          </button>
-        </div>
+        {role && (
+          <div className="flex justify-between gap-4">
+            <Link to="/cart">
+              <ShoppingCartOutlinedIcon />
+            </Link>
+            <button onClick={onLogout}>
+              <LogoutOutlinedIcon />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

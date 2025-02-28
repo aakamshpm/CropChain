@@ -9,6 +9,7 @@ import { useSnackbar } from "notistack";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCartAsync, updateRetailerCart } from "../utils/cartSlice";
 import RetailerCounter from "../components/RetailerCounter";
+import ProductRatings from "../components/ProductRatings";
 
 const ProductView = () => {
   const { id } = useParams();
@@ -91,10 +92,7 @@ const ProductView = () => {
     refetch();
   }, [data, cartItems, role]);
 
-  const averageRating = product?.ratings?.length
-    ? product.ratings.reduce((sum, r) => sum + r.rating, 0) /
-      product.ratings.length
-    : 0;
+  const averageRating = product?.averageRating || 0;
 
   if (!product) {
     return (
@@ -214,29 +212,12 @@ const ProductView = () => {
           </div>
         </div>
 
-        {/* Reviews Section */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Customer Reviews
-          </h2>
-          {product?.ratings?.length > 0 ? (
-            <div className="space-y-4">
-              {product.ratings.map((rating, index) => (
-                <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
-                  <div className="flex items-center space-x-2">
-                    <Rating value={rating.rating} readOnly precision={0.5} />
-                    <p className="text-sm text-gray-600">
-                      by {rating.user?.name || "Anonymous"}
-                    </p>
-                  </div>
-                  <p className="text-gray-700 mt-2">{rating.comment}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-600">No reviews yet.</p>
-          )}
-        </div>
+        <ProductRatings
+          productId={id}
+          ratings={product?.ratings}
+          averageRating={averageRating}
+          refetchProduct={refetch}
+        />
       </div>
     </div>
   );

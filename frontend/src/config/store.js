@@ -4,6 +4,7 @@ import cartReducer from "../utils/cartSlice";
 import orderReducer from "../utils/orderSlice";
 import producReducer from "../utils/productSlice";
 import farmerReducer from "../utils/farmerSlice";
+import { productAverageRatingReducer } from "../utils/productRatingSlice";
 import { userApi } from "../utils/userServices";
 
 const store = configureStore({
@@ -13,6 +14,7 @@ const store = configureStore({
     order: orderReducer,
     product: producReducer,
     farmer: farmerReducer,
+    productAverageRating: productAverageRatingReducer,
     [userApi.reducerPath]: userApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

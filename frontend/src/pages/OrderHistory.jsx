@@ -46,9 +46,9 @@ const OrderHistory = () => {
     );
   }
 
-  if (!orders || orders.length === 0) {
+  if (!orders || orders?.orders.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen">
+      <div className="flex flex-col justify-center items-center h-[30em]">
         <p className="text-gray-600 text-lg">No orders found.</p>
         <Link
           to="/"

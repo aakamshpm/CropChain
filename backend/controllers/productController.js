@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import Product from "../models/Product.js";
 import fs from "fs";
 import decodeToken from "../utils/decodeToken.js";
+import mongoose from "mongoose";
 
 // add products to sell
 const addProduct = asyncHandler(async (req, res) => {
@@ -246,7 +247,99 @@ const searchForProducts = asyncHandler(async (req, res) => {
   }
 });
 
-// fetch products based on cate
+// Controller to rate a product
+const rateProduct = asyncHandler(async (req, res) => {
+  try {
+    const { productId, rating, comment } = req.body;
+    const { userId } = req;
+
+    // Validate required fields
+    if (!productId || !userId || !rating) {
+      res.status(400);
+      throw new Error("Product ID, User ID, and rating are required");
+    }
+
+    // Validate rating value
+    if (rating < 1 || rating > 5) {
+      res.status(400);
+      throw new Error("Rating must be between 1 and 5");
+    }
+
+    // Find the product
+    const product = await Product.findById(productId);
+    if (!product) {
+      res.status(404);
+      throw new Error("Product not found");
+    }
+
+    // Convert userId to ObjectId
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    // Check for existing rating
+    const existingRatingIndex = product.ratings.findIndex((r) =>
+      r.userId.equals(userObjectId)
+    );
+
+    if (existingRatingIndex >= 0) {
+      // Update existing rating
+      product.ratings[existingRatingIndex].rating = rating;
+      if (comment !== undefined) {
+        product.ratings[existingRatingIndex].comment = comment;
+      }
+    } else {
+      // Add new rating
+      product.ratings.push({
+        userId: userObjectId,
+        rating,
+        comment: comment || "",
+      });
+    }
+
+    // Calculate new average rating
+    const totalRatings = product.ratings.length;
+    const sumRatings = product.ratings.reduce(
+      (sum, rating) => sum + rating.rating,
+      0
+    );
+    product.averageRating = sumRatings / totalRatings;
+
+    // Save the updated product
+    await product.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Rating submitted successfully",
+      averageRating: product.averageRating,
+      totalRatings: totalRatings,
+    });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
+// Controller to get average rating
+const getAverageRating = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    // Find the product
+    const product = await Product.findById(productId);
+    if (!product) {
+      res.status(404);
+      throw new Error("Product not found");
+    }
+
+    res.status(200).json({
+      success: true,
+      averageRating: product.averageRating,
+      totalRatings: product.ratings.length,
+    });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+};
 
 export {
   addProduct,
@@ -257,4 +350,6 @@ export {
   removeProduct,
   removeAllProductsFromFarmer,
   searchForProducts,
+  rateProduct,
+  getAverageRating,
 };

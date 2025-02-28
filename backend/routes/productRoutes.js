@@ -4,8 +4,10 @@ import { protect } from "../middlewares/authMiddleware.js";
 import {
   addProduct,
   getAllProducts,
+  getAverageRating,
   getProductById,
   getProductsByFarmer,
+  rateProduct,
   removeAllProductsFromFarmer,
   removeProduct,
   searchForProducts,
@@ -31,5 +33,8 @@ router.delete(
   removeAllProductsFromFarmer
 );
 router.delete("/remove/:productId", protect(["farmer"]), removeProduct);
+
+router.post("/rate-product", protect(["consumer", "retailer"]), rateProduct);
+router.get("/average-rating", getAverageRating);
 
 export default router;
