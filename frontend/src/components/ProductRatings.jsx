@@ -65,7 +65,7 @@ const ProductRatings = ({
       </div>
 
       {/* Rating Form */}
-      {user && !userRating && (
+      {!(Object.keys(user).length === 0) && !userRating && (
         <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
           <h3 className="text-lg font-medium mb-4">Rate this product</h3>
           <div className="flex flex-col space-y-4">

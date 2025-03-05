@@ -1,9 +1,18 @@
 import PersonIcon from "@mui/icons-material/Person";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const ProductWidget = ({ product, imageUrl }) => {
-  const { _id, name, category, pricePerKg, farmer, quantityAvailableInKg } =
-    product;
+  const { role } = useSelector((state) => state.user);
+
+  const {
+    _id,
+    name,
+    retailerPrice,
+    pricePerKg,
+    farmer,
+    quantityAvailableInKg,
+  } = product;
 
   return (
     <div className="border-2 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden bg-white flex flex-col">
@@ -25,7 +34,12 @@ const ProductWidget = ({ product, imageUrl }) => {
         <Link to={`/product/${_id}`} className="hover:text-blue-600">
           <h3 className="text-xl font-semibold truncate">{name}</h3>
         </Link>
-        <p className="text-lg font-medium text-gray-800">₹ {pricePerKg} /kg</p>
+        <p className="text-lg font-medium text-gray-800">
+          ₹{" "}
+          {role === "retailer" && retailerPrice
+            ? retailerPrice + " /100kg"
+            : pricePerKg + " /kg"}
+        </p>
 
         {/* Stock Status */}
         {quantityAvailableInKg < 1 ? (

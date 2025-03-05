@@ -51,4 +51,15 @@ const verifyFarmer = asyncHandler(async (req, res) => {
     throw new Error(err.message);
   }
 });
-export { registerAdmin, loginAdmin, verifyFarmer };
+
+const logoutAdmin = asyncHandler(async (req, res) => {
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    expires: new Date(0),
+  });
+  res.json({ message: "Logout successful" });
+});
+
+export { registerAdmin, loginAdmin, verifyFarmer, logoutAdmin };

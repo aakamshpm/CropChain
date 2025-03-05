@@ -56,6 +56,22 @@ const SideBar = () => {
               <span className="ml-2">Retailers</span>
             </Link>
           </li>
+          <li>
+            <Link
+              to="/orders"
+              className="flex items-center p-2 rounded-lg hover:bg-green-700 transition duration-300"
+            >
+              <span className="ml-2">View All Orders</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/orders-to-deliver"
+              className="flex items-center p-2 rounded-lg hover:bg-green-700 transition duration-300"
+            >
+              <span className="ml-2">View Orders to Deliver</span>
+            </Link>
+          </li>
         </ul>
       </nav>
 

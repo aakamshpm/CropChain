@@ -29,7 +29,7 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("role");
     },
-    resetMessageState: (state) => {
+    resetMessageState: (state, action) => {
       state.success = null;
       state.error = null;
     },

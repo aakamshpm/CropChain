@@ -1,52 +1,32 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useSnackbar } from "notistack";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
-import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import ChecklistRtlOutlinedIcon from "@mui/icons-material/ChecklistRtlOutlined";
-import AssignmentTurnedInOutlinedIcon from "@mui/icons-material/AssignmentTurnedInOutlined";
+import {
+  HomeOutlined,
+  PersonOutlineOutlined,
+  InventoryOutlined,
+  LogoutOutlined,
+  ChecklistRtlOutlined,
+  AssignmentTurnedInOutlined,
+} from "@mui/icons-material";
 import { logoutFarmer } from "../auth/farmerActions";
 import { clearCredentials, setCredentials } from "../auth/authSlice";
 import { useGetFarmerDetailsQuery } from "../auth/authService";
 import { useEffect } from "react";
-import { fetchAllProducts } from "../auth/productActions";
 
-const Sidebar = () => {
+const Sidebar = ({ isMobileSidebarOpen, setMobileSidebarOpen }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
-
   const { data } = useGetFarmerDetailsQuery();
 
   const sidebarOption = [
-    {
-      path: "/",
-      icon: <HomeOutlinedIcon />,
-      name: "Home",
-    },
-    {
-      path: `/profile`,
-      icon: <PersonOutlineOutlinedIcon />,
-      name: "Profile",
-    },
-    {
-      path: `/products`,
-      icon: <InventoryOutlinedIcon />,
-      name: "Products",
-    },
-    {
-      path: `/orders`,
-      icon: <ChecklistRtlOutlinedIcon />,
-      name: "Orders",
-    },
-    {
-      path: `/verify`,
-      icon: <AssignmentTurnedInOutlinedIcon />,
-      name: "Verify",
-    },
+    { path: "/", icon: <HomeOutlined />, name: "Home" },
+    { path: "/profile", icon: <PersonOutlineOutlined />, name: "Profile" },
+    { path: "/products", icon: <InventoryOutlined />, name: "Products" },
+    { path: "/orders", icon: <ChecklistRtlOutlined />, name: "Orders" },
+    { path: "/verify", icon: <AssignmentTurnedInOutlined />, name: "Verify" },
   ];
 
   const handleLogout = () => {
@@ -70,23 +50,32 @@ const Sidebar = () => {
         })
       );
     }
-  }, [data]);
+  }, [data, dispatch]);
 
   return (
     <>
-      <div className="h-screen flex flex-col justify-between items-center bg-primary-color p-4 text-white">
-        <div className="flex flex-col items-center">
+      <div
+        className={`fixed lg:relative h-screen flex flex-col justify-between items-center bg-primary-color p-4 text-white transition-transform duration-300
+          ${
+            isMobileSidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full lg:translate-x-0"
+          }`}
+        style={{ width: "230px", zIndex: 40 }}
+      >
+        <div className="flex flex-col items-center w-full">
           <header className="flex flex-col items-center">
             <h1 className="text-2xl font-bold">Crop Chain</h1>
             <p>-Farmer-</p>
           </header>
 
-          <div className="options flex flex-col mt-10 gap-6">
+          <div className="options flex flex-col mt-10 gap-6 w-full">
             {sidebarOption.map(({ path, icon, name }, i) => (
               <Link
                 key={i}
                 to={path}
-                className="flex justify-start items-center gap-2"
+                className="flex justify-start items-center gap-2 p-2 hover:bg-white/10 rounded-lg"
+                onClick={() => setMobileSidebarOpen(false)}
               >
                 {React.cloneElement(icon, {
                   fontSize: "large",
@@ -97,10 +86,22 @@ const Sidebar = () => {
             ))}
           </div>
         </div>
-        <button onClick={handleLogout}>
-          <LogoutOutlinedIcon /> Logout
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg w-full"
+        >
+          <LogoutOutlined />
+          <span className="text-lg font-medium">Logout</span>
         </button>
       </div>
+
+      {isMobileSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 lg:hidden z-30"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
     </>
   );
 };

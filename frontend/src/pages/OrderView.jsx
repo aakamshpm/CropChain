@@ -180,12 +180,9 @@ const OrderView = () => {
                 <p className="text-gray-600">
                   <strong>Quantity:</strong> {item?.quantity || 0} kg
                 </p>
+
                 <p className="text-gray-600">
-                  <strong>Price:</strong> ₹ {item?.pricePerKg || 0}/kg
-                </p>
-                <p className="text-gray-600">
-                  <strong>Total:</strong> ₹{" "}
-                  {item?.quantity * item?.pricePerKg || 0}
+                  <strong>Total:</strong> ₹ {item.price || 0}
                 </p>
               </div>
             </div>

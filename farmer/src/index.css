@@ -24,26 +24,55 @@
   font-family: "Outfit" sans-serif;
 }
 
-.app {
+/* .app {
   height: 100vh;
-}
+} */
 
 .layout {
   display: flex;
   height: 100vh;
   overflow: hidden;
+  position: relative;
 }
 
 .sidebar {
   width: 230px;
-  position: fixed;
   height: 100vh;
   overflow-y: auto;
+  position: fixed;
+  left: 0;
+  z-index: 40;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-in-out;
 }
 
 .content {
-  margin-left: 250px;
   flex: 1;
   overflow-y: auto;
   height: 100vh;
+  width: 100%;
+  position: relative;
+  z-index: 30;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+  .sidebar {
+    transform: none;
+    position: relative;
+  }
+
+  .content {
+    width: calc(100% - 230px);
+  }
+}
+
+/* Mobile open state */
+.sidebar-open .sidebar {
+  transform: translateX(0);
+}
+
+.sidebar-open .content {
+  margin-left: 230px;
 }

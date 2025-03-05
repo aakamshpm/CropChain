@@ -18,6 +18,8 @@ import FarmerDetails from "./pages/FarmerDetails.jsx";
 import ViewFarmers from "./pages/ViewFarmers.jsx";
 import ViewConsumers from "./pages/ViewConsumers.jsx";
 import ViewRetailers from "./pages/ViewRetailers.jsx";
+import ViewAllOrders from "./pages/ViewAllOrders.jsx";
+import ViewOrdersToDeliver from "./pages/ViewOrdersToDeliver.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -30,6 +32,8 @@ const router = createBrowserRouter(
           <Route path="/view-farmers" element={<ViewFarmers />} />
           <Route path="/consumers" element={<ViewConsumers />} />
           <Route path="/retailers" element={<ViewRetailers />} />
+          <Route path="/orders" element={<ViewAllOrders />} />
+          <Route path="/orders-to-deliver" element={<ViewOrdersToDeliver />} />
         </Route>
 
         <Route element={<PublicRoutes />}>

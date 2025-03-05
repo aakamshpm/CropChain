@@ -84,7 +84,9 @@ const ViewFarmers = () => {
                   key={farmer._id}
                   className="hover:bg-gray-50 transition-colors"
                 >
-                  <TableCell>{farmer.name}</TableCell>
+                  <TableCell>
+                    {farmer.firstName + " " + farmer.lastName}
+                  </TableCell>
                   <TableCell>{farmer.cropsGrown.length || "N/A"}</TableCell>
                   <TableCell>{farmer.phoneNumber || "N/A"}</TableCell>
                   <TableCell>

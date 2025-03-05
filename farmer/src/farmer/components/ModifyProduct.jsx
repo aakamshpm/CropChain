@@ -55,10 +55,7 @@ const ModifyProduct = ({
       .typeError("Please enter a valid number")
       .required("Price is required")
       .positive("Enter a positive number"),
-    retailerPrice: Yup.number()
-      .typeError("Please enter a valid number")
-      .required("Retailer price is required")
-      .positive("Enter a positive number"),
+
     quantityAvailableInKg: Yup.number()
       .typeError("Please enter a valid number")
       .required("Quantity is required")
@@ -83,17 +80,7 @@ const ModifyProduct = ({
     borderRadius: 2,
     maxHeight: "90vh",
     overflowY: "auto",
-  };
-
-  // Backdrop styles
-  const backdropStyle = {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    backdropFilter: "blur(8px)",
-    zIndex: 1,
+    zIndex: 1300, // Ensure modal is on top
   };
 
   // Set preview image if product exists
@@ -129,7 +116,6 @@ const ModifyProduct = ({
       onClose={handleClose}
       aria-labelledby="popup-title"
       aria-describedby="popup-description"
-      style={backdropStyle}
     >
       <Box sx={modalStyle}>
         <Typography id="popup-title" variant="h6" component="h2" mb={3}>
@@ -222,7 +208,6 @@ const ModifyProduct = ({
                     error={
                       touched.retailerPrice && Boolean(errors.retailerPrice)
                     }
-                    helperText={<ErrorMessage name="retailerPrice" />}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">₹</InputAdornment>

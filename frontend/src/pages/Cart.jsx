@@ -10,20 +10,46 @@ import Counter from "../components/Counter";
 const Cart = () => {
   const { data: products, isLoading, isError } = useGetProductsQuery();
   const { cartItems } = useSelector((state) => state.cart);
-
-  const role = isUserAuthenticated();
+  const { role } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
 
   const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const product in cartItems) {
-      const productInfo = products?.data.find((item) => item._id === product);
-      if (productInfo) {
-        totalAmount += cartItems[product] * productInfo.pricePerKg;
+    let total = 0;
+    for (const productId in cartItems) {
+      const product = products?.data.find((item) => item._id === productId);
+      if (product) {
+        // Calculate price based on user role
+        const price =
+          role === "retailer" && product.retailerPrice
+            ? product.retailerPrice
+            : product.pricePerKg;
+
+        total +=
+          role === "retailer" && product.retailerPrice
+            ? (cartItems[productId] * price) / 100
+            : cartItems[productId] * price;
       }
     }
-    return totalAmount;
+    return total;
+  };
+
+  const getItemPrice = (id) => {
+    let itemTotal = 0;
+    const productInfo = products?.data.find((item) => item._id === id);
+    if (productInfo) {
+      const price =
+        role === "retailer" && productInfo.retailerPrice
+          ? productInfo.retailerPrice
+          : productInfo.pricePerKg;
+
+      itemTotal =
+        role === "retailer" && productInfo.retailerPrice
+          ? (cartItems[productInfo._id] * price) / 100
+          : cartItems[productInfo._id] * price;
+    }
+
+    return itemTotal;
   };
 
   return (
@@ -70,7 +96,12 @@ const Cart = () => {
                             />
                             <p className="text-lg">{product.name}</p>
                           </div>
-                          <p className="text-lg">₹ {product.pricePerKg}</p>
+                          <p className="text-lg">
+                            ₹{" "}
+                            {role === "retailer" && product.retailerPrice
+                              ? product.retailerPrice
+                              : product.pricePerKg}
+                          </p>
 
                           {/* Cart Counter  */}
                           {role === "retailer" ? (
@@ -87,7 +118,7 @@ const Cart = () => {
                           )}
 
                           <p className="text-lg font-semibold">
-                            ₹ {product.pricePerKg * cartItems[product._id]}
+                            ₹ {getItemPrice(product._id)}
                           </p>
                           <button
                             onClick={() =>

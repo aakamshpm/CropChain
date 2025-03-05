@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import { loginFarmer } from "../auth/farmerActions";
@@ -7,12 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import "react-phone-number-input/style.css";
-import { resetMessageState } from "../auth/authSlice";
 import { FiSmartphone, FiLock } from "react-icons/fi";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { error, success } = useSelector((state) => state.auth);
 
   const validationSchema = Yup.object().shape({
     phoneNumber: Yup.string()
@@ -31,24 +29,16 @@ const Login = () => {
     setIsLoading(true);
     try {
       await dispatch(loginFarmer(values)).unwrap();
+      enqueueSnackbar("Login success", { variant: "success" });
+      navigate("/");
+    } catch (error) {
+      enqueueSnackbar(error, { variant: "error" });
+      console.log(error);
     } finally {
       setSubmitting(false);
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (success) {
-      enqueueSnackbar("Login success", { variant: "success" });
-      dispatch(resetMessageState());
-      navigate("/");
-    }
-
-    if (error) {
-      enqueueSnackbar(error, { variant: "error" });
-      dispatch(resetMessageState());
-    }
-  }, [success, error, dispatch]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50 flex items-center justify-center p-4">

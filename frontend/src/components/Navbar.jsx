@@ -16,14 +16,11 @@ import {
 } from "../utils/userSlice";
 import { consumerLogout } from "../utils/actions/consumerActions";
 import { retailerLogout } from "../utils/actions/retailerActions";
-import { getUserIdFromToken } from "../utils/utils";
 
 const Navbar = () => {
   const role = isUserAuthenticated();
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [searchTerm, setSearchTerm] = useState("");
 
   const onLogout = async () => {
@@ -51,7 +48,6 @@ const Navbar = () => {
     const fetchData = async () => {
       if (role) {
         dispatch(getCartDataAsync());
-
         try {
           const response = await dispatch(fetchUserProfile({ role })).unwrap();
           if (response) {
@@ -88,19 +84,26 @@ const Navbar = () => {
   }, [dispatch, role]);
 
   return (
-    <div className="flex flex-col ">
-      <div className="flex justify-between px-20 py-5 items-center">
-        <Link to="/" className="logo flex items-center justify-between">
-          <img src="/plant.png" alt="logo" />
-          <h1 className=" text-2xl font-semibold ml-1">CropChain</h1>
+    <div className="flex flex-col">
+      {/* Top Section */}
+      <div className="flex flex-col sm:flex-row justify-between px-4 sm:px-8 md:px-12 lg:px-20 py-3 sm:py-5 items-center gap-4 sm:gap-0">
+        {/* Logo */}
+        <Link to="/" className="logo flex items-center">
+          <img
+            src="/plant.png"
+            alt="logo"
+            className="w-8 h-8 sm:w-10 sm:h-10"
+          />
+          <h1 className="text-xl sm:text-2xl font-semibold ml-1">CropChain</h1>
         </Link>
 
-        <div className="flex">
-          <div className="border-y-[1px] border-s border-gray-500 rounded-s-lg px-4 py-1 flex items-center w-[25em]">
-            <SearchOutlinedIcon />
+        {/* Search Bar */}
+        <div className="flex w-full sm:w-auto">
+          <div className="border-y-[1px] border-s border-gray-500 rounded-s-lg px-2 sm:px-4 py-1 flex items-center w-full sm:w-[20em]">
+            <SearchOutlinedIcon className="!w-5 !h-5 sm:!w-6 sm:!h-6" />
             <TextField
               variant="standard"
-              placeholder="Search for products"
+              placeholder="Search products"
               fullWidth
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -112,53 +115,63 @@ const Navbar = () => {
               slotProps={{
                 input: {
                   disableUnderline: true,
-                  style: { fontFamily: "Poppins", marginLeft: "4px" },
+                  style: {
+                    fontFamily: "Poppins",
+                    marginLeft: "4px",
+                    fontSize: "0.875rem", // sm:text-base
+                  },
                 },
               }}
+              size="small"
             />
           </div>
           <button
             onClick={searchProducts}
-            className="bg-[#00B207] rounded-e-lg text-white px-4 py-1"
+            className="bg-[#00B207] rounded-e-lg text-white px-3 sm:px-4 py-1 text-sm sm:text-base"
           >
             Submit
           </button>
         </div>
 
+        {/* Profile/Auth */}
         <div className="flex items-center">
           {role ? (
-            <Link to="/profile" className="flex">
-              <Person2OutlinedIcon sx={{ fontSize: 30 }} />
-              <p className="text-lg ">
-                Profile <span>({role.toUpperCase()})</span>
+            <Link to="/profile" className="flex items-center gap-1 sm:gap-2">
+              <Person2OutlinedIcon className="!w-6 !h-6 sm:!w-7 sm:!h-7" />
+              <p className="text-sm sm:text-base">
+                Profile{" "}
+                <span className="text-xs sm:text-sm">
+                  ({role.toUpperCase()})
+                </span>
               </p>
             </Link>
           ) : (
-            <div>
-              <p className="flex">
-                <Link to="/login">Sign In</Link>
-                <span className="ml-1 mr-1">/</span>
-                <Link to="/register"> Sign Up</Link>
-              </p>
+            <div className="flex gap-1 sm:gap-2 text-sm sm:text-base">
+              <Link to="/login">Sign In</Link>
+              <span>/</span>
+              <Link to="/register">Sign Up</Link>
             </div>
           )}
         </div>
       </div>
 
-      <div className="bg-[#F2F2F2] px-20 py-3 flex justify-between items-center">
-        <div className="flex justify-between gap-5">
+      {/* Bottom Section */}
+      <div className="bg-[#F2F2F2] px-4 sm:px-8 md:px-12 lg:px-20 py-2 sm:py-3 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-0">
+        {/* Navigation Links */}
+        <div className="flex gap-3 sm:gap-5 text-sm sm:text-base">
           <Link to="/">Home</Link>
           {role && <Link to="/my-orders">Orders</Link>}
           <Link to="/farmers">Farmers</Link>
         </div>
 
+        {/* Cart & Logout */}
         {role && (
-          <div className="flex justify-between gap-4">
+          <div className="flex gap-3 sm:gap-4">
             <Link to="/cart">
-              <ShoppingCartOutlinedIcon />
+              <ShoppingCartOutlinedIcon className="!w-5 !h-5 sm:!w-6 sm:!h-6" />
             </Link>
             <button onClick={onLogout}>
-              <LogoutOutlinedIcon />
+              <LogoutOutlinedIcon className="!w-5 !h-5 sm:!w-6 sm:!h-6" />
             </button>
           </div>
         )}

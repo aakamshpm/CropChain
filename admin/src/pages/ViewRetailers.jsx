@@ -83,7 +83,9 @@ const ViewRetailers = () => {
                   key={retailer._id}
                   className="hover:bg-gray-50 transition-colors"
                 >
-                  <TableCell>{retailer.name}</TableCell>
+                  <TableCell>
+                    {retailer.firstName + " " + retailer.lastName}
+                  </TableCell>
                   <TableCell>{retailer.phoneNumber}</TableCell>
                   <TableCell>
                     {retailer.shopAddress.shopName || "N/A"}

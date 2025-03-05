@@ -142,12 +142,12 @@ const OrderHistory = () => {
                             {item.product.name}
                           </p>
                           <p className="text-gray-600 text-sm">
-                            {item.quantity} kg x ₹ {item.pricePerKg}
+                            {item.quantity} kg
                           </p>
                         </div>
                       </div>
                       <p className="text-gray-900 font-medium">
-                        ₹ {item.quantity * item.pricePerKg}
+                        ₹ {item.price}
                       </p>
                     </div>
                   ))}

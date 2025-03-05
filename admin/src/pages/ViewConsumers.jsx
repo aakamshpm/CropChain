@@ -82,7 +82,9 @@ const ViewConsumers = () => {
                   key={consumer._id}
                   className="hover:bg-gray-50 transition-colors"
                 >
-                  <TableCell>{consumer.name}</TableCell>
+                  <TableCell>
+                    {consumer.firstName + " " + consumer.lastName}
+                  </TableCell>
                   <TableCell>{consumer.phoneNumber}</TableCell>
                   <TableCell>
                     {[consumer.address?.city, consumer.address?.state]

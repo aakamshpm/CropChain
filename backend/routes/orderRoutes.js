@@ -4,6 +4,8 @@ import {
   cancelOrder,
   createOrder,
   fetchAnOrder,
+  getAllOrders,
+  getCropChainOrders,
   getFarmerOrders,
   getUserOrders,
   updateOrderStatus,
@@ -22,12 +24,15 @@ router.post(
   protect(["consumer", "retailer"]),
   verifyPayment
 );
-router.post("/update-status", protect(["farmer"]), updateOrderStatus);
+router.post("/update-status", protect(["farmer", "admin"]), updateOrderStatus);
 
 router.put(
   "/cancel/:orderId",
   protect(["consumer", "retailer", "farmer"]),
   cancelOrder
 );
+
+router.get("/all", protect(["admin"]), getAllOrders);
+router.get("/cropchain-orders", protect(["admin"]), getCropChainOrders);
 
 export default router;

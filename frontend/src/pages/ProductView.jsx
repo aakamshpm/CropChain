@@ -20,10 +20,10 @@ const ProductView = () => {
   const [retailerCartQuantity, setRetailerCartQuantity] = useState(100);
 
   const { enqueueSnackbar } = useSnackbar();
-  const role = isUserAuthenticated();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { cartItems } = useSelector((state) => state.cart);
+  const { role } = useSelector((state) => state.user);
 
   const handleCart = async () => {
     if (!role) {
@@ -33,7 +33,10 @@ const ProductView = () => {
       return;
     }
 
-    if (role === "retailer " && quantityAvailable < retailerCartQuantity) {
+    if (
+      role === "retailer" &&
+      parseFloat(retailerCartQuantity) > quantityAvailable
+    ) {
       enqueueSnackbar("Quantity exceeds stock available", { variant: "error" });
       return;
     }
@@ -74,7 +77,8 @@ const ProductView = () => {
         );
       }
     } catch (error) {
-      const errorMessage = error.message || "Failed to update cart";
+      const errorMessage =
+        error.error || error.message || "Failed to update cart";
       enqueueSnackbar(errorMessage, { variant: "error" });
     }
   };
@@ -134,7 +138,10 @@ const ProductView = () => {
 
             {/* Price */}
             <p className="text-3xl font-semibold text-green-600">
-              ₹{product?.pricePerKg} / kg
+              ₹{" "}
+              {role === "retailer" && product.retailerPrice
+                ? product.retailerPrice + " /100kg"
+                : product.pricePerKg + " /kg"}
             </p>
 
             {/* Description */}

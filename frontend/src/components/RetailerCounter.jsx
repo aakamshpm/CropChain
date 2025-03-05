@@ -3,7 +3,7 @@ import { TextField } from "@mui/material";
 const RetailerCounter = ({ cartQuantity, setCartQuantity }) => {
   const onChangeHandler = (e) => {
     const { value } = e.target;
-    setCartQuantity(value);
+    setCartQuantity(parseFloat(value));
   };
   return (
     <div className="flex items-center">

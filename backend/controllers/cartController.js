@@ -172,6 +172,15 @@ const updateRetailerCart = asyncHandler(async (req, res) => {
     if (!retailerData) {
       return res.status(404).json({ message: "Retailer not found" });
     }
+
+    // Check if quantity exceeds stock
+    const product = await Product.findById(productId);
+
+    if (quantity > product.quantityAvailableInKg) {
+      res.status(400);
+      throw new Error("Quantity exceeds stock!");
+    }
+
     if (
       retailerData.cartFarmerId &&
       cartFarmerId !== String(retailerData.cartFarmerId)

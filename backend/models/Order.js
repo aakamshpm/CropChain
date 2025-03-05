@@ -31,12 +31,16 @@ const orderSchema = mongoose.Schema(
           required: true,
         },
         quantity: { type: Number, required: true },
-        pricePerKg: { type: Number, required: true }, // Price at the time of order
+        price: { type: Number, required: true }, // Price at the time of order
       },
     ],
 
     totalAmount: { type: String, required: true },
-    deliveryOption: { type: String, required: true },
+    deliveryOption: {
+      type: String,
+      enum: ["cropChain", "selfManaged"],
+      required: true,
+    },
     deliveryCharge: { type: Number, required: true },
 
     status: {

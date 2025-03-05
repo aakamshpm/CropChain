@@ -21,25 +21,19 @@ import { placeOrderAsync } from "../utils/orderSlice";
 import { clearCartData } from "../utils/cartSlice";
 
 const Checkout = () => {
-  const { cartItems, cartFarmerId } = useSelector((state) => state.cart);
-  const { userData, address } = useSelector((state) => state.user);
-  const [deliveryOption, setDeliveryOption] = useState("selfManaged");
-  const { enqueueSnackbar } = useSnackbar();
-  const [paymentMode, setPaymentMode] = useState("cod");
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { data: products, isLoading, isError } = useGetProductsQuery();
 
-  const getTotalCartAmount = () => {
-    let totalAmount = 0;
-    for (const product in cartItems) {
-      const productInfo = products?.data.find((item) => item._id === product);
-      if (productInfo) {
-        totalAmount += cartItems[product] * productInfo.pricePerKg;
-      }
-    }
-    return totalAmount;
-  };
+  const { cartItems, cartFarmerId } = useSelector((state) => state.cart);
+  const { userData, address } = useSelector((state) => state.user);
+  const { role } = useSelector((state) => state.user);
+
+  const [deliveryOption, setDeliveryOption] = useState("selfManaged");
+
+  const { enqueueSnackbar } = useSnackbar();
+  const [paymentMode, setPaymentMode] = useState("cod");
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const validationSchema = Yup.object({
     firstName: Yup.string().required("First name is required"),
@@ -61,15 +55,51 @@ const Checkout = () => {
     }
   }, []);
 
+  const getTotalCartAmount = () => {
+    let total = 0;
+    for (const productId in cartItems) {
+      const product = products?.data.find((item) => item._id === productId);
+      if (product) {
+        // Calculate price based on user role
+        const price =
+          role === "retailer" && product.retailerPrice
+            ? product.retailerPrice
+            : product.pricePerKg;
+
+        total +=
+          role === "retailer" && product.retailerPrice
+            ? (cartItems[productId] * price) / 100
+            : cartItems[productId] * price;
+      }
+    }
+    return total;
+  };
+
+  // Calculate delivery charge
+  const deliveryCharge = deliveryOption === "cropChain" ? 40 : 0;
+
   const placeOrder = async (formAddress) => {
     let orderedProducts = [];
+    let calculatedTotal = 0;
 
     products?.data.forEach((product) => {
       if (cartItems[product._id] > 0) {
+        // Determine the correct price to use
+        const price =
+          role === "retailer" && product.retailerPrice
+            ? product.retailerPrice
+            : product.pricePerKg;
+
+        const itemTotal =
+          role === "retailer" && product.retailerPrice
+            ? (cartItems[product._id] * price) / 100
+            : cartItems[product._id] * price;
+        calculatedTotal += itemTotal;
+
         orderedProducts.push({
           product: product._id,
           quantity: cartItems[product._id],
-          pricePerKg: product.pricePerKg,
+          price: itemTotal,
         });
       }
     });
@@ -80,13 +110,12 @@ const Checkout = () => {
       paymentMode,
       address: formAddress,
       deliveryOption,
-      deliveryCharge: deliveryOption === "cropchain0" ? 0 : 40,
+      deliveryCharge,
+      totalAmount: calculatedTotal,
     };
 
     try {
       const orderResponse = await dispatch(placeOrderAsync(orderData)).unwrap();
-
-      console.log(orderResponse);
 
       if (!orderResponse) {
         throw new Error("Order response is undefined or invalid");
@@ -289,6 +318,15 @@ const Checkout = () => {
               <div className="flex flex-col gap-2 mt-2">
                 {products?.data.map((product, i) => {
                   if (cartItems[product._id] > 0) {
+                    const price =
+                      role === "retailer" && product.retailerPrice
+                        ? product.retailerPrice
+                        : product.pricePerKg;
+
+                    const itemTotal =
+                      role === "retailer" && product.retailerPrice
+                        ? (cartItems[product._id] * price) / 100
+                        : cartItems[product._id] * price;
                     return (
                       <div
                         key={i}
@@ -308,9 +346,7 @@ const Checkout = () => {
                             x{cartItems[product._id]}
                           </p>
                         </div>
-                        <p className="text-base font-medium">
-                          ₹ {product.pricePerKg * cartItems[product._id]}
-                        </p>
+                        <p className="text-base font-medium">₹ {itemTotal}</p>
                       </div>
                     );
                   }

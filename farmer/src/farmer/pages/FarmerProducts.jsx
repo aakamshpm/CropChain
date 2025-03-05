@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useGetProductsByFarmerQuery } from "../auth/authService";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
+  Box,
+  Typography,
   Button,
   Dialog,
   DialogActions,
@@ -26,7 +27,7 @@ const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  const { id } = useSelector((state) => state.auth.data);
+  const { id } = useSelector((state) => state.auth?.data);
 
   const { products, loading, error } = useSelector((state) => state.product);
 
@@ -101,22 +102,23 @@ const Products = () => {
         </div>
       </div>
 
-      {/* Modify Product Dialog */}
-      <ModifyProduct
-        open={openModifyDialog}
-        handleClose={handleModifyDialogClose}
-        product={selectedProduct}
-        modify={!!selectedProduct} // Set modify mode if a product is selected
-        preview={preview}
-        setPreview={setPreview}
-        farmerId={id}
-      />
-
       {products.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-[600px] p-6">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "calc(100vh - 200px)",
+            marginTop: "2em",
+            textAlign: "center",
+          }}
+        >
           <MdOutlineInventory2 className="text-6xl text-gray-500 mb-4" />
-          <p className="text-lg text-gray-700">No Products Found</p>
-        </div>
+          <Typography variant="h6" color="textSecondary">
+            No Products Found
+          </Typography>
+        </Box>
       ) : (
         <FarmerTable
           data={products || []}
@@ -124,6 +126,17 @@ const Products = () => {
           farmerId={id}
         />
       )}
+
+      {/* Modify Product Dialog */}
+      <ModifyProduct
+        open={openModifyDialog}
+        handleClose={handleModifyDialogClose}
+        product={selectedProduct}
+        modify={!!selectedProduct}
+        preview={preview}
+        setPreview={setPreview}
+        farmerId={id}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog

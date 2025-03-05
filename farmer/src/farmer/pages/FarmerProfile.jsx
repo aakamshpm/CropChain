@@ -4,7 +4,6 @@ import PhoneInput from "react-phone-number-input";
 import { useDispatch, useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 import { updateFarmerData, uploadProfilePhoto } from "../auth/farmerActions";
-import { resetMessageState } from "../auth/authSlice";
 import {
   Box,
   Chip,
@@ -53,9 +52,7 @@ const Profile = () => {
   ];
 
   const formDataRef = useRef(new FormData());
-  const { data: response, isLoading, refetch } = useGetFarmerDetailsQuery();
-
-  const { error, success, data } = useSelector((state) => state.auth);
+  const { data: response, refetch } = useGetFarmerDetailsQuery();
 
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
@@ -171,7 +168,7 @@ const Profile = () => {
     }
   };
 
-  const handleUpdateProfile = () => {
+  const handleUpdateProfile = async () => {
     const updateData = {
       firstName: farmerData.firstName,
       lastName: farmerData.lastName,
@@ -190,21 +187,15 @@ const Profile = () => {
       cropsGrown: farmerData.cropsGrown,
     };
 
-    dispatch(updateFarmerData(updateData));
-  };
-
-  useEffect(() => {
-    if (success) {
-      enqueueSnackbar(data?.message || "Success", { variant: "success" });
-      dispatch(resetMessageState()); // Reset success and error state to null
-    }
-    if (error) {
-      enqueueSnackbar(error, {
+    try {
+      const response = await dispatch(updateFarmerData(updateData)).unwrap();
+      enqueueSnackbar(response.message || "Success", { variant: "success" });
+    } catch (err) {
+      enqueueSnackbar(err, {
         variant: "error",
       });
-      dispatch(resetMessageState());
     }
-  }, [success, error, dispatch]);
+  };
 
   if (!response) {
     return <p>Loading ...</p>;
@@ -217,15 +208,15 @@ const Profile = () => {
       </h1>
 
       <Grid container spacing={4}>
-        <Grid item xs={12} md={8}>
+        <Grid xs={12} md={8}>
           <Paper elevation={3} className="p-6 rounded-lg">
             {/* Personal Details Section */}
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <PersonIcon Box /> Personal Information
+                <PersonIcon /> Personal Information
               </h2>
               <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     fullWidth
                     label="First Name"
@@ -244,7 +235,7 @@ const Profile = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     fullWidth
                     label="Last Name"
@@ -263,7 +254,7 @@ const Profile = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <div className="phone-input">
                     <TextField
                       fullWidth
@@ -293,7 +284,7 @@ const Profile = () => {
                   </div>
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid xs={12}>
                   <TextField
                     fullWidth
                     label="Aadhaar Number"
@@ -318,7 +309,7 @@ const Profile = () => {
                 <HomeIcon /> Address Details
               </h2>
               <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     fullWidth
                     label="Building Name"
@@ -335,7 +326,7 @@ const Profile = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     fullWidth
                     label="Street"
@@ -352,7 +343,7 @@ const Profile = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     select
                     fullWidth
@@ -376,7 +367,7 @@ const Profile = () => {
                   </TextField>
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     fullWidth
                     label="Postal Code"
@@ -401,7 +392,7 @@ const Profile = () => {
                 <FarmIcon /> Farm Information
               </h2>
               <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     fullWidth
                     label="Farm Name"
@@ -418,7 +409,7 @@ const Profile = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     fullWidth
                     label="Farm Size (Acres)"
@@ -435,7 +426,7 @@ const Profile = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     fullWidth
                     label="Latitude"
@@ -452,7 +443,7 @@ const Profile = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <TextField
                     fullWidth
                     label="Longitude"
@@ -469,7 +460,7 @@ const Profile = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid xs={12}>
                   <Box className="flex flex-col">
                     <Chip
                       icon={<CropIcon />}
@@ -503,7 +494,7 @@ const Profile = () => {
         </Grid>
 
         {/* Profile Picture Section */}
-        <Grid item xs={12} md={4}>
+        <Grid xs={12} md={4}>
           <Paper elevation={3} className="p-6 rounded-lg text-center">
             <div className="relative inline-block">
               {preview && (
