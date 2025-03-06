@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Retailer from "../models/Retailer.js";
 import bcrypt from "bcryptjs";
+import fs from "fs";
 import generateToken from "../utils/generateToken.js";
 
 const registerRetailer = asyncHandler(async (req, res) => {

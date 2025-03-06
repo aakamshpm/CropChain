@@ -39,7 +39,7 @@ const Register = () => {
   useEffect(() => {
     if (success) {
       enqueueSnackbar("Registration successful!", { variant: "success" });
-      navigate("/login");
+      navigate("/");
     }
     if (error) {
       enqueueSnackbar(error, { variant: "error" });

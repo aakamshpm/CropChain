@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
-import { removeProduct } from "../auth/productActions";
+import { fetchAllProducts, removeProduct } from "../auth/productActions";
 import { useSnackbar } from "notistack";
 
 const FarmerTable = ({ data, onEdit, farmerId }) => {

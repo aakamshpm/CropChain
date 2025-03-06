@@ -4,6 +4,7 @@ import {
 } from "../utils/userServices";
 import ProductWidget from "../components/ProductWidget";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import { Box, CardMedia } from "@mui/material";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -223,6 +224,9 @@ const UserHome = () => {
               )}
               <h3 className="text-base sm:text-lg font-semibold mt-2">
                 {farmer.firstName} {farmer.lastName}
+                {farmer.verificationStatus === "approved" && (
+                  <VerifiedIcon className="text-green-500 ml-2" />
+                )}
               </h3>
               <p className="text-gray-600 text-xs sm:text-sm">
                 {farmer.address?.city}, {farmer.address?.state}

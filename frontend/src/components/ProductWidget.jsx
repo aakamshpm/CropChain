@@ -1,4 +1,5 @@
 import PersonIcon from "@mui/icons-material/Person";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -59,6 +60,9 @@ const ProductWidget = ({ product, imageUrl }) => {
         <PersonIcon className="text-gray-600" />
         <p className="text-sm text-gray-700 truncate">
           {farmer.firstName + " " + farmer.lastName}
+          {farmer.verificationStatus === "approved" && (
+            <VerifiedIcon className="text-green-500 ml-2" />
+          )}
         </p>
       </Link>
     </div>

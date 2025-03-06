@@ -9,7 +9,9 @@ import {
   LogoutOutlined,
   ChecklistRtlOutlined,
   AssignmentTurnedInOutlined,
+  MenuBookOutlined,
 } from "@mui/icons-material";
+
 import { logoutFarmer } from "../auth/farmerActions";
 import { clearCredentials, setCredentials } from "../auth/authSlice";
 import { useGetFarmerDetailsQuery } from "../auth/authService";
@@ -27,6 +29,11 @@ const Sidebar = ({ isMobileSidebarOpen, setMobileSidebarOpen }) => {
     { path: "/products", icon: <InventoryOutlined />, name: "Products" },
     { path: "/orders", icon: <ChecklistRtlOutlined />, name: "Orders" },
     { path: "/verify", icon: <AssignmentTurnedInOutlined />, name: "Verify" },
+    {
+      path: "/farmer-guide",
+      icon: <MenuBookOutlined />,
+      name: "Guidance",
+    },
   ];
 
   const handleLogout = () => {

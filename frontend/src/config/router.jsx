@@ -19,6 +19,7 @@ import SearchProducts from "../pages/SearchProducts";
 import FarmerDetails from "../pages/FarmerDetails";
 import OrderView from "../pages/OrderView";
 import Profile from "../pages/Profile";
+import About from "../pages/About";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,6 +36,7 @@ export const router = createBrowserRouter(
       <Route path="/my-orders" element={<OrderHistory />} />
       <Route path="/my-orders/:id" element={<OrderView />} />
       <Route path="/search" element={<SearchProducts />} />
+      <Route path="/about" element={<About />} />
 
       {/* Login and Register restricted to unauthenticated users */}
       <Route element={<PublicRoute />}>

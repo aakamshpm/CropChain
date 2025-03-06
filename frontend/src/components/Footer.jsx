@@ -27,19 +27,19 @@ const Footer = () => {
               <div className="w-8 my-3 bg-[#00B207] h-[2px]" />
               <div className="flex flex-col items-start gap-2">
                 <Link
-                  to="#"
+                  to="/profile"
                   className="text-[#808080] text-sm hover:text-white"
                 >
                   My Account
                 </Link>
                 <Link
-                  to="#"
+                  to="/my-orders"
                   className="text-[#808080] text-sm hover:text-white"
                 >
                   Order History
                 </Link>
                 <Link
-                  to="#"
+                  to="/cart"
                   className="text-[#808080] text-sm hover:text-white"
                 >
                   Shopping Cart
@@ -59,7 +59,7 @@ const Footer = () => {
               <div className="w-8 my-3 bg-[#00B207] h-[2px]" />
               <div className="flex flex-col items-start gap-2">
                 <Link
-                  to="#"
+                  to="/about"
                   className="text-[#808080] text-sm hover:text-white"
                 >
                   About
@@ -77,7 +77,7 @@ const Footer = () => {
                   Product
                 </Link>
                 <Link
-                  to="#"
+                  to="/my-orders"
                   className="text-[#808080] text-sm hover:text-white"
                 >
                   Track Order
@@ -91,7 +91,7 @@ const Footer = () => {
               <div className="w-8 my-3 bg-[#00B207] h-[2px]" />
               <div className="flex flex-col items-start gap-2">
                 <Link
-                  to="#"
+                  to="/about"
                   className="text-[#808080] text-sm hover:text-white"
                 >
                   Contact

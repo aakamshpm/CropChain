@@ -13,6 +13,7 @@ import Profile from "../farmer/pages/FarmerProfile";
 import Products from "../farmer/pages/FarmerProducts";
 import Orders from "../farmer/pages/Orders";
 import Verify from "../farmer/pages/Verify";
+import FarmerDashboardGuide from "../farmer/pages/FarmerDashboardGuide";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -32,6 +33,7 @@ export const router = createBrowserRouter(
           <Route path="products" element={<Products />} />
           <Route path="orders" element={<Orders />} />
           <Route path="verify" element={<Verify />} />
+          <Route path="farmer-guide" element={<FarmerDashboardGuide />} />
         </Route>
       </Route>
     </Route>

@@ -368,6 +368,41 @@ const getAverageRating = async (req, res) => {
   }
 };
 
+const reapplyForVerification = asyncHandler(async (req, res) => {
+  const { farmerId } = req;
+  try {
+    // Find the farmer by ID and update the necessary fields
+    const updatedFarmer = await Farmer.findByIdAndUpdate(
+      farmerId,
+      {
+        $set: {
+          appliedForReview: false,
+          extractedOCR: null,
+          confidenceScore: null,
+          statusMatch: null,
+          verifiedAt: null,
+          verificationStatus: "pending",
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedFarmer) {
+      res.status(404);
+      throw new Error("Farmer not Found");
+    }
+
+    res.status(200).json({
+      message: "Reapplied for verification successfully",
+      farmer: updatedFarmer,
+    });
+  } catch (error) {
+    console.error("Error reapplying for verification:", error);
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
 export {
   farmerLogin,
   farmerRegister,
@@ -381,4 +416,5 @@ export {
   fetchAppliedFarmers,
   addOrUpdateRating,
   getAverageRating,
+  reapplyForVerification,
 };

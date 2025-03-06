@@ -81,7 +81,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
 
     const products = await Product.find(query).populate(
       "farmer",
-      "firstName lastName farmName address.city"
+      "firstName lastName farmName verificationStatus address.city"
     );
 
     res
@@ -100,7 +100,7 @@ const getProductById = asyncHandler(async (req, res) => {
   try {
     const product = await Product.findById(productId).populate(
       "farmer",
-      "firstName lastName farmName address.city"
+      "firstName lastName farmName verificationStatus address.city"
     );
 
     if (!product) {
@@ -121,7 +121,7 @@ const getProductsByFarmer = asyncHandler(async (req, res) => {
   try {
     const products = await Product.find({ farmer }).populate(
       "farmer",
-      "firstName lastName farmName address.city"
+      "firstName lastName farmName verificationStatus address.city"
     );
     res.status(200).json({ data: products });
   } catch (err) {
@@ -239,7 +239,10 @@ const searchForProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.find({
       $text: { $search: search },
-    }).populate("farmer", "firstName lastName farmName address.city");
+    }).populate(
+      "farmer",
+      "firstName lastName farmName verificationStatus address.city"
+    );
     res.status(200).json(products);
   } catch (err) {
     res.status(500);

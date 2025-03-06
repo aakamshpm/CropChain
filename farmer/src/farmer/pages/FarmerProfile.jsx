@@ -534,7 +534,16 @@ const Profile = () => {
               color="primary"
               fullWidth
               startIcon={<ImageIcon />}
-              onClick={() => dispatch(uploadProfilePhoto(formDataRef.current))}
+              onClick={async () => {
+                try {
+                  const response = await dispatch(
+                    uploadProfilePhoto(formDataRef.current)
+                  ).unwrap();
+                  enqueueSnackbar(response.message, { variant: "success" });
+                } catch (error) {
+                  enqueueSnackbar("Error", { variant: "error" });
+                }
+              }}
               sx={{ mt: 2 }}
             >
               Upload Profile Picture

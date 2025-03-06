@@ -37,7 +37,6 @@ const ViewOrdersToDeliver = () => {
       } catch (error) {
         const errorMessage =
           error.response?.data?.message || "Failed to fetch orders";
-        enqueueSnackbar(errorMessage, { variant: "error" });
       } finally {
         setLoading(false);
       }
@@ -212,6 +211,10 @@ const ViewOrdersToDeliver = () => {
                           <h3 className="text-lg font-semibold mb-3">
                             Order Details
                           </h3>
+                          <p className="text-base font-bold mb-2">
+                            <span className="font-bold">Contact:</span>{" "}
+                            {order.address?.phoneNumber || "Not provided"}
+                          </p>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <p className="font-medium">Products:</p>
@@ -228,10 +231,22 @@ const ViewOrdersToDeliver = () => {
                             <div>
                               <p className="font-medium">Delivery Address:</p>
                               <p className="text-gray-600">
-                                {order.address?.street}, {order.address?.city}
+                                {order.address?.firstName}{" "}
+                                {order.address?.lastName}
                                 <br />
-                                {order.address?.state} -{" "}
-                                {order.address?.pincode}
+                                {order.address?.street}
+                                <br />
+                                {order.address?.city}, {"Kerala"} -{" "}
+                                {order.address?.postalCode}
+                              </p>
+
+                              <p className="mt-2 text-sm">
+                                <span className="font-medium">
+                                  Delivery Option:
+                                </span>{" "}
+                                {order.deliveryOption === "cropChain"
+                                  ? "CropChain Managed"
+                                  : "Self Managed"}
                               </p>
 
                               <p className="font-medium mt-3">Payment:</p>

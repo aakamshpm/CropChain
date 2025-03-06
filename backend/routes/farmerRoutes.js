@@ -14,6 +14,7 @@ import {
   uploadDocumentsForVerification,
   farmerRegister,
   updateFarmerProfile,
+  reapplyForVerification,
 } from "../controllers/farmerController.js";
 
 const router = express.Router();
@@ -53,6 +54,11 @@ router.post(
   ]),
   uploadDocumentsForVerification
 );
+
+// ======================
+// Apply for reverification
+// ======================
+router.put("/reapply", protect(["farmer"]), reapplyForVerification);
 
 // ======================
 // Admin-Only Routes

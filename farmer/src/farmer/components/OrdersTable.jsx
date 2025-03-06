@@ -24,8 +24,10 @@ const OrdersTable = ({ orders }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (orders) setOrderStatus(orders.status);
-  }, []);
+    if (selectedRow) {
+      setOrderStatus(selectedRow.status);
+    }
+  }, [selectedRow]);
 
   const columns = [
     { field: "_id", headerName: "ID", width: 250 },
@@ -80,6 +82,9 @@ const OrdersTable = ({ orders }) => {
         })
       );
       setOrderStatus(e.target.value);
+      enqueueSnackbar(`Status updated to ${e.target.value}`, {
+        variant: "success",
+      });
     } catch (error) {
       enqueueSnackbar("Something went wrong", { variant: "error" });
     }
@@ -126,6 +131,40 @@ const OrdersTable = ({ orders }) => {
                   General Information
                 </Typography>
                 <p>
+                  <strong>Phone:</strong>{" "}
+                  <span
+                    style={{
+                      color: "#00B207",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                      backgroundColor: "#e8f5e9",
+                      padding: "2px 8px",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    {selectedRow.address.phoneNumber}
+                  </span>
+                </p>
+
+                <p>
+                  <strong>Delivery Option:</strong>{" "}
+                  <span
+                    style={{
+                      color: "#00B207",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem",
+                      backgroundColor: "#e8f5e9",
+                      padding: "2px 8px",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    {selectedRow.deliveryOption === "cropChain"
+                      ? "Crop Chain Delivery"
+                      : "Self-Managed"}
+                  </span>
+                </p>
+
+                <p>
                   <strong>Order ID:</strong> {selectedRow._id}
                 </p>
                 <p>
@@ -142,7 +181,7 @@ const OrdersTable = ({ orders }) => {
                   {selectedRow.paymentStatus ? "Paid" : "Unpaid"}
                 </p>
                 <p>
-                  <strong>Total Amount:</strong> ${selectedRow.totalAmount}
+                  <strong>Total Amount:</strong> ₹{selectedRow.totalAmount}
                 </p>
               </div>
 
@@ -208,7 +247,7 @@ const OrdersTable = ({ orders }) => {
                         <strong>Quantity:</strong> {item.quantity}
                       </p>
                       <p>
-                        <strong>Price:</strong> ₹ {item.pricePerKg}/kg
+                        <strong>Price:</strong> ₹ {item.price}
                       </p>
                     </div>
                   </Box>
@@ -223,20 +262,35 @@ const OrdersTable = ({ orders }) => {
                 <FormControl>
                   <RadioGroup
                     aria-labelledby="demo-radio-buttons-group-label"
-                    defaultValue={orderStatus}
+                    value={orderStatus}
                     name="radio-buttons-group"
                     onChange={handleOrderStatus}
-                    sx={{ display: "flex", flexDirection: "row" }}
+                    sx={{ display: "flex", flexDirection: "row", gap: 3 }}
                   >
                     <FormControlLabel
                       value="Pending"
-                      control={<Radio />}
+                      control={<Radio color="primary" />}
                       label="Pending"
                     />
+
+                    {selectedRow.deliveryOption === "cropChain" ? (
+                      <FormControlLabel
+                        value="Processed"
+                        control={<Radio color="success" />}
+                        label="Processed"
+                      />
+                    ) : (
+                      <FormControlLabel
+                        value="Completed"
+                        control={<Radio color="success" />}
+                        label="Completed"
+                      />
+                    )}
+
                     <FormControlLabel
-                      value="Completed"
-                      control={<Radio />}
-                      label="Completed"
+                      value="Cancelled"
+                      control={<Radio color="error" />}
+                      label="Cancelled"
                     />
                   </RadioGroup>
                 </FormControl>

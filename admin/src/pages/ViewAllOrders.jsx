@@ -38,7 +38,6 @@ const ViewAllOrders = () => {
       } catch (error) {
         const errorMessage =
           error.response?.data?.message || "Failed to fetch orders";
-        enqueueSnackbar(errorMessage, { variant: "error" });
       } finally {
         setLoading(false);
       }
@@ -229,7 +228,7 @@ const ViewAllOrders = () => {
                               {order.products.map((product, index) => (
                                 <li key={index} className="text-sm">
                                   {product.product?.name} - {product.quantity}kg
-                                  <br />@ ₹{product.pricePerKg}/kg
+                                  <br />@ ₹{product.price}
                                   <br />
                                   <span className="text-gray-500">
                                     Category: {product.product?.category}
@@ -244,10 +243,13 @@ const ViewAllOrders = () => {
                               Delivery Details
                             </h3>
                             <p className="text-sm">
+                              {order.address?.firstName}{" "}
+                              {order.address?.lastName}
+                              <br />
                               {order.address?.street}
                               <br />
-                              {order.address?.city}, {order.address?.state} -{" "}
-                              {order.address?.pincode}
+                              {order.address?.city}, {"Kerala"} -{" "}
+                              {order.address?.postalCode}
                             </p>
                             <p className="mt-2 text-sm">
                               <span className="font-medium">
@@ -259,7 +261,7 @@ const ViewAllOrders = () => {
                             </p>
                             <p className="text-sm">
                               <span className="font-medium">Contact:</span>{" "}
-                              {order.address?.contactNumber || "Not provided"}
+                              {order.address?.phoneNumber || "Not provided"}
                             </p>
                             <p className="text-sm mt-2">
                               <span className="font-medium">
