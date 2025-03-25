@@ -18,7 +18,7 @@ CropChain is a full-stack **MERN** application designed to connect **farmers** d
 - **Database:** MongoDB  
 - **Authentication:** JWT  
 - **State Management:** Redux  
-- **Deployment:** *(To be added if deployed)*  
+- **Deployment:** 
 
 ---
 
@@ -32,34 +32,48 @@ cd cropchain
 2️⃣ Install Dependencies
 
 # Install backend dependencies
+```sh
 cd backend
 npm install
+```
 
 # Install frontend dependencies
+```sh
 cd ../frontend
 npm install
+```
 
 # Install admin dependencies
+```sh
 cd ../admin
 npm install
+```
 
 # Install farmer dependencies
+```sh
 cd ../farmer
 npm install
+```
 
 3️⃣ Setup Environment Variables
 Create a .env file inside the backend directory and add:
 
+```sh
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret_key
 PORT=5000
+```
 
 4️⃣ Run the Project
 # Start backend (inside backend folder)
+```sh
 npm run server
+```
 
 # Start frontend (inside frontend folder)
+```sh
 npm run dev
+```
 
 
 🛠 Future Enhancements
