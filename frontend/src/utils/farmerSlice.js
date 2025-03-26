@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const farmerUrl = "http://localhost:8000/api/farmer";
+const farmerUrl = `${import.meta.env.VITE_API_SERVER_URL}/api/farmer`;
 
 const initialState = {
   farmerData: {},

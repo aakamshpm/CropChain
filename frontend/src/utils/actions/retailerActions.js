@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-const retailerURL = "http://localhost:8000/api/retailer";
+const retailerURL = `${import.meta.env.VITE_API_SERVER_URL}/api/retailer`;
 
 const config = {
   headers: {

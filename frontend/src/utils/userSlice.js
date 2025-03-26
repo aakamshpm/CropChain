@@ -3,7 +3,7 @@ import axios from "axios";
 import { retailerLogin, retailerRegister } from "./actions/retailerActions";
 import { consumerLogin, consumerRegister } from "./actions/consumerActions";
 
-const serverUrl = "http://localhost:8000/api";
+const serverUrl = `${import.meta.env.VITE_API_SERVER_URL}/api`;
 
 // Async Thunk: Fetch User Details
 export const fetchUserProfile = createAsyncThunk(

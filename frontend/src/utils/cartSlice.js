@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const cartUrl = "http://localhost:8000/api/cart";
+const cartUrl = `${import.meta.env.VITE_API_SERVER_URL}/api/cart`;
 
 const initialState = {
   cartItems: {},
